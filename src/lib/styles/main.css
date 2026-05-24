@@ -1,0 +1,344 @@
+@import './variables.css';
+@import './typography.css';
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--color-void);
+  color: var(--color-ink);
+  scroll-behavior: smooth;
+  transition:
+    background-color 260ms var(--ease-ceremony),
+    color 260ms var(--ease-ceremony);
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+.site-shell {
+  position: relative;
+  z-index: 1;
+}
+
+.webgl-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 58% 35%, var(--color-stage-hisui), transparent 30rem),
+    linear-gradient(145deg, var(--color-stage-clay), transparent 42%),
+    linear-gradient(180deg, transparent, var(--color-stage-depth)),
+    var(--color-void);
+  transition: background 260ms var(--ease-ceremony);
+}
+
+.webgl-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.navigation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-3);
+}
+
+.navigation__brand {
+  font-family: var(--font-serif);
+  font-size: 1.125rem;
+}
+
+.navigation__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.navigation__links {
+  display: none;
+  gap: var(--space-3);
+  color: var(--color-nav-muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.theme-toggle {
+  position: relative;
+  display: inline-grid;
+  width: 2.35rem;
+  height: 2.35rem;
+  place-items: center;
+  border: 1px solid var(--color-line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-void) 68%, transparent);
+  color: var(--color-ink);
+  cursor: pointer;
+  transition:
+    border-color 220ms var(--ease-ceremony),
+    background-color 220ms var(--ease-ceremony),
+    color 220ms var(--ease-ceremony);
+}
+
+.theme-toggle__icon {
+  position: relative;
+  display: block;
+  width: 0.92rem;
+  height: 0.92rem;
+  border-radius: 999px;
+  background: var(--color-gold);
+  box-shadow: 0 0 0 0.22rem color-mix(in srgb, var(--color-gold) 18%, transparent);
+  transition:
+    background-color 220ms var(--ease-ceremony),
+    box-shadow 220ms var(--ease-ceremony),
+    transform 220ms var(--ease-ceremony);
+}
+
+:root[data-theme='dark'] .theme-toggle__icon {
+  background: transparent;
+  box-shadow: inset -0.28rem -0.18rem 0 0 var(--color-gold);
+  transform: rotate(-18deg);
+}
+
+.hero {
+  display: grid;
+  min-height: 100svh;
+  align-items: center;
+  padding: var(--space-ma) var(--space-3);
+}
+
+.hero__content,
+.section__inner {
+  width: min(100%, var(--content-width));
+  margin: 0 auto;
+}
+
+.hero h1,
+.section h2 {
+  max-width: 11ch;
+  margin: var(--space-2) 0 var(--space-ma);
+}
+
+.hero__text,
+.section__body {
+  max-width: 42rem;
+  color: var(--color-muted);
+  font-size: var(--step-0);
+}
+
+.hero__cue {
+  display: inline-flex;
+  margin-top: var(--space-4);
+  color: var(--color-gold);
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.section {
+  min-height: 90svh;
+  padding: var(--space-6) var(--space-3);
+}
+
+.narrative-grid,
+.collection-grid {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.narrative-grid {
+  grid-template-columns: 1fr;
+}
+
+.collection-grid {
+  margin-top: var(--space-4);
+}
+
+.degree-card {
+  border-top: 1px solid color-mix(in srgb, var(--color-gold) 42%, transparent);
+  padding-top: var(--space-3);
+}
+
+.degree-card h3 {
+  margin: 0.35rem 0 0.8rem;
+  font-size: var(--step-1);
+}
+
+.degree-card p {
+  color: var(--color-muted);
+}
+
+.degree-card__type {
+  margin: 0;
+  color: var(--color-gold);
+  font-size: 0.76rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.certificate {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 0;
+  padding: var(--space-3);
+  border: 1px solid var(--color-line);
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--color-ink) 5%, transparent) 1px, transparent 1px),
+    linear-gradient(color-mix(in srgb, var(--color-ink) 5%, transparent) 1px, transparent 1px),
+    color-mix(in srgb, var(--color-void) 58%, transparent);
+  background-size: 12px 12px;
+}
+
+.certificate div {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.certificate dt {
+  color: color-mix(in srgb, var(--color-ink) 52%, transparent);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.certificate dd {
+  margin: 0;
+  color: var(--color-ink);
+  font-size: 0.92rem;
+}
+
+.guardian-panel {
+  display: grid;
+  gap: var(--space-3);
+  max-width: 38rem;
+}
+
+.text-link {
+  width: fit-content;
+  border-bottom: 1px solid var(--color-gold);
+  color: var(--color-gold);
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.membership-form {
+  display: grid;
+  gap: var(--space-3);
+  width: min(100%, 36rem);
+  margin-top: var(--space-4);
+}
+
+.membership-form label {
+  display: grid;
+  gap: var(--space-1);
+  color: var(--color-muted);
+}
+
+.membership-form input,
+.membership-form textarea {
+  width: 100%;
+  border: 1px solid color-mix(in srgb, var(--color-gold) 44%, transparent);
+  border-radius: 0;
+  background: var(--color-field);
+  color: var(--color-ink);
+  padding: 0.9rem 1rem;
+}
+
+.membership-form button {
+  width: fit-content;
+  border: 1px solid var(--color-gold);
+  background: transparent;
+  color: var(--color-gold);
+  padding: 0.9rem 1.2rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.footer {
+  padding: var(--space-5) var(--space-3);
+  color: var(--color-muted);
+}
+
+.footer__inner {
+  display: flex;
+  width: min(100%, var(--content-width));
+  margin: 0 auto;
+  flex-direction: column;
+  gap: var(--space-3);
+  border-top: 1px solid color-mix(in srgb, var(--color-gold) 34%, transparent);
+  padding-top: var(--space-4);
+}
+
+.footer p {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(1.4rem, 5vw, 2.4rem);
+}
+
+.footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+@media (min-width: 760px) {
+  .navigation {
+    padding: var(--space-4);
+  }
+
+  .navigation__links {
+    display: flex;
+  }
+
+  .hero,
+  .section {
+    padding-inline: var(--space-5);
+  }
+
+  .narrative-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .collection-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .footer {
+    padding-inline: var(--space-5);
+  }
+
+  .footer__inner {
+    flex-direction: row;
+    align-items: end;
+    justify-content: space-between;
+  }
+}

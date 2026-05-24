@@ -1,0 +1,46 @@
+:root {
+  --color-ink: #172019;
+  --color-void: #f4efe4;
+  --color-moss: #dce4d2;
+  --color-haniwa: #8b4513;
+  --color-hisui: #00a86b;
+  --color-gold: #9a7a32;
+  --color-paper: #fffaf0;
+  --color-muted: rgba(23, 32, 25, 0.68);
+  --color-nav-muted: rgba(23, 32, 25, 0.72);
+  --color-line: rgba(23, 32, 25, 0.14);
+  --color-field: rgba(255, 250, 240, 0.72);
+  --color-stage-hisui: rgba(0, 168, 107, 0.16);
+  --color-stage-clay: rgba(139, 69, 19, 0.14);
+  --color-stage-depth: rgba(220, 228, 210, 0.72);
+
+  --font-serif: 'TonokiHeritage', 'Cormorant Garamond', 'Iowan Old Style', Georgia, serif;
+  --font-sans: 'SakaiRefined', Inter, 'Helvetica Neue', Arial, sans-serif;
+
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2rem;
+  --space-5: 4rem;
+  --space-6: 7rem;
+
+  --content-width: 72rem;
+  --ease-ceremony: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+:root[data-theme='dark'] {
+  --color-ink: #f4efe4;
+  --color-void: #080b07;
+  --color-moss: #1f3327;
+  --color-haniwa: #9b6244;
+  --color-hisui: #00a86b;
+  --color-gold: #c8a96a;
+  --color-paper: #efe7d6;
+  --color-muted: rgba(244, 239, 228, 0.74);
+  --color-nav-muted: rgba(244, 239, 228, 0.74);
+  --color-line: rgba(244, 239, 228, 0.14);
+  --color-field: rgba(8, 11, 7, 0.62);
+  --color-stage-hisui: rgba(0, 168, 107, 0.16);
+  --color-stage-clay: rgba(155, 98, 68, 0.28);
+  --color-stage-depth: rgba(8, 11, 7, 1);
+}

@@ -1,0 +1,87 @@
+/* Fluid Typography System using clamp() */
+:root {
+  --step-0: clamp(1rem, 0.92rem + 0.39vw, 1.25rem);
+  --step-1: clamp(1.25rem, 1.08rem + 0.87vw, 1.8rem);
+  --step-2: clamp(1.56rem, 1.25rem + 1.56vw, 2.56rem);
+  --step-3: clamp(2.44rem, 1.79rem + 3.27vw, 4.55rem);
+  --space-ma: clamp(2rem, 5vw, 8rem);
+}
+
+@font-face {
+  font-family: 'TonokiHeritage';
+  src:
+    local('Iowan Old Style'),
+    local('Georgia');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SakaiRefined';
+  src:
+    local('Avenir Next'),
+    local('Helvetica Neue');
+  font-weight: 300 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+h1 {
+  font-size: var(--step-3);
+}
+
+h2 {
+  font-size: var(--step-3);
+}
+
+h3 {
+  font-size: var(--step-1);
+}
+
+.heritage-text {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+.functional-text {
+  font-family: var(--font-sans);
+}
+
+.eyebrow {
+  color: var(--color-gold);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.text-reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.text-reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
