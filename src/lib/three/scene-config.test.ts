@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest';
 import {
   TONOKI_COLORS,
   createMagatamaMaterialOptions,
+  createMagatamaDragRotationDelta,
   createParticleThemeSettings,
   createRendererOptions
 } from './scene-config';
@@ -47,13 +48,23 @@ describe('createMagatamaMaterialOptions', () => {
   });
 });
 
+describe('createMagatamaDragRotationDelta', () => {
+  test('maps a drag gesture into multi-axis rotation only', () => {
+    expect(createMagatamaDragRotationDelta({ movementX: 20, movementY: -10 })).toEqual({
+      x: -0.06,
+      y: 0.12,
+      z: 0.045
+    });
+  });
+});
+
 describe('createParticleThemeSettings', () => {
-  test('uses brighter matcha-green particles in light mode', () => {
+  test('uses a soft but visible particle field in light mode', () => {
     expect(createParticleThemeSettings('light')).toEqual({
-      earthColor: 0x4d7c3a,
-      jadeColor: 0x00a86b,
-      alpha: 0.92,
-      sizeScale: 2.25
+      earthColor: 0x86ad6a,
+      jadeColor: 0x4fc092,
+      alpha: 0.58,
+      sizeScale: 1.55
     });
   });
 

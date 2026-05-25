@@ -7,25 +7,12 @@
   --space-ma: clamp(2rem, 5vw, 8rem);
 }
 
-@font-face {
-  font-family: 'TonokiHeritage';
-  src:
-    local('Iowan Old Style'),
-    local('Georgia');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'SakaiRefined';
-  src:
-    local('Avenir Next'),
-    local('Helvetica Neue');
-  font-weight: 300 600;
-  font-style: normal;
-  font-display: swap;
-}
+/*
+ * Real webfont families are loaded through the Google Fonts stylesheet in
+ * app.html. Cormorant Garamond carries the English display voice; Noto Serif JP
+ * provides a restrained mincho fallback for Japanese heritage text; Zen Kaku
+ * Gothic New and Inter keep body/UI text quiet and highly legible.
+ */
 
 body {
   font-family: var(--font-sans);
@@ -39,7 +26,7 @@ h1,
 h2,
 h3 {
   font-family: var(--font-serif);
-  font-weight: 400;
+  font-weight: 500;
   line-height: 1.1;
 }
 
@@ -57,7 +44,7 @@ h3 {
 
 .heritage-text {
   font-family: var(--font-serif);
-  font-weight: 400;
+  font-weight: 500;
   line-height: 1.1;
 }
 
@@ -84,4 +71,30 @@ h3 {
 .text-reveal.active {
   opacity: 1;
   transform: translateY(0);
+}
+
+/*
+ * Word-mask scaffolding for the `typographyReveal` action (rise mode).
+ * Each word is wrapped in `.reveal-word` (the overflow mask) and the actual
+ * text lives in `.reveal-word__inner` so GSAP can translate the inner span
+ * underneath the parent mask.
+ *
+ * The padding-bottom / negative margin-bottom pair gives the mask enough
+ * vertical room to clear descenders (y, g, p, q) under the project's tight
+ * line-height: 1.1 on headings, without nudging surrounding layout.
+ */
+.reveal-word {
+  display: inline-block;
+  overflow: hidden;
+  /* Default vertical-align (baseline) keeps the text inside aligned with the
+     surrounding line so splitting a heading into masks doesn't shift letters
+     up or down by a pixel. */
+  line-height: inherit;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+
+.reveal-word__inner {
+  display: inline-block;
+  will-change: transform;
 }

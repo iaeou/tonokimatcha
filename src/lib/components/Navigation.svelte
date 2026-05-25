@@ -8,7 +8,7 @@
     <nav class="navigation__links" aria-label="Primary navigation">
       <a href="/#lineage">Lineage</a>
       <a href="/#collection">Collection</a>
-      <a href="/private-club">Private Club</a>
+      <a href="/club">Club</a>
     </nav>
     <ThemeToggle />
   </div>

@@ -14,8 +14,12 @@
   --color-stage-clay: rgba(139, 69, 19, 0.14);
   --color-stage-depth: rgba(220, 228, 210, 0.72);
 
-  --font-serif: 'TonokiHeritage', 'Cormorant Garamond', 'Iowan Old Style', Georgia, serif;
-  --font-sans: 'SakaiRefined', Inter, 'Helvetica Neue', Arial, sans-serif;
+  --font-serif:
+    'Cormorant Garamond', 'Noto Serif JP', 'Iowan Old Style', Georgia, 'Hiragino Mincho ProN',
+    'Yu Mincho', serif;
+  --font-sans:
+    'Zen Kaku Gothic New', Inter, 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Helvetica Neue',
+    Arial, sans-serif;
 
   --space-1: 0.5rem;
   --space-2: 1rem;

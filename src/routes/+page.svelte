@@ -74,6 +74,6 @@
       Admission requests are reviewed for cultural fit, storage discipline, and the seriousness of
       the service context.
     </p>
-    <a class="text-link" href="/private-club">Begin sponsorship request</a>
+    <a class="text-link" href="/club">Begin sponsorship request</a>
   </div>
 </Section>

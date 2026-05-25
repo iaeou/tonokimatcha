@@ -1,6 +1,11 @@
 import type { MeshPhysicalMaterialParameters, WebGLRendererParameters } from 'three';
 import type { Theme } from '$lib/stores/theme';
 
+interface DragRotationInput {
+  movementX: number;
+  movementY: number;
+}
+
 export const TONOKI_COLORS = {
   hisuiJade: 0x00a86b,
   haniwaClay: 0x8b4513,
@@ -37,13 +42,21 @@ export function createMagatamaMaterialOptions(): MeshPhysicalMaterialParameters 
   };
 }
 
+export function createMagatamaDragRotationDelta({ movementX, movementY }: DragRotationInput) {
+  return {
+    x: movementY * 0.006,
+    y: movementX * 0.006,
+    z: (movementX - movementY) * 0.0015
+  };
+}
+
 export function createParticleThemeSettings(theme: Theme) {
   if (theme === 'light') {
     return {
-      earthColor: 0x4d7c3a,
-      jadeColor: TONOKI_COLORS.hisuiJade,
-      alpha: 0.92,
-      sizeScale: 2.25
+      earthColor: 0x86ad6a,
+      jadeColor: 0x4fc092,
+      alpha: 0.58,
+      sizeScale: 1.55
     };
   }
 

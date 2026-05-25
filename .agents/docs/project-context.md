@@ -20,33 +20,37 @@ Tonoki Matcha is planned as a high-end SvelteKit digital museum for a luxury mat
 
 ## Current Implementation Snapshot
 
-Last reviewed: 2026-05-24.
+Last reviewed: 2026-05-25.
 
 The project is now a working SvelteKit baseline with:
 
 - Global layout rendering a fixed Three.js scene behind the page content.
-- Navigation, footer, landing content, collection cards, and private-club request route.
+- Navigation, footer, landing content, collection cards, and club request route at `/club`.
 - Vanilla CSS theme system with light as default and dark as the previous moss/ink palette.
 - Theme toggle persisted with `localStorage` via `src/lib/stores/theme.ts`.
-- Fluid typography tokens and local-font fallbacks in `src/lib/styles/typography.css`.
+- Fluid typography tokens and Google webfont stacks with system fallbacks in `src/lib/styles/typography.css`.
 - Procedural Magatama geometry with rounded Bezier silhouette and transmissive jade material.
 - GPU particle system using custom vortex shaders for earth-to-jade lineage transition.
-- GSAP hero reveal, Magatama floating animation, pointer rotation, and ScrollTrigger links.
+- GSAP hero reveal, Magatama floating animation, ambient pointer rotation, drag-only multi-axis Magatama rotation, and ScrollTrigger links.
 - Focused Vitest coverage for theme logic, hero animation options, Three.js config, Magatama geometry, and particle attributes.
+- Branded webfont pairing — Cormorant Garamond for English ceremonial display, Noto Serif JP as the mincho heritage fallback, and Zen Kaku Gothic New + Inter for body/UI text — loaded via Google Fonts with `preconnect` and `display=swap`.
+- Vite manualChunks splits `three` and `gsap` into their own async chunks so the initial page shell loads independently of WebGL.
+- Typography reveal effects on headings and eyebrows via `src/lib/animations/typography-reveal.ts` (`typographyReveal` Svelte action). `rise` mode splits headings into per-word mask spans and animates them up while the heading's `letter-spacing` tightens from `-0.02em` to rest. `breath` mode (used on `.eyebrow`) eases `letter-spacing` from `0em` to its resting value (e.g. `0.18em`) with a subtle opacity fade. Both are IntersectionObserver-triggered once, respect `prefers-reduced-motion`, and pre-hide synchronously so there's no flash before GSAP loads.
 
 ## Known Local Development Note
 
 The workspace path contains `##`:
 
-`/Users/jasubal/WORKS/##ILLA/tonokimatcha`
+`/Users/jasubal/WORKS/##ILLA/tonokimatcha/*tonokimatcha.com`
 
-`npm run check` works from the real project path. Vitest, Vite build, and local browser verification should be run from a clean mirror path because Vite can mis-resolve `#` in URLs:
+`npm run check` works from the real project path. Vitest, Vite build, preview, and local dev server runs must execute from a clean mirror path because Vite can mis-resolve `#` in URLs.
+
+The npm scripts now automate that mirror through `scripts/run-clean-path.mjs`, so these commands are safe from the real project path:
 
 ```sh
-rsync -a --delete --exclude node_modules --exclude .svelte-kit --exclude .DS_Store '/Users/jasubal/WORKS/##ILLA/tonokimatcha/' /tmp/tonoki-matcha-dev-src/
-cd /tmp/tonoki-matcha-dev-src
-npm test -- src/lib/animations/hero-reveal.test.ts src/lib/stores/theme.test.ts src/lib/three/geometry.test.ts src/lib/three/scene-config.test.ts
+npm test
 npm run build
+npm run dev
 ```
 
-The dev server used during development has been run from `/tmp/tonoki-matcha-dev-src` on port `5174`.
+The runner syncs the source tree to `/tmp/tonoki-matcha-dev-src`, installs dependencies there with `npm ci` when `package.json` or `package-lock.json` changes, and then runs the requested local binary from the mirror. Extra arguments still work, for example `npm test -- src/lib/stores/theme.test.ts` or `npm run dev -- --port 5174`.

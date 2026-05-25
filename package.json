@@ -4,11 +4,11 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "dev": "vite --host 0.0.0.0",
-    "build": "vite build",
-    "preview": "vite preview",
+    "dev": "node scripts/run-clean-path.mjs vite --host 0.0.0.0",
+    "build": "node scripts/run-clean-path.mjs vite build",
+    "preview": "node scripts/run-clean-path.mjs vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-    "test": "vitest run"
+    "test": "node scripts/run-clean-path.mjs vitest run"
   },
   "devDependencies": {
     "@sveltejs/adapter-auto": "^6.0.0",

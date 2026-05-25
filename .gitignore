@@ -6,6 +6,7 @@ build
 .env.*
 !.env.example
 .DS_Store
+*.code-workspace
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

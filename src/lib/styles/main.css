@@ -19,6 +19,12 @@ body {
   min-width: 320px;
 }
 
+:root.is-rotating-magatama,
+:root.is-rotating-magatama * {
+  cursor: grabbing !important;
+  user-select: none;
+}
+
 a {
   color: inherit;
   text-decoration: none;

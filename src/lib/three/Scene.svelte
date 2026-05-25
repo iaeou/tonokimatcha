@@ -24,6 +24,7 @@
           NormalBlending,
           PerspectiveCamera,
           Points,
+          Raycaster,
           Scene,
           SRGBColorSpace,
           ShaderMaterial,
@@ -35,6 +36,7 @@
         { createLineageParticleGeometry, createMagatamaGeometry },
         {
           TONOKI_COLORS,
+          createMagatamaDragRotationDelta,
           createMagatamaMaterialOptions,
           createParticleThemeSettings,
           createRendererOptions
@@ -121,9 +123,17 @@
       scene.add(ambientLight, keyLight);
 
       const pointer = new Vector2(0, 0);
+      const dragPointer = new Vector2(0, 0);
+      const raycaster = new Raycaster();
+      const baseRotation = { x: -0.08, y: -0.28, z: -0.44 };
+      const scrollRotation = { ...baseRotation };
+      const dragRotation = { x: 0, y: 0, z: 0 };
       let sceneDestroyed = false;
       let frameId = 0;
       let scrollProgress = 0;
+      let isDraggingMagatama = false;
+      let lastDragX = 0;
+      let lastDragY = 0;
 
       const resize = () => {
         const width = container.clientWidth;
@@ -143,6 +153,51 @@
         pointer.y = (event.clientY / window.innerHeight - 0.5) * 2;
       };
 
+      const syncDragPointer = (event: PointerEvent) => {
+        const rect = canvas.getBoundingClientRect();
+        dragPointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        dragPointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+      };
+
+      const targetAllowsDrag = (target: EventTarget | null) =>
+        target instanceof Element && !target.closest('a, button, input, textarea, select, label');
+
+      const handlePointerDown = (event: PointerEvent) => {
+        if (!targetAllowsDrag(event.target)) return;
+
+        syncDragPointer(event);
+        raycaster.setFromCamera(dragPointer, camera);
+
+        if (raycaster.intersectObject(magatama, false).length === 0) return;
+
+        isDraggingMagatama = true;
+        lastDragX = event.clientX;
+        lastDragY = event.clientY;
+        document.documentElement.classList.add('is-rotating-magatama');
+        event.preventDefault();
+      };
+
+      const handlePointerDrag = (event: PointerEvent) => {
+        if (!isDraggingMagatama) return;
+
+        const delta = createMagatamaDragRotationDelta({
+          movementX: event.clientX - lastDragX,
+          movementY: event.clientY - lastDragY
+        });
+
+        dragRotation.x += delta.x;
+        dragRotation.y += delta.y;
+        dragRotation.z += delta.z;
+        lastDragX = event.clientX;
+        lastDragY = event.clientY;
+        event.preventDefault();
+      };
+
+      const endDrag = () => {
+        isDraggingMagatama = false;
+        document.documentElement.classList.remove('is-rotating-magatama');
+      };
+
       const floatTween = gsap.to(magatama.position, {
         y: '+=0.2',
         duration: 3.4,
@@ -151,7 +206,7 @@
         ease: 'sine.inOut'
       });
 
-      const scrollTween = gsap.to(magatama.rotation, {
+      const scrollTween = gsap.to(scrollRotation, {
         x: Math.PI / 2,
         y: Math.PI * 2,
         ease: 'none',
@@ -184,8 +239,11 @@
         const time = performance.now() * 0.001;
         particleUniforms.uTime.value = time;
 
-        magatama.rotation.x += pointer.y * 0.0025;
-        magatama.rotation.y += pointer.x * 0.004;
+        magatama.rotation.set(
+          scrollRotation.x + pointer.y * 0.08 + dragRotation.x,
+          scrollRotation.y + pointer.x * 0.12 + dragRotation.y,
+          scrollRotation.z + dragRotation.z
+        );
         particles.rotation.y = time * 0.035 + scrollProgress * 0.8;
 
         renderer.render(scene, camera);
@@ -195,6 +253,10 @@
       resize();
       window.addEventListener('resize', resize);
       window.addEventListener('pointermove', handlePointerMove, { passive: true });
+      window.addEventListener('pointerdown', handlePointerDown);
+      window.addEventListener('pointermove', handlePointerDrag);
+      window.addEventListener('pointerup', endDrag);
+      window.addEventListener('pointercancel', endDrag);
       frameId = requestAnimationFrame(render);
 
       destroyScene = () => {
@@ -208,6 +270,11 @@
         ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
         window.removeEventListener('resize', resize);
         window.removeEventListener('pointermove', handlePointerMove);
+        window.removeEventListener('pointerdown', handlePointerDown);
+        window.removeEventListener('pointermove', handlePointerDrag);
+        window.removeEventListener('pointerup', endDrag);
+        window.removeEventListener('pointercancel', endDrag);
+        document.documentElement.classList.remove('is-rotating-magatama');
         themeObserver.disconnect();
         magatama.geometry.dispose();
         magatamaMaterial.dispose();

@@ -16,27 +16,27 @@ interface ParticleOptions {
 export function createMagatamaShape() {
   const shape = new Shape();
 
-  shape.moveTo(-0.34, 0.9);
-  shape.bezierCurveTo(-0.02, 1.56, 0.72, 1.32, 1.04, 0.5);
-  shape.bezierCurveTo(1.28, -0.12, 0.92, -0.7, 0.34, -0.78);
-  shape.bezierCurveTo(0.05, -0.82, -0.04, -0.98, 0.12, -1.16);
-  shape.bezierCurveTo(0.28, -1.34, -0.08, -1.44, -0.42, -1.22);
-  shape.bezierCurveTo(-0.92, -0.9, -1.04, -0.24, -0.9, 0.28);
-  shape.bezierCurveTo(-0.78, 0.68, -0.56, 0.82, -0.34, 0.9);
+  shape.moveTo(-0.22, 1.24);
+  shape.bezierCurveTo(0.18, 1.52, 0.78, 1.42, 1.04, 0.98);
+  shape.bezierCurveTo(1.38, 0.4, 1.2, -0.36, 0.78, -0.92);
+  shape.bezierCurveTo(0.43, -1.39, -0.15, -1.57, -0.58, -1.34);
+  shape.bezierCurveTo(-0.86, -1.19, -0.9, -0.88, -0.7, -0.62);
+  shape.bezierCurveTo(-0.45, -0.29, -0.26, 0.03, -0.58, 0.38);
+  shape.bezierCurveTo(-0.93, 0.76, -0.78, 1.08, -0.22, 1.24);
   shape.closePath();
-  shape.holes.push(new Shape().absellipse(0.35, 0.42, 0.12, 0.12, 0, Math.PI * 2, false, 0));
+  shape.holes.push(new Shape().absellipse(-0.07, 0.76, 0.22, 0.18, 0, Math.PI * 2, false, 0));
 
   return shape;
 }
 
 export function createMagatamaGeometry() {
   const geometry = new ExtrudeGeometry(createMagatamaShape(), {
-    depth: 0.3,
+    depth: 0.42,
     bevelEnabled: true,
-    bevelSegments: 36,
-    bevelSize: 0.09,
-    bevelThickness: 0.13,
-    curveSegments: 96
+    bevelSegments: 48,
+    bevelSize: 0.13,
+    bevelThickness: 0.17,
+    curveSegments: 128
   });
 
   geometry.center();

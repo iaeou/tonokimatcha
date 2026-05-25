@@ -23,6 +23,25 @@ describe('createMagatamaShape', () => {
     expect(topPoints.length).toBeGreaterThan(12);
     expect(topHeight / topWidth).toBeGreaterThan(0.28);
   });
+
+  test('matches the reference bead proportions with a tall comma silhouette', () => {
+    const points = createMagatamaShape().getPoints(128);
+    const width = Math.max(...points.map((point) => point.x)) - Math.min(...points.map((point) => point.x));
+    const height = Math.max(...points.map((point) => point.y)) - Math.min(...points.map((point) => point.y));
+
+    expect(width / height).toBeGreaterThan(0.58);
+    expect(width / height).toBeLessThan(0.75);
+  });
+
+  test('places the aperture high and near the center like the reference bead', () => {
+    const holePoints = createMagatamaShape().holes[0].getPoints(48);
+    const centerX = (Math.min(...holePoints.map((point) => point.x)) + Math.max(...holePoints.map((point) => point.x))) / 2;
+    const centerY = (Math.min(...holePoints.map((point) => point.y)) + Math.max(...holePoints.map((point) => point.y))) / 2;
+
+    expect(centerX).toBeGreaterThan(-0.18);
+    expect(centerX).toBeLessThan(0.08);
+    expect(centerY).toBeGreaterThan(0.6);
+  });
 });
 
 describe('createLineageParticlePositions', () => {

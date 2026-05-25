@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { typographyReveal } from '$lib/animations/typography-reveal';
+
   interface Props {
     id?: string;
     className?: string;
@@ -15,8 +17,15 @@
 
 <section class={`section ${className}`} id={sectionId} aria-labelledby={`${sectionId}-title`}>
   <div class="section__inner">
-    <p class="eyebrow">{eyebrow}</p>
-    <h2 id={`${sectionId}-title`}>{title}</h2>
+    <p class="eyebrow" use:typographyReveal={{ mode: 'breath', restLetterSpacing: '0.18em' }}>
+      {eyebrow}
+    </p>
+    <h2
+      id={`${sectionId}-title`}
+      use:typographyReveal={{ mode: 'rise', delay: 0.12 }}
+    >
+      {title}
+    </h2>
     <div class="section__body">
       {#if children}
         {@render children()}
