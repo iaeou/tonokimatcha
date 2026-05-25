@@ -144,7 +144,11 @@
         camera.position.set(0, 0.12, width > 760 ? 5.8 : 7.2);
         magatama.position.x = width > 760 ? 1.25 : width > 620 ? 1.65 : 0.95;
         magatama.position.y = width > 620 ? 0.12 : 0.26;
-        magatama.scale.setScalar(width > 760 ? 0.92 : width > 620 ? 0.58 : 0.44);
+        // Scales reduced from 0.92 / 0.58 / 0.44 to compensate for the new
+        // bead's larger bounding box (~3.5×3.9 vs ~2.4×2.8) and to land at
+        // ~45% viewport height — restrained museum proportions that clear the
+        // headline column.
+        magatama.scale.setScalar(width > 760 ? 0.55 : width > 620 ? 0.35 : 0.27);
         camera.updateProjectionMatrix();
       };
 

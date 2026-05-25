@@ -23,22 +23,25 @@ export function createRendererOptions(canvas: HTMLCanvasElement): WebGLRendererP
   };
 }
 
+/**
+ * Mid-jade Magatama material.
+ *
+ * Earlier near-black (#072411) read as a solid silhouette against the cream
+ * stage and lost the jade character entirely. The color is now a visible
+ * mid-hisui green (#2e6b3e), thickness is eased from 1.5 → 0.9 so light isn't
+ * over-absorbed inside the bead, and `ior` stays high for the wet polished
+ * look. Clearcoat and roughness preserve the surface sheen.
+ */
 export function createMagatamaMaterialOptions(): MeshPhysicalMaterialParameters {
   return {
-    color: TONOKI_COLORS.hisuiJade,
-    clearcoat: 1,
-    clearcoatRoughness: 0.08,
-    attenuationColor: TONOKI_COLORS.hisuiJade,
-    attenuationDistance: 0.85,
-    emissive: 0x0a3a2a,
-    emissiveIntensity: 0.18,
-    ior: 1.45,
+    color: 0x2e6b3e,
+    roughness: 0.12,
     metalness: 0,
-    opacity: 0.9,
-    roughness: 0.1,
-    thickness: 0.65,
-    transmission: 0.9,
-    transparent: true
+    clearcoat: 0.9,
+    clearcoatRoughness: 0.08,
+    transmission: 0.5,
+    thickness: 0.9,
+    ior: 1.61
   };
 }
 

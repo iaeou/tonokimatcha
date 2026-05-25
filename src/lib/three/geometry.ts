@@ -3,6 +3,7 @@ import {
   CatmullRomCurve3,
   ExtrudeGeometry,
   Float32BufferAttribute,
+  Path,
   Shape,
   Vector3
 } from 'three';
@@ -13,30 +14,43 @@ interface ParticleOptions {
   seed: number;
 }
 
+/**
+ * Magatama silhouette — rounder, deeper "stout comma" form rather than the
+ * earlier slim curve. The path is six contiguous cubic beziers walking the
+ * outer edge clockwise from the top crown, plus a single circular suspension
+ * hole (cord aperture) drilled high in the upper lobe.
+ *
+ * Coordinate space is intentionally larger than the previous bead (~3.5 wide
+ * × ~3.9 tall before centering); the consuming scene scales it down to taste.
+ */
 export function createMagatamaShape() {
   const shape = new Shape();
 
-  shape.moveTo(-0.22, 1.24);
-  shape.bezierCurveTo(0.18, 1.52, 0.78, 1.42, 1.04, 0.98);
-  shape.bezierCurveTo(1.38, 0.4, 1.2, -0.36, 0.78, -0.92);
-  shape.bezierCurveTo(0.43, -1.39, -0.15, -1.57, -0.58, -1.34);
-  shape.bezierCurveTo(-0.86, -1.19, -0.9, -0.88, -0.7, -0.62);
-  shape.bezierCurveTo(-0.45, -0.29, -0.26, 0.03, -0.58, 0.38);
-  shape.bezierCurveTo(-0.93, 0.76, -0.78, 1.08, -0.22, 1.24);
-  shape.closePath();
-  shape.holes.push(new Shape().absellipse(-0.07, 0.76, 0.22, 0.18, 0, Math.PI * 2, false, 0));
+  shape.moveTo(0, 1.8);
+  shape.bezierCurveTo(1.4, 1.8, 1.9, 0.2, 0.9, -1.0);
+  shape.bezierCurveTo(0.4, -1.7, -0.2, -2.1, -0.6, -2.1);
+  shape.bezierCurveTo(-1.1, -2.1, -1.3, -1.7, -1.0, -1.2);
+  shape.bezierCurveTo(-0.4, -0.5, -0.5, 0.5, -1.2, 0.9);
+  shape.bezierCurveTo(-1.8, 1.2, -1.1, 1.8, 0, 1.8);
+
+  // Suspension hole — circular cord aperture in the upper lobe.
+  const holePath = new Path();
+  holePath.absarc(-0.16, 0.9, 0.24, 0, Math.PI * 2, true);
+  shape.holes.push(holePath);
 
   return shape;
 }
 
 export function createMagatamaGeometry() {
   const geometry = new ExtrudeGeometry(createMagatamaShape(), {
-    depth: 0.42,
+    depth: 0.6,
     bevelEnabled: true,
-    bevelSegments: 48,
-    bevelSize: 0.13,
-    bevelThickness: 0.17,
-    curveSegments: 128
+    bevelThickness: 0.16,
+    bevelSize: 0.16,
+    bevelOffset: 0,
+    bevelSegments: 8,
+    curveSegments: 96,
+    steps: 2
   });
 
   geometry.center();

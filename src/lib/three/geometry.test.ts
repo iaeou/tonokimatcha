@@ -6,41 +6,47 @@ import {
 } from './geometry';
 
 describe('createMagatamaShape', () => {
-  test('creates a closed comma bead outline with an inner aperture', () => {
+  test('creates a closed bezier silhouette with a single suspension hole', () => {
     const shape = createMagatamaShape();
 
     expect(shape.getPoints(24).length).toBeGreaterThan(20);
     expect(shape.holes).toHaveLength(1);
   });
 
-  test('keeps the upper jade silhouette rounded without a long flat ridge', () => {
-    const points = createMagatamaShape().getPoints(96);
-    const topPoints = points.filter((point) => point.y > 0.78);
-
-    const topWidth = Math.max(...topPoints.map((point) => point.x)) - Math.min(...topPoints.map((point) => point.x));
-    const topHeight = Math.max(...topPoints.map((point) => point.y)) - Math.min(...topPoints.map((point) => point.y));
-
-    expect(topPoints.length).toBeGreaterThan(12);
-    expect(topHeight / topWidth).toBeGreaterThan(0.28);
-  });
-
-  test('matches the reference bead proportions with a tall comma silhouette', () => {
+  test('uses the rounder stout-comma proportions of the new reference bead', () => {
     const points = createMagatamaShape().getPoints(128);
     const width = Math.max(...points.map((point) => point.x)) - Math.min(...points.map((point) => point.x));
     const height = Math.max(...points.map((point) => point.y)) - Math.min(...points.map((point) => point.y));
 
-    expect(width / height).toBeGreaterThan(0.58);
-    expect(width / height).toBeLessThan(0.75);
+    // The new bead sits noticeably wider than the slim comma — width is now
+    // close to height, not roughly two-thirds of it.
+    expect(width / height).toBeGreaterThan(0.7);
+    expect(width / height).toBeLessThan(1.05);
   });
 
-  test('places the aperture high and near the center like the reference bead', () => {
-    const holePoints = createMagatamaShape().holes[0].getPoints(48);
-    const centerX = (Math.min(...holePoints.map((point) => point.x)) + Math.max(...holePoints.map((point) => point.x))) / 2;
-    const centerY = (Math.min(...holePoints.map((point) => point.y)) + Math.max(...holePoints.map((point) => point.y))) / 2;
+  test('crowns the silhouette near y = 1.8 and tails down past y = -2', () => {
+    const points = createMagatamaShape().getPoints(96);
+    const maxY = Math.max(...points.map((point) => point.y));
+    const minY = Math.min(...points.map((point) => point.y));
 
-    expect(centerX).toBeGreaterThan(-0.18);
-    expect(centerX).toBeLessThan(0.08);
-    expect(centerY).toBeGreaterThan(0.6);
+    expect(maxY).toBeCloseTo(1.8, 1);
+    expect(minY).toBeLessThan(-1.95);
+  });
+
+  test('drills the suspension hole as a circle high in the upper lobe', () => {
+    const holePoints = createMagatamaShape().holes[0].getPoints(48);
+    const minX = Math.min(...holePoints.map((point) => point.x));
+    const maxX = Math.max(...holePoints.map((point) => point.x));
+    const minY = Math.min(...holePoints.map((point) => point.y));
+    const maxY = Math.max(...holePoints.map((point) => point.y));
+    const centerX = (minX + maxX) / 2;
+    const centerY = (minY + maxY) / 2;
+    const diameter = maxX - minX;
+
+    expect(centerX).toBeCloseTo(-0.16, 1);
+    expect(centerY).toBeCloseTo(0.9, 1);
+    // Diameter is twice the absarc radius of 0.24.
+    expect(diameter).toBeCloseTo(0.48, 1);
   });
 });
 

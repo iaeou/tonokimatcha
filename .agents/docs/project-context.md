@@ -29,7 +29,7 @@ The project is now a working SvelteKit baseline with:
 - Vanilla CSS theme system with light as default and dark as the previous moss/ink palette.
 - Theme toggle persisted with `localStorage` via `src/lib/stores/theme.ts`.
 - Fluid typography tokens and Google webfont stacks with system fallbacks in `src/lib/styles/typography.css`.
-- Procedural Magatama geometry with rounded Bezier silhouette and transmissive jade material.
+- Procedural Magatama geometry with a stout-comma bezier silhouette, circular suspension hole, and a mid-hisui jade material (`color: 0x2e6b3e`, `transmission: 0.5`, `thickness: 0.9`, `ior: 1.61`, `clearcoat: 0.9`). Rendered at restrained museum proportions via reduced scene scales (~45% viewport height on desktop).
 - GPU particle system using custom vortex shaders for earth-to-jade lineage transition.
 - GSAP hero reveal, Magatama floating animation, ambient pointer rotation, drag-only multi-axis Magatama rotation, and ScrollTrigger links.
 - Focused Vitest coverage for theme logic, hero animation options, Three.js config, Magatama geometry, and particle attributes.

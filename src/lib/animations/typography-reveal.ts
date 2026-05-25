@@ -16,8 +16,10 @@ import type { Action } from 'svelte/action';
  *                fades in while its letter-spacing eases from a tight value out
  *                to its resting (wider) value — a single soft expansion.
  *
- * Both effects respect `prefers-reduced-motion: reduce`. GSAP is lazy-imported
- * so it doesn't run during SSR or load until the action is mounted.
+ * Both effects respect `prefers-reduced-motion: reduce`. The timeline is built
+ * paused and triggered by an IntersectionObserver (not GSAP's ScrollTrigger):
+ * IO is built into the browser, fires reliably for above-the-fold elements
+ * without a refresh dance, and keeps the bundle one chunk lighter.
  */
 
 /** Resting ease that matches the project's `--ease-ceremony` CSS variable. */
@@ -76,13 +78,6 @@ export function createRiseRevealOptions(
   };
 }
 
-export function createRiseHiddenState(options = createRiseRevealOptions()) {
-  return {
-    y: 0,
-    yPercent: options.riseFromPercent
-  } as const;
-}
-
 /**
  * Defaults for the breath effect.
  *
@@ -99,6 +94,37 @@ export function createBreathRevealOptions(
     letterSpacingFrom: '0em',
     opacityFrom: 0.2,
     ...overrides
+  };
+}
+
+/**
+ * Pre-hide state passed to `gsap.set()` for word spans in rise mode.
+ *
+ * Both `y: 0` and `yPercent: 110` are returned on purpose. The synchronous
+ * pre-hide writes `transform: translateY(110%)` as inline CSS before GSAP
+ * loads; once GSAP arrives, its transform parser may interpret an existing
+ * inline transform as a pixel `y` value. Explicitly resetting `y` to 0
+ * guarantees the only vertical offset GSAP tracks afterwards is the
+ * `yPercent`, so the rise animation lands at exactly `translate(0, 0)` and
+ * the words become fully visible.
+ */
+export function createRiseHiddenState(): { y: number; yPercent: number } {
+  return { y: 0, yPercent: 110 };
+}
+
+/**
+ * Defaults for the IntersectionObserver that triggers each reveal.
+ *
+ * `rootMargin: '0px 0px -18% 0px'` moves the bottom edge of the trigger
+ * region up by 18% of the viewport height, so a heading only triggers once
+ * its top has crossed roughly 82% from the top of the viewport — the IO
+ * equivalent of GSAP ScrollTrigger's `start: 'top 82%'`.
+ */
+export function createRevealObserverOptions(): IntersectionObserverInit {
+  return {
+    root: null,
+    rootMargin: '0px 0px -18% 0px',
+    threshold: 0
   };
 }
 
@@ -171,44 +197,32 @@ export function prefersReducedMotion(): boolean {
 }
 
 /**
- * IntersectionObserver trigger that matches the previous viewport start line:
- * `top 82%` means reveal when the element reaches 82% of the viewport height.
+ * Trigger `reveal` once when `node` first intersects the viewport.
+ *
+ * Defensive: in environments without `IntersectionObserver` (Vitest with no
+ * jsdom shim, older browsers, certain SSR mocks) the callback fires
+ * synchronously so the content is never left in its pre-hide state. The
+ * returned cleanup is always safe to call multiple times.
  */
-export function createRevealObserverOptions(): IntersectionObserverInit {
-  return {
-    root: null,
-    rootMargin: '0px 0px -18% 0px',
-    threshold: 0
-  };
-}
-
-export function observeReveal(
-  node: HTMLElement,
-  onReveal: () => void,
-  options: IntersectionObserverInit = createRevealObserverOptions()
-): () => void {
-  if (typeof window === 'undefined' || !window.IntersectionObserver) {
-    onReveal();
+export function observeReveal(node: HTMLElement, reveal: () => void): () => void {
+  if (typeof IntersectionObserver === 'undefined') {
+    reveal();
     return () => {};
   }
 
-  let revealed = false;
-  const observer = new window.IntersectionObserver((entries) => {
-    if (revealed) return;
-
-    if (entries.some((entry) => entry.isIntersecting || entry.intersectionRatio > 0)) {
-      revealed = true;
-      observer.disconnect();
-      onReveal();
+  const observer = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      if (entry.isIntersecting) {
+        reveal();
+        observer.disconnect();
+        return;
+      }
     }
-  }, options);
+  }, createRevealObserverOptions());
 
   observer.observe(node);
 
-  return () => {
-    revealed = true;
-    observer.disconnect();
-  };
+  return () => observer.disconnect();
 }
 
 export type RevealMode = 'rise' | 'breath';
@@ -232,8 +246,10 @@ export interface TypographyRevealParams {
  * `use:typographyReveal={{ mode: 'breath', restLetterSpacing: '0.18em' }}` on
  * an eyebrow.
  *
- * The `gsap` import is async and dynamic so this module is tree-shake friendly
- * and stays out of the SSR bundle.
+ * GSAP is imported dynamically so it stays out of the SSR bundle and the
+ * action itself remains synchronous for the pre-hide. The reveal is gated on
+ * `observeReveal`, which uses IntersectionObserver in the browser and a
+ * synchronous fallback in test / non-DOM environments.
  */
 export const typographyReveal: Action<HTMLElement, TypographyRevealParams | undefined> = (
   node,
@@ -241,7 +257,6 @@ export const typographyReveal: Action<HTMLElement, TypographyRevealParams | unde
 ) => {
   const mode: RevealMode = params?.mode ?? 'rise';
   const delay = params?.delay ?? 0;
-  const observerOptions = createRevealObserverOptions();
 
   let disposed = false;
   let cleanup: (() => void) | null = null;
@@ -265,19 +280,20 @@ export const typographyReveal: Action<HTMLElement, TypographyRevealParams | unde
 
     (async () => {
       const { default: gsap } = await import('gsap');
-
       if (disposed) return;
 
       if (reduced) {
-        gsap.set(innerSpans, { yPercent: 0, opacity: 1 });
+        gsap.set(innerSpans, { y: 0, yPercent: 0, opacity: 1 });
+        node.style.letterSpacing = opts.letterSpacingTo;
         return;
       }
 
-      gsap.set(innerSpans, createRiseHiddenState(opts));
+      // Reset y back to 0 alongside yPercent so the pre-hide inline transform
+      // can't survive as a stale pixel offset after the reveal completes.
+      gsap.set(innerSpans, createRiseHiddenState());
       gsap.set(node, { letterSpacing: opts.letterSpacingFrom });
 
-      const tl = gsap.timeline({ paused: true });
-
+      const tl = gsap.timeline({ paused: true, delay });
       tl.to(innerSpans, {
         y: 0,
         yPercent: 0,
@@ -295,29 +311,14 @@ export const typographyReveal: Action<HTMLElement, TypographyRevealParams | unde
         '<'
       );
 
-      let delayedPlay: { kill: () => void } | null = null;
-      const observerCleanup = observeReveal(
-        node,
-        () => {
-          if (disposed) return;
-
-          if (delay > 0) {
-            delayedPlay = gsap.delayedCall(delay, () => {
-              if (!disposed) tl.play(0);
-            });
-            return;
-          }
-
-          tl.play(0);
-        },
-        observerOptions
-      );
+      const stopObserving = observeReveal(node, () => tl.play());
 
       cleanup = () => {
-        observerCleanup();
-        delayedPlay?.kill();
+        stopObserving();
         tl.kill();
       };
+
+      if (disposed) cleanup();
     })();
   } else {
     const opts = createBreathRevealOptions();
@@ -330,7 +331,6 @@ export const typographyReveal: Action<HTMLElement, TypographyRevealParams | unde
 
     (async () => {
       const { default: gsap } = await import('gsap');
-
       if (disposed) return;
 
       if (reduced) {
@@ -340,8 +340,7 @@ export const typographyReveal: Action<HTMLElement, TypographyRevealParams | unde
 
       gsap.set(node, { letterSpacing: opts.letterSpacingFrom, opacity: opts.opacityFrom });
 
-      const tl = gsap.timeline({ paused: true });
-
+      const tl = gsap.timeline({ paused: true, delay });
       tl.to(node, {
         letterSpacing: restSpacing,
         opacity: 1,
@@ -349,29 +348,14 @@ export const typographyReveal: Action<HTMLElement, TypographyRevealParams | unde
         ease: opts.ease
       });
 
-      let delayedPlay: { kill: () => void } | null = null;
-      const observerCleanup = observeReveal(
-        node,
-        () => {
-          if (disposed) return;
-
-          if (delay > 0) {
-            delayedPlay = gsap.delayedCall(delay, () => {
-              if (!disposed) tl.play(0);
-            });
-            return;
-          }
-
-          tl.play(0);
-        },
-        observerOptions
-      );
+      const stopObserving = observeReveal(node, () => tl.play());
 
       cleanup = () => {
-        observerCleanup();
-        delayedPlay?.kill();
+        stopObserving();
         tl.kill();
       };
+
+      if (disposed) cleanup();
     })();
   }
 

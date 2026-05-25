@@ -29,22 +29,27 @@ describe('createRendererOptions', () => {
 });
 
 describe('createMagatamaMaterialOptions', () => {
-  test('uses transmissive jade material settings for the ceremonial bead', () => {
+  test('uses a mid-hisui jade with eased thickness so the bead reads as jade, not silhouette', () => {
     expect(createMagatamaMaterialOptions()).toMatchObject({
-      color: TONOKI_COLORS.hisuiJade,
-      transmission: 0.9,
-      thickness: 0.65,
-      roughness: 0.1,
+      color: 0x2e6b3e,
+      roughness: 0.12,
       metalness: 0,
-      clearcoat: 1
+      clearcoat: 0.9,
+      clearcoatRoughness: 0.08,
+      transmission: 0.5,
+      thickness: 0.9,
+      ior: 1.61
     });
   });
 
-  test('uses attenuation properties as a jade-like subsurface scattering approximation', () => {
-    expect(createMagatamaMaterialOptions()).toMatchObject({
-      attenuationColor: TONOKI_COLORS.hisuiJade,
-      attenuationDistance: 0.85
-    });
+  test('drops attenuation, opacity, and emissive in favor of the deeper stone-like body', () => {
+    const opts = createMagatamaMaterialOptions();
+    expect(opts.attenuationColor).toBeUndefined();
+    expect(opts.attenuationDistance).toBeUndefined();
+    expect(opts.opacity).toBeUndefined();
+    expect(opts.transparent).toBeUndefined();
+    expect(opts.emissive).toBeUndefined();
+    expect(opts.emissiveIntensity).toBeUndefined();
   });
 });
 

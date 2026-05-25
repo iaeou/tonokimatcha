@@ -62,6 +62,54 @@ Known browser note:
 
 - `/favicon.ico` returns 404. This is harmless for the current baseline but should be handled before production.
 
+## Subsequent Updates (post 32-test verification)
+
+After the verification above, two further changes landed:
+
+### Typography reveal — refactored API for IntersectionObserver
+
+`src/lib/animations/typography-reveal.ts` now exports three additional helpers used by the test suite to lock in the IntersectionObserver-based trigger:
+
+- `createRevealObserverOptions()` — returns `{ root: null, rootMargin: '0px 0px -18% 0px', threshold: 0 }`. This is the IO equivalent of GSAP ScrollTrigger's `start: 'top 82%'`.
+- `createRiseHiddenState()` — returns `{ y: 0, yPercent: 110 }`. The explicit `y: 0` reset prevents the synchronous inline `transform: translateY(110%)` from surviving in GSAP's tracker as a stale pixel offset, which would have left words mis-positioned after the reveal.
+- `observeReveal(node, callback)` — sets up the IO in the browser, fires the callback synchronously in environments without `IntersectionObserver` (Vitest node env), returns a cleanup function.
+
+The action body now uses `observeReveal(node, () => tl.play())` against a `paused: true` timeline. No more `gsap/ScrollTrigger` import inside the typography module. `Scene.svelte` still imports ScrollTrigger for its own scroll-rotation and vortex scrub — unrelated.
+
+### Magatama — second adaptation round (deep stone bezier)
+
+Replaced the Magatama silhouette and material with a user-supplied snippet that pushes the design from "bright Hisui glow" to "dense dark jade stone".
+
+Silhouette: `createMagatamaShape()` rewritten as six cubic beziers walking from `(0, 1.8)` clockwise around a stouter, more rounded comma. Suspension hole is now a true circle (`new Path().absarc(-0.16, 0.9, 0.24, 0, Math.PI * 2, true)`) instead of an ellipse. Width-to-height ratio sits near 0.85 (was ~0.68); bounding box grew from ~2.4×2.8 to ~3.5×3.9.
+
+Extrude: `depth: 0.6`, `bevelThickness: 0.16`, `bevelSize: 0.16`, `bevelOffset: 0`, `bevelSegments: 8`, `curveSegments: 96`, `steps: 2`. Thicker front-to-back than before, coarser bevel (8 vs 48 segments — fewer polygons, slightly sharper bevel crease).
+
+Material: `color: 0x072411` (near-black moss green), `roughness: 0.12`, `metalness: 0`, `clearcoat: 0.9`, `clearcoatRoughness: 0.08`, `transmission: 0.5`, `thickness: 1.5`, `ior: 1.61`. Dropped from the previous material: `attenuationColor`, `attenuationDistance`, `opacity`, `transparent`, `emissive`, `emissiveIntensity`. The directional key light in `Scene.svelte` is still `TONOKI_COLORS.hisuiJade` at intensity 2.2, so jade-tinted highlights still play across the new dark surface.
+
+Tests updated accordingly: `geometry.test.ts` now asserts the rounder proportions (width/height between 0.7 and 1.05), the crown at y ≈ 1.8 with the tail past y = -1.95, and the circular hole at (-0.16, 0.9) with diameter ≈ 0.48. The flat-ridge regression guard was retired — it was specific to the previous slim-comma version. `scene-config.test.ts` now asserts the new material values and explicitly checks that the dropped properties (`attenuationColor`, `attenuationDistance`, `opacity`, `transparent`, `emissive`, `emissiveIntensity`) are `undefined`.
+
+What was NOT touched, on purpose:
+
+- `Scene.svelte` magatama scale (`0.92 / 0.58 / 0.44`), position, and rotation. The new geometry's bounding box is ~1.36× larger; at the current scale the bead will occupy roughly that much more screen space. If it overwhelms the composition, drop to ~`0.68 / 0.43 / 0.32` and the on-screen size matches the previous bead.
+- Lighting, ambient color, magatama drag/float/scroll tweens, particle system.
+
+Files changed in this round:
+
+- Modified: `src/lib/animations/typography-reveal.ts`
+- Modified: `src/lib/three/geometry.ts`
+- Modified: `src/lib/three/geometry.test.ts`
+- Modified: `src/lib/three/scene-config.ts`
+- Modified: `src/lib/three/scene-config.test.ts`
+
+Re-run `npm test`, `npm run check`, and reload the dev preview to validate. The test-file count stays at 5; total test count will shift slightly because two scene-config tests were merged into one with a `toMatchObject` and one explicit "dropped properties" sibling, and two new geometry tests replaced the previous proportion + rounded-top tests.
+
+### Magatama tuning pass — lighter + smaller
+
+Dev preview showed the near-black bead reading as a solid silhouette and the larger bounding box overwhelming the headline column. Two follow-up changes:
+
+- **Material**: color moved from `0x072411` (near-black) to `0x2e6b3e` (mid-hisui green). Thickness eased from `1.5` → `0.9` so light isn't over-absorbed inside the bead. All other physical params unchanged. Test assertions updated accordingly.
+- **Scale**: `magatama.scale.setScalar(...)` in `Scene.svelte` reduced from `0.92 / 0.58 / 0.44` (desktop / tablet / mobile) to `0.55 / 0.35 / 0.27`. Lands the bead at roughly 45% viewport height and clears the hero text. Position offsets unchanged.
+
 ## Updated Pending Tasks
 
 ### Still Open
