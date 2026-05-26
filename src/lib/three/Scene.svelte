@@ -1,6 +1,7 @@
 <script lang="ts">
   import { browser } from '$app/environment';
   import { onDestroy, onMount } from 'svelte';
+  import { MAGATAMA_TUNING } from './magatama-tuning';
 
   let container: HTMLDivElement;
   let canvas: HTMLCanvasElement;
@@ -68,7 +69,7 @@
       const magatamaMaterial = new MeshPhysicalMaterial(createMagatamaMaterialOptions());
       const magatama = new Mesh(createMagatamaGeometry(), magatamaMaterial);
 
-      magatama.rotation.set(-0.08, -0.28, -0.44);
+      magatama.rotation.set(MAGATAMA_TUNING.animation.baseRotation.x, MAGATAMA_TUNING.animation.baseRotation.y, MAGATAMA_TUNING.animation.baseRotation.z);
       scene.add(magatama);
 
       const particleUniforms = {
@@ -90,12 +91,12 @@
       });
 
       const particles = new Points(
-        createLineageParticleGeometry({ count: 1100, spread: 4.6, seed: 1500 }),
+        createLineageParticleGeometry(MAGATAMA_TUNING.particles),
         particleMaterial
       );
 
-      particles.position.y = -1.52;
-      particles.rotation.x = -0.12;
+      particles.position.y = MAGATAMA_TUNING.particles.positionY;
+      particles.rotation.x = MAGATAMA_TUNING.particles.rotationX;
       scene.add(particles);
 
       const syncParticleTheme = () => {
@@ -104,7 +105,7 @@
 
         particleUniforms.uEarthColor.value.set(settings.earthColor);
         particleUniforms.uJadeColor.value.set(settings.jadeColor);
-        particleUniforms.uAlpha.value = settings.alpha;
+        particleUniforms.uAlpha.value = settings.alpha * MAGATAMA_TUNING.particles.opacity;
         particleUniforms.uSizeScale.value = settings.sizeScale;
         particleMaterial.blending = theme === 'light' ? NormalBlending : AdditiveBlending;
         particleMaterial.needsUpdate = true;
@@ -117,15 +118,15 @@
         attributes: true
       });
 
-      const ambientLight = new AmbientLight(TONOKI_COLORS.ceremonialWhite, 0.52);
-      const keyLight = new DirectionalLight(TONOKI_COLORS.hisuiJade, 2.2);
-      keyLight.position.set(5, 5, 5);
+      const ambientLight = new AmbientLight(MAGATAMA_TUNING.lighting.ambientColor, MAGATAMA_TUNING.lighting.ambientIntensity);
+      const keyLight = new DirectionalLight(MAGATAMA_TUNING.lighting.keyLightColor, MAGATAMA_TUNING.lighting.keyLightIntensity);
+      keyLight.position.set(MAGATAMA_TUNING.lighting.keyLightX, MAGATAMA_TUNING.lighting.keyLightY, MAGATAMA_TUNING.lighting.keyLightZ);
       scene.add(ambientLight, keyLight);
 
       const pointer = new Vector2(0, 0);
       const dragPointer = new Vector2(0, 0);
       const raycaster = new Raycaster();
-      const baseRotation = { x: -0.08, y: -0.28, z: -0.44 };
+      const baseRotation = { ...MAGATAMA_TUNING.animation.baseRotation };
       const scrollRotation = { ...baseRotation };
       const dragRotation = { x: 0, y: 0, z: 0 };
       let sceneDestroyed = false;
@@ -141,14 +142,10 @@
 
         renderer.setSize(width, height, false);
         camera.aspect = width / height;
-        camera.position.set(0, 0.12, width > 760 ? 5.8 : 7.2);
-        magatama.position.x = width > 760 ? 1.25 : width > 620 ? 1.65 : 0.95;
-        magatama.position.y = width > 620 ? 0.12 : 0.26;
-        // Scales reduced from 0.92 / 0.58 / 0.44 to compensate for the new
-        // bead's larger bounding box (~3.5×3.9 vs ~2.4×2.8) and to land at
-        // ~45% viewport height — restrained museum proportions that clear the
-        // headline column.
-        magatama.scale.setScalar(width > 760 ? 0.55 : width > 620 ? 0.35 : 0.27);
+        camera.position.set(0, 0.12, width > 760 ? MAGATAMA_TUNING.layout.cameraZDesktop : MAGATAMA_TUNING.layout.cameraZMobile);
+        magatama.position.x = width > 760 ? MAGATAMA_TUNING.layout.positionXDesktop : width > 620 ? MAGATAMA_TUNING.layout.positionXTablet : MAGATAMA_TUNING.layout.positionXMobile;
+        magatama.position.y = width > 620 ? MAGATAMA_TUNING.layout.positionYWide : MAGATAMA_TUNING.layout.positionYNarrow;
+        magatama.scale.setScalar(width > 760 ? MAGATAMA_TUNING.layout.scaleDesktop : width > 620 ? MAGATAMA_TUNING.layout.scaleTablet : MAGATAMA_TUNING.layout.scaleMobile);
         camera.updateProjectionMatrix();
       };
 
@@ -203,8 +200,8 @@
       };
 
       const floatTween = gsap.to(magatama.position, {
-        y: '+=0.2',
-        duration: 3.4,
+        y: `+=${MAGATAMA_TUNING.animation.floatAmplitude}`,
+        duration: MAGATAMA_TUNING.animation.floatDuration,
         repeat: -1,
         yoyo: true,
         ease: 'sine.inOut'
@@ -244,11 +241,11 @@
         particleUniforms.uTime.value = time;
 
         magatama.rotation.set(
-          scrollRotation.x + pointer.y * 0.08 + dragRotation.x,
-          scrollRotation.y + pointer.x * 0.12 + dragRotation.y,
+          scrollRotation.x + pointer.y * MAGATAMA_TUNING.animation.pointerParallaxX + dragRotation.x,
+          scrollRotation.y + pointer.x * MAGATAMA_TUNING.animation.pointerParallaxY + dragRotation.y,
           scrollRotation.z + dragRotation.z
         );
-        particles.rotation.y = time * 0.035 + scrollProgress * 0.8;
+        particles.rotation.y = time * MAGATAMA_TUNING.animation.particleRotationRate + scrollProgress * MAGATAMA_TUNING.animation.scrollParticleRate;
 
         renderer.render(scene, camera);
         frameId = requestAnimationFrame(render);

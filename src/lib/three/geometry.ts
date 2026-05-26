@@ -7,6 +7,7 @@ import {
   Shape,
   Vector3
 } from 'three';
+import { MAGATAMA_TUNING } from './magatama-tuning';
 
 interface ParticleOptions {
   count: number;
@@ -43,14 +44,7 @@ export function createMagatamaShape() {
 
 export function createMagatamaGeometry() {
   const geometry = new ExtrudeGeometry(createMagatamaShape(), {
-    depth: 0.6,
-    bevelEnabled: true,
-    bevelThickness: 0.16,
-    bevelSize: 0.16,
-    bevelOffset: 0,
-    bevelSegments: 8,
-    curveSegments: 96,
-    steps: 2
+    ...MAGATAMA_TUNING.geometry
   });
 
   geometry.center();
@@ -99,7 +93,7 @@ export function createLineageParticleGeometry(options: ParticleOptions) {
     state = (state * 1664525 + 1013904223) >>> 0;
     randoms[base + 2] = state / 4294967295;
 
-    sizes[index] = 6 + randoms[base + 2] * 12;
+    sizes[index] = MAGATAMA_TUNING.particles.sizeMin + randoms[base + 2] * (MAGATAMA_TUNING.particles.sizeMax - MAGATAMA_TUNING.particles.sizeMin);
   }
 
   geometry.setAttribute('position', new Float32BufferAttribute(createLineageParticlePositions(options), 3));

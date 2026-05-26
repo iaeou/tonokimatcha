@@ -29,25 +29,25 @@ describe('createRendererOptions', () => {
 });
 
 describe('createMagatamaMaterialOptions', () => {
-  test('uses a mid-hisui jade with eased thickness so the bead reads as jade, not silhouette', () => {
+  test('uses a translucent mid-hisui jade so the bead reads as polished stone', () => {
     expect(createMagatamaMaterialOptions()).toMatchObject({
       color: 0x2e6b3e,
-      roughness: 0.12,
+      opacity: 0.3,
+      roughness: 0.2,
       metalness: 0,
       clearcoat: 0.9,
       clearcoatRoughness: 0.08,
       transmission: 0.5,
-      thickness: 0.9,
-      ior: 1.61
+      thickness: 0.3,
+      ior: 1.61,
+      transparent: true
     });
   });
 
-  test('drops attenuation, opacity, and emissive in favor of the deeper stone-like body', () => {
+  test('drops attenuation and emissive in favor of the tuned stone-like body', () => {
     const opts = createMagatamaMaterialOptions();
     expect(opts.attenuationColor).toBeUndefined();
     expect(opts.attenuationDistance).toBeUndefined();
-    expect(opts.opacity).toBeUndefined();
-    expect(opts.transparent).toBeUndefined();
     expect(opts.emissive).toBeUndefined();
     expect(opts.emissiveIntensity).toBeUndefined();
   });

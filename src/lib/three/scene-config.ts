@@ -1,5 +1,6 @@
 import type { MeshPhysicalMaterialParameters, WebGLRendererParameters } from 'three';
 import type { Theme } from '$lib/stores/theme';
+import { MAGATAMA_TUNING } from './magatama-tuning';
 
 interface DragRotationInput {
   movementX: number;
@@ -28,45 +29,26 @@ export function createRendererOptions(canvas: HTMLCanvasElement): WebGLRendererP
  *
  * Earlier near-black (#072411) read as a solid silhouette against the cream
  * stage and lost the jade character entirely. The color is now a visible
- * mid-hisui green (#2e6b3e), thickness is eased from 1.5 → 0.9 so light isn't
+ * mid-hisui green (#2e6b3e), low thickness keeps light from being
  * over-absorbed inside the bead, and `ior` stays high for the wet polished
- * look. Clearcoat and roughness preserve the surface sheen.
+ * look. The shared tuning module also controls opacity and clearcoat.
  */
 export function createMagatamaMaterialOptions(): MeshPhysicalMaterialParameters {
   return {
-    color: 0x2e6b3e,
-    roughness: 0.12,
-    metalness: 0,
-    clearcoat: 0.9,
-    clearcoatRoughness: 0.08,
-    transmission: 0.5,
-    thickness: 0.9,
-    ior: 1.61
+    ...MAGATAMA_TUNING.material,
+    // transparent must be true for opacity < 1 to render correctly
+    transparent: MAGATAMA_TUNING.material.opacity < 1
   };
 }
 
 export function createMagatamaDragRotationDelta({ movementX, movementY }: DragRotationInput) {
   return {
-    x: movementY * 0.006,
-    y: movementX * 0.006,
-    z: (movementX - movementY) * 0.0015
+    x: movementY * MAGATAMA_TUNING.animation.dragSensitivityXY,
+    y: movementX * MAGATAMA_TUNING.animation.dragSensitivityXY,
+    z: (movementX - movementY) * MAGATAMA_TUNING.animation.dragSensitivityZ
   };
 }
 
 export function createParticleThemeSettings(theme: Theme) {
-  if (theme === 'light') {
-    return {
-      earthColor: 0x86ad6a,
-      jadeColor: 0x4fc092,
-      alpha: 0.58,
-      sizeScale: 1.55
-    };
-  }
-
-  return {
-    earthColor: TONOKI_COLORS.haniwaClay,
-    jadeColor: TONOKI_COLORS.hisuiJade,
-    alpha: 0.78,
-    sizeScale: 1
-  };
+  return theme === 'light' ? MAGATAMA_TUNING.particlesLight : MAGATAMA_TUNING.particlesDark;
 }

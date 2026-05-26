@@ -20,7 +20,7 @@ Tonoki Matcha is planned as a high-end SvelteKit digital museum for a luxury mat
 
 ## Current Implementation Snapshot
 
-Last reviewed: 2026-05-25.
+Last reviewed: 2026-05-26.
 
 The project is now a working SvelteKit baseline with:
 
@@ -29,13 +29,14 @@ The project is now a working SvelteKit baseline with:
 - Vanilla CSS theme system with light as default and dark as the previous moss/ink palette.
 - Theme toggle persisted with `localStorage` via `src/lib/stores/theme.ts`.
 - Fluid typography tokens and Google webfont stacks with system fallbacks in `src/lib/styles/typography.css`.
-- Procedural Magatama geometry with a stout-comma bezier silhouette, circular suspension hole, and a mid-hisui jade material (`color: 0x2e6b3e`, `transmission: 0.5`, `thickness: 0.9`, `ior: 1.61`, `clearcoat: 0.9`). Rendered at restrained museum proportions via reduced scene scales (~45% viewport height on desktop).
+- Procedural Magatama geometry with a stout-comma bezier silhouette, circular suspension hole, and centralized tuning in `src/lib/three/magatama-tuning.ts`. The current material uses translucent mid-hisui jade (`color: 0x2e6b3e`, `opacity: 0.3`, `roughness: 0.2`, `transmission: 0.5`, `thickness: 0.3`, `ior: 1.61`, `clearcoat: 0.9`) and renders at restrained museum proportions via reduced scene scales (~45% viewport height on desktop).
 - GPU particle system using custom vortex shaders for earth-to-jade lineage transition.
 - GSAP hero reveal, Magatama floating animation, ambient pointer rotation, drag-only multi-axis Magatama rotation, and ScrollTrigger links.
 - Focused Vitest coverage for theme logic, hero animation options, Three.js config, Magatama geometry, and particle attributes.
 - Branded webfont pairing — Cormorant Garamond for English ceremonial display, Noto Serif JP as the mincho heritage fallback, and Zen Kaku Gothic New + Inter for body/UI text — loaded via Google Fonts with `preconnect` and `display=swap`.
 - Vite manualChunks splits `three` and `gsap` into their own async chunks so the initial page shell loads independently of WebGL.
 - Typography reveal effects on headings and eyebrows via `src/lib/animations/typography-reveal.ts` (`typographyReveal` Svelte action). `rise` mode splits headings into per-word mask spans and animates them up while the heading's `letter-spacing` tightens from `-0.02em` to rest. `breath` mode (used on `.eyebrow`) eases `letter-spacing` from `0em` to its resting value (e.g. `0.18em`) with a subtle opacity fade. Both are IntersectionObserver-triggered once, respect `prefers-reduced-motion`, and pre-hide synchronously so there's no flash before GSAP loads.
+- The latest visual reference is `.agents/docs/magatama-reference-geometry-2026-05-26.jpg`; older transient WebGL screenshots were removed to keep the agent docs focused.
 
 ## Known Local Development Note
 
