@@ -3,23 +3,55 @@
   import { createHeroRevealOptions } from '$lib/animations/hero-reveal';
   import { typographyReveal } from '$lib/animations/typography-reveal';
 
+  let heroSection: HTMLElement;
   let heroContent: HTMLDivElement;
 
-  onMount(async () => {
-    const { default: gsap } = await import('gsap');
+  onMount(() => {
+    const updateImageFade = () => {
+      const progress = Math.min(Math.max(window.scrollY / (window.innerHeight * 1.35), 0), 1);
+      const easedProgress = progress * progress * (3 - 2 * progress);
+      heroSection.style.setProperty('--hero-image-opacity', String(1 - easedProgress));
+    };
 
-    // The h1 and eyebrow are animated by `typographyReveal` (word-mask rise +
-    // ma letter-spacing breath). The subtitle and cue keep the original soft
-    // fade/translate so body copy stays readable and doesn't compete with the
-    // headline for attention.
-    gsap.from(heroContent.querySelectorAll('.hero-subtitle, .hero__cue'), {
-      ...createHeroRevealOptions(),
-      stagger: 0.14
-    });
+    updateImageFade();
+    window.addEventListener('scroll', updateImageFade, { passive: true });
+    window.addEventListener('resize', updateImageFade);
+
+    const revealContent = async () => {
+      const { default: gsap } = await import('gsap');
+
+      // The h1 and eyebrow are animated by `typographyReveal` (word-mask rise +
+      // ma letter-spacing breath). The subtitle and cue keep the original soft
+      // fade/translate so body copy stays readable and doesn't compete with the
+      // headline for attention.
+      gsap.from(heroContent.querySelectorAll('.hero-subtitle, .hero__cue'), {
+        ...createHeroRevealOptions(),
+        stagger: 0.14
+      });
+    };
+
+    revealContent();
+
+    return () => {
+      window.removeEventListener('scroll', updateImageFade);
+      window.removeEventListener('resize', updateImageFade);
+    };
   });
 </script>
 
-<section class="hero" aria-labelledby="threshold-title">
+<section class="hero" aria-labelledby="threshold-title" bind:this={heroSection}>
+  <figure class="hero__figure" aria-hidden="true">
+    <picture>
+      <source srcset="/images/home-header2-m.webp" media="(max-width: 767px)" type="image/webp" />
+      <img
+        class="hero__image"
+        src="/images/home-header2.webp"
+        alt=""
+        decoding="async"
+        fetchpriority="high"
+      />
+    </picture>
+  </figure>
   <div class="hero__content" bind:this={heroContent}>
     <p class="eyebrow" use:typographyReveal={{ mode: 'breath', restLetterSpacing: '0.18em' }}>
       The Threshold
