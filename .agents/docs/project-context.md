@@ -20,7 +20,7 @@ Tonoki Matcha is planned as a high-end SvelteKit digital museum for a luxury mat
 
 ## Current Implementation Snapshot
 
-Last reviewed: 2026-05-26.
+Last reviewed: 2026-07-19.
 
 The project is now a working SvelteKit baseline with:
 
@@ -32,6 +32,8 @@ The project is now a working SvelteKit baseline with:
 - Procedural Magatama geometry with a stout-comma bezier silhouette, circular suspension hole, and centralized tuning in `src/lib/three/magatama-tuning.ts`. The current material uses translucent mid-hisui jade (`color: 0x2e6b3e`, `opacity: 0.3`, `roughness: 0.2`, `transmission: 0.5`, `thickness: 0.3`, `ior: 1.61`, `clearcoat: 0.9`) and renders at restrained museum proportions via reduced scene scales (~45% viewport height on desktop).
 - GPU particle system using custom vortex shaders for earth-to-jade lineage transition.
 - GSAP hero reveal, Magatama floating animation, ambient pointer rotation, drag-only multi-axis Magatama rotation, and ScrollTrigger links.
+- Lenis smooth scrolling via `src/lib/animations/smooth-scroll.ts`: lazily imported, GSAP ticker drives `lenis.raf`, `ScrollTrigger.update` on scroll, `anchors: true` for in-page cues, native touch scrolling preserved (`syncTouch: false`), fully disabled under `prefers-reduced-motion`. Tuning lives in `createSmoothScrollOptions()`.
+- Route-level View Transitions in `src/routes/+layout.svelte` (`onNavigate` + `document.startViewTransition`) with ceremonial cross-fade keyframes in `main.css`, reduced-motion guard, and instant fallback where the API is unsupported.
 - Focused Vitest coverage for theme logic, hero animation options, Three.js config, Magatama geometry, and particle attributes.
 - Branded webfont pairing — Cormorant Garamond for English ceremonial display, Noto Serif JP as the mincho heritage fallback, and Zen Kaku Gothic New + Inter for body/UI text — loaded via Google Fonts with `preconnect` and `display=swap`.
 - Vite manualChunks splits `three` and `gsap` into their own async chunks so the initial page shell loads independently of WebGL.

@@ -19,6 +19,40 @@ body {
   min-width: 320px;
 }
 
+/* Ceremonial route transition: slow cross-fade into the next hall.
+   The incoming view rises slightly, like a scroll being unrolled. */
+::view-transition-old(root) {
+  animation: tonoki-hall-exit 480ms var(--ease-ceremony, ease) both;
+}
+
+::view-transition-new(root) {
+  animation: tonoki-hall-enter 640ms var(--ease-ceremony, ease) both;
+}
+
+@keyframes tonoki-hall-exit {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes tonoki-hall-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
+
 :root.is-rotating-magatama,
 :root.is-rotating-magatama * {
   cursor: grabbing !important;
