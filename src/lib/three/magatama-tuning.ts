@@ -30,6 +30,30 @@ export const MAGATAMA_TUNING = {
     ior: 1.61,                  // refractive index; glass ~= 1.5, diamond ~= 2.4
   },
 
+  // HDRI-style environment (procedural RoomEnvironment via PMREM)
+  // Scene.svelte -> scene.environment
+  environment: {
+    intensity: 0.85,          // scene.environmentIntensity; how much the env lights/refracts
+    rotationY: 2.1,           // radians; rotates reflections around the bead
+  },
+
+  // Postprocessing (bloom + film grain)
+  // scene-config.ts -> createBloomOptions() / createGrainOptions()
+  // Scene.svelte -> EffectComposer
+  postprocessing: {
+    bloom: {
+      intensity: 0.75,            // bloom strength
+      luminanceThreshold: 0.62,   // only highlights above this glow
+      luminanceSmoothing: 0.25,   // soft knee around the threshold
+      mipmapBlur: true,           // wide, soft halo (vs tight glow)
+      radius: 0.72,               // halo spread when mipmapBlur is on
+    },
+    grain: {
+      premultiply: true,          // modulate noise by scene color (keeps empty areas clean)
+      opacity: 0.14,              // film grain strength
+    },
+  },
+
   // Lighting
   // Scene.svelte -> ambientLight / keyLight
   lighting: {

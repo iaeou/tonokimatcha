@@ -52,3 +52,30 @@ export function createMagatamaDragRotationDelta({ movementX, movementY }: DragRo
 export function createParticleThemeSettings(theme: Theme) {
   return theme === 'light' ? MAGATAMA_TUNING.particlesLight : MAGATAMA_TUNING.particlesDark;
 }
+
+/**
+ * Environment settings for the procedural HDRI (RoomEnvironment + PMREM).
+ * The env map is what makes `transmission` read as real jade: without it the
+ * refraction has nothing to bend, so the bead looks like tinted plastic.
+ */
+export function createEnvironmentSettings() {
+  return { ...MAGATAMA_TUNING.environment };
+}
+
+/**
+ * Bloom options for the pmndrs `postprocessing` BloomEffect.
+ * Threshold sits above the cream stage luminance so only the jade's
+ * clearcoat highlights and refracted hotspots bloom - not the whole page.
+ */
+export function createBloomOptions() {
+  return { ...MAGATAMA_TUNING.postprocessing.bloom };
+}
+
+/**
+ * Film-grain options for the pmndrs NoiseEffect. `premultiply` scales the
+ * noise by scene color, so fully transparent pixels stay untouched and the
+ * grain lives only on the bead and particle cloud.
+ */
+export function createGrainOptions() {
+  return { ...MAGATAMA_TUNING.postprocessing.grain };
+}

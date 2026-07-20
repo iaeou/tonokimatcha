@@ -20,9 +20,11 @@
           AmbientLight,
           Color,
           DirectionalLight,
+          HalfFloatType,
           Mesh,
           MeshPhysicalMaterial,
           NormalBlending,
+          PMREMGenerator,
           PerspectiveCamera,
           Points,
           Raycaster,
@@ -32,11 +34,16 @@
           Vector2,
           WebGLRenderer
         },
+        { RoomEnvironment },
+        { BloomEffect, EffectComposer, EffectPass, NoiseEffect, RenderPass },
         { default: gsap },
         { ScrollTrigger },
         { createLineageParticleGeometry, createMagatamaGeometry },
         {
           TONOKI_COLORS,
+          createBloomOptions,
+          createEnvironmentSettings,
+          createGrainOptions,
           createMagatamaDragRotationDelta,
           createMagatamaMaterialOptions,
           createParticleThemeSettings,
@@ -46,6 +53,8 @@
         { default: vortexFrag }
       ] = await Promise.all([
         import('three'),
+        import('three/examples/jsm/environments/RoomEnvironment.js'),
+        import('postprocessing'),
         import('gsap'),
         import('gsap/dist/ScrollTrigger'),
         import('./geometry'),
@@ -65,6 +74,32 @@
       renderer.setClearColor(TONOKI_COLORS.inkVoid, 0);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.outputColorSpace = SRGBColorSpace;
+
+      // Procedural HDRI: gives transmission/clearcoat something real to refract.
+      const environmentSettings = createEnvironmentSettings();
+      const pmremGenerator = new PMREMGenerator(renderer);
+      const roomEnvironment = new RoomEnvironment();
+      const environmentTexture = pmremGenerator.fromScene(roomEnvironment, 0.04).texture;
+
+      scene.environment = environmentTexture;
+      scene.environmentIntensity = environmentSettings.intensity;
+      scene.environmentRotation.y = environmentSettings.rotationY;
+      roomEnvironment.dispose();
+      pmremGenerator.dispose();
+
+      // Postprocessing: bloom halo on jade highlights + fine film grain.
+      const grainOptions = createGrainOptions();
+      const bloomEffect = new BloomEffect(createBloomOptions());
+      const grainEffect = new NoiseEffect({ premultiply: grainOptions.premultiply });
+
+      grainEffect.blendMode.opacity.value = grainOptions.opacity;
+
+      const composer = new EffectComposer(renderer, { frameBufferType: HalfFloatType });
+      const renderPass = new RenderPass(scene, camera);
+      const effectPass = new EffectPass(camera, bloomEffect, grainEffect);
+
+      composer.addPass(renderPass);
+      composer.addPass(effectPass);
 
       const magatamaMaterial = new MeshPhysicalMaterial(createMagatamaMaterialOptions());
       const magatama = new Mesh(createMagatamaGeometry(), magatamaMaterial);
@@ -141,6 +176,7 @@
         const height = container.clientHeight;
 
         renderer.setSize(width, height, false);
+        composer.setSize(width, height, false);
         camera.aspect = width / height;
         camera.position.set(0, 0.12, width > 760 ? MAGATAMA_TUNING.layout.cameraZDesktop : MAGATAMA_TUNING.layout.cameraZMobile);
         magatama.position.x = width > 760 ? MAGATAMA_TUNING.layout.positionXDesktop : width > 620 ? MAGATAMA_TUNING.layout.positionXTablet : MAGATAMA_TUNING.layout.positionXMobile;
@@ -247,7 +283,7 @@
         );
         particles.rotation.y = time * MAGATAMA_TUNING.animation.particleRotationRate + scrollProgress * MAGATAMA_TUNING.animation.scrollParticleRate;
 
-        renderer.render(scene, camera);
+        composer.render();
         frameId = requestAnimationFrame(render);
       };
 
@@ -281,6 +317,8 @@
         magatamaMaterial.dispose();
         particles.geometry.dispose();
         particleMaterial.dispose();
+        composer.dispose();
+        environmentTexture.dispose();
         renderer.dispose();
       };
     };

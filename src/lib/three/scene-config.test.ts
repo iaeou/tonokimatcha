@@ -1,6 +1,9 @@
 import { describe, expect, test } from 'vitest';
 import {
   TONOKI_COLORS,
+  createBloomOptions,
+  createEnvironmentSettings,
+  createGrainOptions,
   createMagatamaMaterialOptions,
   createMagatamaDragRotationDelta,
   createParticleThemeSettings,
@@ -79,6 +82,36 @@ describe('createParticleThemeSettings', () => {
       jadeColor: 0x00a86b,
       alpha: 0.78,
       sizeScale: 1
+    });
+  });
+});
+
+describe('createEnvironmentSettings', () => {
+  test('exposes a defensive copy of the HDRI environment tuning', () => {
+    const settings = createEnvironmentSettings();
+
+    expect(settings).toEqual({ intensity: 0.85, rotationY: 2.1 });
+    expect(settings).not.toBe(createEnvironmentSettings());
+  });
+});
+
+describe('createBloomOptions', () => {
+  test('blooms only highlights above the cream-stage luminance with a soft wide halo', () => {
+    expect(createBloomOptions()).toEqual({
+      intensity: 0.75,
+      luminanceThreshold: 0.62,
+      luminanceSmoothing: 0.25,
+      mipmapBlur: true,
+      radius: 0.72
+    });
+  });
+});
+
+describe('createGrainOptions', () => {
+  test('premultiplies subtle grain so transparent pixels stay clean', () => {
+    expect(createGrainOptions()).toEqual({
+      premultiply: true,
+      opacity: 0.14
     });
   });
 });
