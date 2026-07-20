@@ -3,6 +3,10 @@ uniform float uProgress;
 uniform float uKofunProgress;
 uniform float uKofunCancelY;
 uniform float uSizeScale;
+uniform float uVelocityBoost;
+uniform vec3 uWindCenter;
+uniform float uWindRadius;
+uniform float uWindStrength;
 uniform vec3 uEarthColor;
 uniform vec3 uJadeColor;
 
@@ -39,9 +43,16 @@ void main() {
   float formation = clamp(uKofunProgress * (0.75 + aRandom.z * 0.5), 0.0, 1.0);
   pos = mix(pos, kofun, formation);
 
+  // Pointer wind: particles are pushed away from the cursor with a gaussian
+  // falloff, gentler where the Kofun constellation is holding formation.
+  vec3 away = pos - uWindCenter;
+  float dist = max(length(away), 0.0001);
+  float falloff = exp(-(dist * dist) / (uWindRadius * uWindRadius));
+  pos += (away / dist) * falloff * uWindStrength * (1.0 - formation * 0.6);
+
   vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
 
-  gl_PointSize = aSize * uSizeScale * (1.0 / -mvPosition.z);
+  gl_PointSize = aSize * uSizeScale * (1.0 + uVelocityBoost) * (1.0 / -mvPosition.z);
   gl_Position = projectionMatrix * mvPosition;
 
   vColor = mix(uEarthColor, uJadeColor, uProgress);

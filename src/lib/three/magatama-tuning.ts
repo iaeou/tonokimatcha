@@ -82,6 +82,14 @@ export const MAGATAMA_TUNING = {
     // Kofun constellation: particles migrate into the Daisenryō keyhole
     // silhouette while scrolling through The Lineage, then dissolve again.
     // geometry.ts -> createKofunConstellationPositions()
+    // Pointer wind: particles part around the cursor and settle back.
+    // vortex.vert -> uWindCenter/uWindRadius/uWindStrength
+    wind: {
+      radius: 1.35,             // influence radius in local particle space
+      strength: 0.6,            // max displacement at the cursor
+      damping: 0.08,            // per-frame lerp of the wind center
+    },
+
     kofun: {
       scale: 1.9,               // silhouette size in local particle space
       offsetY: 1.35,            // lifts the silhouette to counter the cloud's positionY
@@ -124,6 +132,25 @@ export const MAGATAMA_TUNING = {
 
     dragSensitivityXY: 0.006,
     dragSensitivityZ: 0.0015,
+
+    // Camera dolly: the camera drifts along createCameraPath() with scroll,
+    // turning the Magatama into an orbited exhibit instead of a static prop.
+    // Offsets are relative to the responsive base position from resize().
+    cameraDolly: {
+      strength: 1,              // 0 = static camera, 1 = full path amplitude
+      damping: 0.055,           // per-frame lerp toward the target offset
+    },
+  },
+
+  // Scroll-velocity reactivity: fast scrolling briefly heightens the frame
+  // (more bloom, more grain, larger particles); stillness settles it.
+  // Scene.svelte -> render loop
+  velocity: {
+    normalize: 2600,            // |px/s| that counts as "fast" (maps to 1)
+    decay: 0.93,                // per-frame decay of the smoothed impulse
+    bloomBoost: 0.55,           // added to bloom intensity at full impulse
+    grainBoost: 0.1,            // added to grain opacity at full impulse
+    particleBoost: 0.4,         // extra particle size at full impulse
   },
 
   // Responsive layout

@@ -467,3 +467,14 @@ textarea {
   color: var(--color-gold);
   overflow: visible;
 }
+
+/* Sumi reveal — letters surface from wet ink into sharp strokes. */
+.sumi-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.sumi-letter {
+  display: inline-block;
+  will-change: filter, opacity, transform;
+}

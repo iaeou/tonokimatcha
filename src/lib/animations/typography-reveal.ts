@@ -97,6 +97,82 @@ export function createBreathRevealOptions(
   };
 }
 
+export interface SumiRevealOptions {
+  /** Starting blur radius in px — the wet, unfixed ink state. */
+  blurFrom: number;
+  /** Starting opacity. */
+  opacityFrom: number;
+  /** Slight starting scale so the letters "settle" as they dry. */
+  scaleFrom: number;
+  /** Duration per letter, in seconds. */
+  duration: number;
+  /** Per-letter stagger, in seconds. */
+  stagger: number;
+  /** Easing curve. */
+  ease: string;
+}
+
+/**
+ * Defaults for the sumi (ink) reveal.
+ *
+ * Letters surface out of focus — soft, watery, translucent — and crystallise
+ * into sharp strokes, like sumi ink soaking into washi and drying. No masks,
+ * no vertical travel: presence instead of arrival. The 0.045 s letter stagger
+ * sweeps a headline in roughly a second without reading as a typewriter.
+ */
+export function createSumiRevealOptions(
+  overrides: Partial<SumiRevealOptions> = {}
+): SumiRevealOptions {
+  return {
+    blurFrom: 9,
+    opacityFrom: 0,
+    scaleFrom: 1.045,
+    duration: 1.5,
+    stagger: 0.045,
+    ease: TONOKI_REVEAL_EASE,
+    ...overrides
+  };
+}
+
+/**
+ * Replace an element's text with letter-level spans, keeping words unbreakable:
+ *
+ *   <h2><span class="sumi-word"><span class="sumi-letter">T</span>…</span> …</h2>
+ *
+ * Whitespace between words is preserved as text nodes so inline flow and
+ * wrapping behave exactly like the original text. Returns the letter spans.
+ */
+export function splitElementIntoLetterSpans(element: HTMLElement): HTMLSpanElement[] {
+  const tokens = (element.textContent ?? '').split(/(\s+)/);
+  element.textContent = '';
+
+  const letters: HTMLSpanElement[] = [];
+
+  for (const token of tokens) {
+    if (token.length === 0) continue;
+
+    if (/^\s+$/.test(token)) {
+      element.appendChild(document.createTextNode(token));
+      continue;
+    }
+
+    const word = document.createElement('span');
+    word.className = 'sumi-word';
+
+    for (const character of token) {
+      const letter = document.createElement('span');
+      letter.className = 'sumi-letter';
+      letter.textContent = character;
+      word.appendChild(letter);
+      letters.push(letter);
+    }
+
+    element.appendChild(word);
+  }
+
+  return letters;
+}
+
 export interface KintsugiOptions {
   /** Draw duration for the gold stroke, in seconds. */
   duration: number;
@@ -317,7 +393,7 @@ export function observeReveal(node: HTMLElement, reveal: () => void): () => void
   return () => observer.disconnect();
 }
 
-export type RevealMode = 'rise' | 'breath';
+export type RevealMode = 'rise' | 'breath' | 'sumi';
 
 export interface TypographyRevealParams {
   /** Which effect to apply. Defaults to `rise`. */
@@ -364,7 +440,76 @@ export const typographyReveal: Action<HTMLElement, TypographyRevealParams | unde
   // DOM split and GSAP loading (it's a dynamic import, so it can be a few ms).
   // Once GSAP is ready, gsap.set() re-asserts the same state through its own
   // tracking so the animation continues smoothly.
-  if (mode === 'rise') {
+  if (mode === 'sumi') {
+    const opts = createSumiRevealOptions();
+    const letters = splitElementIntoLetterSpans(node);
+
+    let kintsugiPath: SVGPathElement | null = null;
+    if (params?.kintsugi) {
+      const kintsugiOpts = createKintsugiOptions();
+      const { svg, path } = createKintsugiElement(kintsugiOpts);
+      node.appendChild(svg);
+      kintsugiPath = path;
+    }
+
+    if (!reduced) {
+      for (const letter of letters) {
+        letter.style.filter = `blur(${opts.blurFrom}px)`;
+        letter.style.opacity = String(opts.opacityFrom);
+        letter.style.transform = `scale(${opts.scaleFrom})`;
+      }
+      kintsugiPath?.style.setProperty('stroke-dasharray', '1');
+      kintsugiPath?.style.setProperty('stroke-dashoffset', '1');
+    }
+
+    (async () => {
+      const { default: gsap } = await import('gsap');
+      if (disposed) return;
+
+      if (reduced) {
+        gsap.set(letters, { clearProps: 'filter,opacity,transform' });
+        return;
+      }
+
+      gsap.set(letters, {
+        filter: `blur(${opts.blurFrom}px)`,
+        opacity: opts.opacityFrom,
+        scale: opts.scaleFrom
+      });
+
+      const tl = gsap.timeline({ paused: true, delay });
+      tl.to(letters, {
+        filter: 'blur(0px)',
+        opacity: 1,
+        scale: 1,
+        duration: opts.duration,
+        ease: opts.ease,
+        stagger: opts.stagger,
+        clearProps: 'filter,transform'
+      });
+      if (kintsugiPath) {
+        const kintsugiOpts = createKintsugiOptions();
+        tl.to(
+          kintsugiPath,
+          {
+            strokeDashoffset: 0,
+            duration: kintsugiOpts.duration,
+            ease: kintsugiOpts.ease
+          },
+          `-=${opts.duration * 0.5}`
+        );
+      }
+
+      const stopObserving = observeReveal(node, () => tl.play());
+
+      cleanup = () => {
+        stopObserving();
+        tl.kill();
+      };
+
+      if (disposed) cleanup();
+    })();
+  } else if (mode === 'rise') {
     const opts = createRiseRevealOptions();
     const innerSpans = splitElementIntoWordSpans(node);
 

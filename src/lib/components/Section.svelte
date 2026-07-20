@@ -1,6 +1,7 @@
 <script lang="ts">
   import { typographyReveal } from '$lib/animations/typography-reveal';
   import { kanjiDrift } from '$lib/animations/kanji-drift';
+  import { focusScrub } from '$lib/animations/focus-scrub';
 
   interface Props {
     id?: string;
@@ -23,16 +24,16 @@
     <span class="section__kanji" aria-hidden="true" use:kanjiDrift>{kanji}</span>
   {/if}
   <div class="section__inner">
-    <p class="eyebrow" use:typographyReveal={{ mode: 'breath', restLetterSpacing: '0.18em' }}>
+    <p class="eyebrow" use:typographyReveal={{ mode: 'sumi' }}>
       {eyebrow}
     </p>
     <h2
       id={`${sectionId}-title`}
-      use:typographyReveal={{ mode: 'rise', delay: 0.12, kintsugi: true }}
+      use:typographyReveal={{ mode: 'sumi', delay: 0.12, kintsugi: true }}
     >
       {title}
     </h2>
-    <div class="section__body">
+    <div class="section__body" use:focusScrub>
       {#if children}
         {@render children()}
       {/if}

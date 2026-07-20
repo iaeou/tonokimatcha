@@ -7,6 +7,8 @@ import {
   createKintsugiPathD,
   createRiseHiddenState,
   createRiseRevealOptions,
+  createSumiRevealOptions,
+  splitElementIntoLetterSpans,
   observeReveal,
   tokenizeWords
 } from './typography-reveal';
@@ -156,4 +158,35 @@ describe('createKintsugiPathD', () => {
       expect(value).toBeGreaterThanOrEqual(0);
     }
   });
+});
+
+describe('createSumiRevealOptions', () => {
+  test('surfaces letters from wet blur to sharp ink with a sweeping stagger', () => {
+    const opts = createSumiRevealOptions();
+
+    expect(opts.blurFrom).toBeGreaterThan(4);
+    expect(opts.opacityFrom).toBe(0);
+    expect(opts.scaleFrom).toBeGreaterThan(1);
+    expect(opts.stagger).toBeLessThan(0.1);
+  });
+
+  test('accepts overrides', () => {
+    expect(createSumiRevealOptions({ blurFrom: 4 }).blurFrom).toBe(4);
+  });
+});
+
+describe('splitElementIntoLetterSpans', () => {
+  test.skipIf(typeof document === 'undefined')(
+    'wraps each letter, keeps words unbreakable, and preserves spaces',
+    () => {
+    const element = document.createElement('h2');
+    element.textContent = 'The Tree';
+
+    const letters = splitElementIntoLetterSpans(element);
+
+      expect(letters).toHaveLength(7);
+      expect(element.querySelectorAll('.sumi-word')).toHaveLength(2);
+      expect(element.textContent).toBe('The Tree');
+    }
+  );
 });

@@ -53,13 +53,13 @@
     </picture>
   </figure>
   <div class="hero__content" bind:this={heroContent}>
-    <p class="eyebrow" use:typographyReveal={{ mode: 'breath', restLetterSpacing: '0.18em' }}>
+    <p class="eyebrow" use:typographyReveal={{ mode: 'sumi' }}>
       The Threshold
     </p>
     <h1
       id="threshold-title"
       class="hero-title heritage-text"
-      use:typographyReveal={{ mode: 'rise', delay: 0.35 }}
+      use:typographyReveal={{ mode: 'sumi', delay: 0.35 }}
     >
       Before history was written, we were here.
     </h1>

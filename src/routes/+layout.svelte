@@ -7,6 +7,7 @@
   import Scene from '$lib/three/Scene.svelte';
   import Navigation from '$lib/components/Navigation.svelte';
   import Footer from '$lib/components/Footer.svelte';
+  import CursorTrail from '$lib/components/CursorTrail.svelte';
 
   let { children } = $props();
 
@@ -44,6 +45,7 @@
 </script>
 
 <Scene />
+<CursorTrail />
 <Navigation />
 
 <main class="site-shell">

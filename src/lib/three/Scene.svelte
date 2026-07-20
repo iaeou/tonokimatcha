@@ -28,19 +28,21 @@
           NormalBlending,
           PMREMGenerator,
           PerspectiveCamera,
+          Plane,
           Points,
           Raycaster,
           Scene,
           SRGBColorSpace,
           ShaderMaterial,
           Vector2,
+          Vector3,
           WebGLRenderer
         },
         { RoomEnvironment },
         { BloomEffect, EffectComposer, EffectPass, NoiseEffect, RenderPass },
         { default: gsap },
         { ScrollTrigger },
-        { createLineageParticleGeometry, createMagatamaGeometry },
+        { createCameraPath, createLineageParticleGeometry, createMagatamaGeometry },
         {
           TONOKI_COLORS,
           createBloomOptions,
@@ -91,6 +93,7 @@
 
       // Postprocessing: bloom halo on jade highlights + fine film grain.
       const grainOptions = createGrainOptions();
+      const bloomBaseIntensity = createBloomOptions().intensity;
       const bloomEffect = new BloomEffect(createBloomOptions());
       const grainEffect = new NoiseEffect({ premultiply: grainOptions.premultiply });
 
@@ -114,6 +117,10 @@
         uProgress: { value: 0 },
         uKofunProgress: { value: 0 },
         uKofunCancelY: { value: 0 },
+        uVelocityBoost: { value: 0 },
+        uWindCenter: { value: new Vector3(0, 0, 99) },
+        uWindRadius: { value: MAGATAMA_TUNING.particles.wind.radius },
+        uWindStrength: { value: MAGATAMA_TUNING.particles.wind.strength },
         uSizeScale: { value: 1 },
         uEarthColor: { value: new Color() },
         uJadeColor: { value: new Color() },
@@ -165,6 +172,19 @@
       const pointer = new Vector2(0, 0);
       const dragPointer = new Vector2(0, 0);
       const raycaster = new Raycaster();
+
+      // Camera dolly along the ceremonial path + pointer wind + velocity glow.
+      const cameraPath = createCameraPath();
+      const cameraPathOrigin = cameraPath.getPoint(0);
+      const cameraBase = new Vector3();
+      const cameraTarget = new Vector3();
+      const pathPoint = new Vector3();
+      const windNDC = new Vector2(0, 0);
+      const windRaycaster = new Raycaster();
+      const windPlane = new Plane(new Vector3(0, 0, 1), 0);
+      const windWorld = new Vector3();
+      const windLocal = new Vector3();
+      let velocityImpulse = 0;
       const baseRotation = { ...MAGATAMA_TUNING.animation.baseRotation };
       const scrollRotation = { ...baseRotation };
       const dragRotation = { x: 0, y: 0, z: 0 };
@@ -207,7 +227,8 @@
         renderer.setSize(width, height, false);
         composer.setSize(width, height, false);
         camera.aspect = width / height;
-        camera.position.set(0, 0.12, width > 760 ? MAGATAMA_TUNING.layout.cameraZDesktop : MAGATAMA_TUNING.layout.cameraZMobile);
+        cameraBase.set(0, 0.12, width > 760 ? MAGATAMA_TUNING.layout.cameraZDesktop : MAGATAMA_TUNING.layout.cameraZMobile);
+        camera.position.copy(cameraBase);
         magatama.position.x = width > 760 ? MAGATAMA_TUNING.layout.positionXDesktop : width > 620 ? MAGATAMA_TUNING.layout.positionXTablet : MAGATAMA_TUNING.layout.positionXMobile;
         magatama.position.y = width > 620 ? MAGATAMA_TUNING.layout.positionYWide : MAGATAMA_TUNING.layout.positionYNarrow;
         magatama.scale.setScalar(width > 760 ? MAGATAMA_TUNING.layout.scaleDesktop : width > 620 ? MAGATAMA_TUNING.layout.scaleTablet : MAGATAMA_TUNING.layout.scaleMobile);
@@ -297,6 +318,11 @@
           scrub: 1,
           onUpdate: (self) => {
             scrollProgress = self.progress;
+            const impulse = Math.min(
+              Math.abs(self.getVelocity()) / MAGATAMA_TUNING.velocity.normalize,
+              1
+            );
+            velocityImpulse = Math.max(velocityImpulse, impulse);
           }
         }
       });
@@ -332,6 +358,37 @@
         // Let the formed Kofun silhouette face the visitor regardless of the
         // cloud's ambient spin: the shader counter-rotates the targets.
         particleUniforms.uKofunCancelY.value = particles.rotation.y;
+
+        // Camera dolly: drift along the ceremonial path with scroll, damped.
+        cameraPath.getPoint(Math.min(Math.max(scrollProgress, 0), 1), pathPoint);
+        cameraTarget
+          .copy(pathPoint)
+          .sub(cameraPathOrigin)
+          .multiplyScalar(MAGATAMA_TUNING.animation.cameraDolly.strength)
+          .add(cameraBase);
+        camera.position.lerp(cameraTarget, MAGATAMA_TUNING.animation.cameraDolly.damping);
+
+        // Pointer wind: project the cursor onto the particle plane (local).
+        windNDC.set(pointer.x, -pointer.y);
+        windRaycaster.setFromCamera(windNDC, camera);
+        if (windRaycaster.ray.intersectPlane(windPlane, windWorld)) {
+          particles.updateMatrixWorld();
+          windLocal.copy(windWorld);
+          particles.worldToLocal(windLocal);
+          particleUniforms.uWindCenter.value.lerp(
+            windLocal,
+            MAGATAMA_TUNING.particles.wind.damping
+          );
+        }
+
+        // Scroll-velocity reactivity: heightened frame while moving fast.
+        velocityImpulse *= MAGATAMA_TUNING.velocity.decay;
+        bloomEffect.intensity =
+          bloomBaseIntensity + velocityImpulse * MAGATAMA_TUNING.velocity.bloomBoost;
+        grainEffect.blendMode.opacity.value =
+          grainOptions.opacity + velocityImpulse * MAGATAMA_TUNING.velocity.grainBoost;
+        particleUniforms.uVelocityBoost.value =
+          velocityImpulse * MAGATAMA_TUNING.velocity.particleBoost;
 
         composer.render();
         frameId = requestAnimationFrame(render);
