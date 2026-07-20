@@ -50,6 +50,7 @@
           createGrainOptions,
           createMagatamaDragRotationDelta,
           createMagatamaMaterialOptions,
+          createMagatamaThemeMaterialOptions,
           createParticleThemeSettings,
           createRendererOptions
         },
@@ -145,7 +146,7 @@
       particles.rotation.x = MAGATAMA_TUNING.particles.rotationX;
       scene.add(particles);
 
-      const syncParticleTheme = () => {
+      const syncSceneTheme = () => {
         const theme = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
         const settings = createParticleThemeSettings(theme);
 
@@ -155,10 +156,16 @@
         particleUniforms.uSizeScale.value = settings.sizeScale;
         particleMaterial.blending = theme === 'light' ? NormalBlending : AdditiveBlending;
         particleMaterial.needsUpdate = true;
+
+        // The Magatama itself is theme-aware: alpha-translucent stone in the
+        // dark hall, dense refractive jade on the light stage.
+        magatamaMaterial.setValues(createMagatamaThemeMaterialOptions(theme));
+        magatamaMaterial.needsUpdate = true;
+        scene.environmentIntensity = createEnvironmentSettings(theme).intensity;
       };
 
-      const themeObserver = new MutationObserver(syncParticleTheme);
-      syncParticleTheme();
+      const themeObserver = new MutationObserver(syncSceneTheme);
+      syncSceneTheme();
       themeObserver.observe(document.documentElement, {
         attributeFilter: ['data-theme'],
         attributes: true

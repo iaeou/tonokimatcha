@@ -30,10 +30,32 @@ export const MAGATAMA_TUNING = {
     ior: 1.61,                  // refractive index; glass ~= 1.5, diamond ~= 2.4
   },
 
+  // Theme-specific material overrides, merged over `material` and applied by
+  // the theme observer in Scene.svelte. In the dark hall the cream page is
+  // absent, so alpha translucency reads as deep stone; on the light stage the
+  // same alpha dilutes into milk, so light mode trades alpha for refraction:
+  // near-opaque body, high transmission, and jade attenuation for color depth.
+  // scene-config.ts -> createMagatamaThemeMaterialOptions()
+  materialLight: {
+    color: 0x256e42,            // deeper, chroma-rich jade against the cream stage
+    opacity: 0.85,
+    transmission: 0.7,
+    thickness: 0.9,
+    attenuationColor: 0x2e8b57, // light absorbed toward sea-jade inside the stone
+    attenuationDistance: 1.4,
+  },
+  materialDark: {
+    // The dark hall keeps the base translucent stone; attenuation is reset to
+    // the physical defaults so toggling light -> dark fully round-trips.
+    attenuationColor: 0xffffff,
+    attenuationDistance: Infinity,
+  },
+
   // HDRI-style environment (procedural RoomEnvironment via PMREM)
   // Scene.svelte -> scene.environment
   environment: {
-    intensity: 0.42,          // scene.environmentIntensity; how much the env lights/refracts
+    intensity: 0.42,          // dark theme: scene.environmentIntensity
+    intensityLight: 0.58,     // light theme: wet reflections must read on cream
     rotationY: 2.1,           // radians; rotates reflections around the bead
   },
 

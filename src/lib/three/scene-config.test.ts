@@ -5,6 +5,7 @@ import {
   createEnvironmentSettings,
   createGrainOptions,
   createMagatamaMaterialOptions,
+  createMagatamaThemeMaterialOptions,
   createMagatamaDragRotationDelta,
   createParticleThemeSettings,
   createRendererOptions
@@ -113,5 +114,46 @@ describe('createGrainOptions', () => {
       premultiply: true,
       opacity: 0.14
     });
+  });
+});
+
+describe('createMagatamaThemeMaterialOptions', () => {
+  test('light mode trades alpha for refraction: dense deeper jade with attenuation', () => {
+    const opts = createMagatamaThemeMaterialOptions('light');
+
+    expect(opts).toMatchObject({
+      color: 0x256e42,
+      opacity: 0.85,
+      transmission: 0.7,
+      thickness: 0.9,
+      attenuationColor: 0x2e8b57,
+      attenuationDistance: 1.4,
+      transparent: true
+    });
+    // Shared surface character is inherited from the base stone.
+    expect(opts.clearcoat).toBe(0.9);
+    expect(opts.ior).toBe(1.61);
+  });
+
+  test('dark mode keeps the base translucent stone and resets attenuation', () => {
+    const opts = createMagatamaThemeMaterialOptions('dark');
+
+    expect(opts).toMatchObject({
+      color: 0x2e6b3e,
+      opacity: 0.3,
+      transmission: 0.5,
+      thickness: 0.3,
+      attenuationColor: 0xffffff,
+      attenuationDistance: Infinity,
+      transparent: true
+    });
+  });
+});
+
+describe('createEnvironmentSettings theme awareness', () => {
+  test('the light stage gets stronger reflections than the dark hall', () => {
+    expect(createEnvironmentSettings('dark').intensity).toBeCloseTo(0.42);
+    expect(createEnvironmentSettings('light').intensity).toBeCloseTo(0.58);
+    expect(createEnvironmentSettings('light').rotationY).toBeCloseTo(2.1);
   });
 });

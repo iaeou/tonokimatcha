@@ -54,12 +54,37 @@ export function createParticleThemeSettings(theme: Theme) {
 }
 
 /**
+ * Theme-aware Magatama material: the base stone merged with the per-theme
+ * overrides. Dark keeps the alpha-translucent stone (the ink void supplies
+ * its depth); light swaps alpha for refraction — near-opaque deeper jade with
+ * high transmission and jade attenuation — so the bead reads as dense wet
+ * stone on the cream stage instead of diluting into milk.
+ */
+export function createMagatamaThemeMaterialOptions(theme: Theme): MeshPhysicalMaterialParameters {
+  const overrides =
+    theme === 'light' ? MAGATAMA_TUNING.materialLight : MAGATAMA_TUNING.materialDark;
+  const merged = { ...MAGATAMA_TUNING.material, ...overrides };
+
+  return {
+    ...merged,
+    transparent: merged.opacity < 1
+  };
+}
+
+/**
  * Environment settings for the procedural HDRI (RoomEnvironment + PMREM).
  * The env map is what makes `transmission` read as real jade: without it the
  * refraction has nothing to bend, so the bead looks like tinted plastic.
+ * Intensity is theme-aware: the light stage needs stronger reflections for
+ * the wet-stone highlights to register against cream.
  */
-export function createEnvironmentSettings() {
-  return { ...MAGATAMA_TUNING.environment };
+export function createEnvironmentSettings(theme: Theme = 'dark') {
+  const { intensity, intensityLight, rotationY } = MAGATAMA_TUNING.environment;
+
+  return {
+    intensity: theme === 'light' ? intensityLight : intensity,
+    rotationY
+  };
 }
 
 /**
