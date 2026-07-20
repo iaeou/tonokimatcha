@@ -20,7 +20,7 @@ Tonoki Matcha is planned as a high-end SvelteKit digital museum for a luxury mat
 
 ## Current Implementation Snapshot
 
-Last reviewed: 2026-07-19.
+Last reviewed: 2026-07-20.
 
 The project is now a working SvelteKit baseline with:
 
@@ -30,6 +30,8 @@ The project is now a working SvelteKit baseline with:
 - Theme toggle persisted with `localStorage` via `src/lib/stores/theme.ts`.
 - Fluid typography tokens and Google webfont stacks with system fallbacks in `src/lib/styles/typography.css`.
 - Procedural Magatama geometry with a stout-comma bezier silhouette, circular suspension hole, and centralized tuning in `src/lib/three/magatama-tuning.ts`. The current material uses translucent mid-hisui jade (`color: 0x2e6b3e`, `opacity: 0.3`, `roughness: 0.2`, `transmission: 0.5`, `thickness: 0.3`, `ior: 1.61`, `clearcoat: 0.9`) and renders at restrained museum proportions via reduced scene scales (~45% viewport height on desktop).
+- Procedural HDRI environment (`RoomEnvironment` baked through `PMREMGenerator` into `scene.environment`, no external `.hdr` asset) so the Magatama's `transmission`/`clearcoat` refract real lighting. Intensity and Y-rotation tunable under `MAGATAMA_TUNING.environment`.
+- Postprocessing chain via pmndrs `postprocessing`: `EffectComposer` (`frameBufferType: HalfFloatType`, canvas transparency preserved) with a `RenderPass` and one `EffectPass` combining `BloomEffect` (luminance threshold above the cream stage so only jade highlights glow) and a premultiplied `NoiseEffect` film grain that leaves transparent pixels untouched. All knobs under `MAGATAMA_TUNING.postprocessing`; pure creators (`createEnvironmentSettings`, `createBloomOptions`, `createGrainOptions`) in `scene-config.ts` are unit-tested.
 - GPU particle system using custom vortex shaders for earth-to-jade lineage transition.
 - GSAP hero reveal, Magatama floating animation, ambient pointer rotation, drag-only multi-axis Magatama rotation, and ScrollTrigger links.
 - Lenis smooth scrolling via `src/lib/animations/smooth-scroll.ts`: lazily imported, GSAP ticker drives `lenis.raf`, `ScrollTrigger.update` on scroll, `anchors: true` for in-page cues, native touch scrolling preserved (`syncTouch: false`), fully disabled under `prefers-reduced-motion`. Tuning lives in `createSmoothScrollOptions()`.
