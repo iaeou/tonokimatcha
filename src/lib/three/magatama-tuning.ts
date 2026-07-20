@@ -78,6 +78,16 @@ export const MAGATAMA_TUNING = {
     opacity: 1,                 // 0 = invisible, 1 = fully visible (multiplied on top of theme alpha)
     positionY: -1.52,           // cloud Y offset below magatama
     rotationX: -0.12,           // cloud tilt in radians
+
+    // Kofun constellation: particles migrate into the Daisenryō keyhole
+    // silhouette while scrolling through The Lineage, then dissolve again.
+    // geometry.ts -> createKofunConstellationPositions()
+    kofun: {
+      scale: 1.9,               // silhouette size in local particle space
+      offsetY: 1.35,            // lifts the silhouette to counter the cloud's positionY
+      jitter: 0.07,             // constellation looseness (fraction of scale)
+      peak: 1,                  // max formation blend at the section center (0-1)
+    },
   },
 
   // Particle colors - light theme

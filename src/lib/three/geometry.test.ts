@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import {
+  createKofunConstellationPositions,
   createLineageParticleGeometry,
   createMagatamaShape,
   createLineageParticlePositions
@@ -77,5 +78,49 @@ describe('createLineageParticleGeometry', () => {
     expect(size).toBeLessThanOrEqual(18);
     expect(random.getX(0)).toBeGreaterThanOrEqual(0);
     expect(random.getX(0)).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('createKofunConstellationPositions', () => {
+  const options = { count: 200, seed: 1500, scale: 2.7, jitter: 0.12 };
+
+  test('is deterministic for a given seed', () => {
+    const first = createKofunConstellationPositions(options);
+    const second = createKofunConstellationPositions(options);
+
+    expect(first).toHaveLength(600);
+    expect([...first]).toEqual([...second]);
+  });
+
+  test('stays inside the silhouette bounds and keeps depth jitter shallow', () => {
+    const positions = createKofunConstellationPositions(options);
+    const bound = options.scale * 1.1;
+
+    for (let index = 0; index < positions.length; index += 3) {
+      expect(Math.abs(positions[index])).toBeLessThanOrEqual(bound);
+      expect(Math.abs(positions[index + 1])).toBeLessThanOrEqual(bound);
+      expect(Math.abs(positions[index + 2])).toBeLessThanOrEqual(options.jitter * options.scale * 1.01);
+    }
+  });
+
+  test('splits points between the round mound above and the square front below', () => {
+    const positions = createKofunConstellationPositions(options);
+    let above = 0;
+    let below = 0;
+
+    for (let index = 1; index < positions.length; index += 3) {
+      if (positions[index] > 0) above += 1;
+      else below += 1;
+    }
+
+    expect(above).toBeGreaterThan(options.count * 0.3);
+    expect(below).toBeGreaterThan(options.count * 0.2);
+  });
+});
+
+describe('kofun geometry attribute', () => {
+  test('lineage geometry carries aKofun constellation targets', () => {
+    const geometry = createLineageParticleGeometry({ count: 8, spread: 3, seed: 1500 });
+    expect(geometry.getAttribute('aKofun').count).toBe(8);
   });
 });

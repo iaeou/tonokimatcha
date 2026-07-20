@@ -29,7 +29,7 @@
 
 <Hero />
 
-<Section id="lineage" className="heritage-section" eyebrow="The Lineage" title="The Dignified Tree">
+<Section id="lineage" className="heritage-section" eyebrow="The Lineage" title="The Dignified Tree" kanji="樹">
   <div class="narrative-grid">
     <p>
       Tonoki begins with the idea of an upright tree: a dignified witness whose roots remain
@@ -46,7 +46,7 @@
   </div>
 </Section>
 
-<Section id="collection" eyebrow="The Collection" title="Product Degrees">
+<Section id="collection" eyebrow="The Collection" title="Product Degrees" kanji="玉">
   <div class="collection-grid">
     {#each collection as item}
       <article class="degree-card">
@@ -68,7 +68,7 @@
   </div>
 </Section>
 
-<Section id="guardian" eyebrow="The Guardian" title="Private Admission">
+<Section id="guardian" eyebrow="The Guardian" title="Private Admission" kanji="陵">
   <div class="guardian-panel">
     <p>
       Admission requests are reviewed for cultural fit, storage discipline, and the seriousness of

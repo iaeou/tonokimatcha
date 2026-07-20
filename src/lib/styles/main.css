@@ -438,3 +438,32 @@ textarea {
     justify-content: space-between;
   }
 }
+
+/* Ghost kanji watermark — one enormous character drifting behind each hall. */
+.section__kanji {
+  position: absolute;
+  top: 4%;
+  right: clamp(0.5rem, 6vw, 6rem);
+  z-index: 0;
+  font-family: 'Noto Serif JP', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+  font-size: clamp(14rem, 32vw, 30rem);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--color-ink);
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.section__inner {
+  position: relative;
+  z-index: 1;
+}
+
+/* Kintsugi seam — thin gold stroke drawn beneath rising headlines. */
+.kintsugi-line {
+  display: block;
+  margin-top: var(--space-2);
+  color: var(--color-gold);
+  overflow: visible;
+}

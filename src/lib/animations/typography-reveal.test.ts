@@ -3,6 +3,8 @@ import {
   TONOKI_REVEAL_EASE,
   createBreathRevealOptions,
   createRevealObserverOptions,
+  createKintsugiOptions,
+  createKintsugiPathD,
   createRiseHiddenState,
   createRiseRevealOptions,
   observeReveal,
@@ -119,5 +121,39 @@ describe('tokenizeWords', () => {
   test('returns an empty array for empty or whitespace-only input', () => {
     expect(tokenizeWords('')).toEqual([]);
     expect(tokenizeWords('     ')).toEqual([]);
+  });
+});
+
+describe('createKintsugiOptions', () => {
+  test('draws a short gold seam slower than a flick, faster than the rise', () => {
+    const opts = createKintsugiOptions();
+
+    expect(opts.duration).toBeCloseTo(1.1);
+    expect(opts.widthEm).toBeCloseTo(4.5);
+    expect(opts.seed).toBe(7);
+  });
+});
+
+describe('createKintsugiPathD', () => {
+  test('is deterministic per seed and varies across seeds', () => {
+    expect(createKintsugiPathD(100, 8, 7)).toBe(createKintsugiPathD(100, 8, 7));
+    expect(createKintsugiPathD(100, 8, 7)).not.toBe(createKintsugiPathD(100, 8, 8));
+  });
+
+  test('builds three cubic segments spanning the full width', () => {
+    const d = createKintsugiPathD(100, 8, 7);
+
+    expect(d.startsWith('M 0 ')).toBe(true);
+    expect(d.match(/C /g)).toHaveLength(3);
+    expect(d).toContain('100.00');
+  });
+
+  test('keeps the wobble inside the viewBox height', () => {
+    const d = createKintsugiPathD(100, 8, 7);
+    const yValues = [...d.matchAll(/(-?\d+\.\d+)(?=[,\s]|$)/g)].map((m) => Number(m[1]));
+
+    for (const value of yValues) {
+      expect(value).toBeGreaterThanOrEqual(0);
+    }
   });
 });

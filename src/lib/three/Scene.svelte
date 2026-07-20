@@ -2,6 +2,8 @@
   import { browser } from '$app/environment';
   import { onDestroy, onMount } from 'svelte';
   import { MAGATAMA_TUNING } from './magatama-tuning';
+  // Pure gate logic only — Tone.js itself stays behind a dynamic import.
+  import { shouldStrike } from '$lib/audio/jade-bell';
 
   let container: HTMLDivElement;
   let canvas: HTMLCanvasElement;
@@ -110,6 +112,8 @@
       const particleUniforms = {
         uTime: { value: 0 },
         uProgress: { value: 0 },
+        uKofunProgress: { value: 0 },
+        uKofunCancelY: { value: 0 },
         uSizeScale: { value: 1 },
         uEarthColor: { value: new Color() },
         uJadeColor: { value: new Color() },
@@ -171,6 +175,31 @@
       let lastDragX = 0;
       let lastDragY = 0;
 
+      // Sonic Magatama: dragging the stone strikes soft jade-bell tones.
+      // Loaded lazily on the first grab; the gesture unlocks the AudioContext.
+      let jadeBell: import('$lib/audio/jade-bell').JadeBell | null = null;
+      let jadeBellLoading = false;
+      let dragDistancePx = 0;
+      let lastStrikeAt = 0;
+
+      const ensureJadeBell = async () => {
+        if (jadeBell || jadeBellLoading) return;
+        jadeBellLoading = true;
+        try {
+          const { createJadeBell } = await import('$lib/audio/jade-bell');
+          const bell = await createJadeBell();
+          if (sceneDestroyed) {
+            bell.dispose();
+            return;
+          }
+          jadeBell = bell;
+        } catch {
+          // Audio is an ornament: if the context is blocked, stay silent.
+        } finally {
+          jadeBellLoading = false;
+        }
+      };
+
       const resize = () => {
         const width = container.clientWidth;
         const height = container.clientHeight;
@@ -210,6 +239,8 @@
         isDraggingMagatama = true;
         lastDragX = event.clientX;
         lastDragY = event.clientY;
+        dragDistancePx = 0;
+        void ensureJadeBell();
         document.documentElement.classList.add('is-rotating-magatama');
         event.preventDefault();
       };
@@ -225,6 +256,18 @@
         dragRotation.x += delta.x;
         dragRotation.y += delta.y;
         dragRotation.z += delta.z;
+
+        if (jadeBell) {
+          dragDistancePx +=
+            Math.abs(event.clientX - lastDragX) + Math.abs(event.clientY - lastDragY);
+          const now = performance.now();
+          if (shouldStrike({ accumulatedPx: dragDistancePx, elapsedMs: now - lastStrikeAt })) {
+            jadeBell.strike(1 - event.clientY / window.innerHeight);
+            dragDistancePx = 0;
+            lastStrikeAt = now;
+          }
+        }
+
         lastDragX = event.clientX;
         lastDragY = event.clientY;
         event.preventDefault();
@@ -268,6 +311,10 @@
           scrub: true,
           onUpdate: (self) => {
             scrollProgress = Math.max(scrollProgress, self.progress);
+            // Keyhole constellation forms at the heart of The Lineage and
+            // dissolves on the way out: sin() peaks mid-section.
+            particleUniforms.uKofunProgress.value =
+              Math.sin(self.progress * Math.PI) * MAGATAMA_TUNING.particles.kofun.peak;
           }
         }
       });
@@ -282,6 +329,9 @@
           scrollRotation.z + dragRotation.z
         );
         particles.rotation.y = time * MAGATAMA_TUNING.animation.particleRotationRate + scrollProgress * MAGATAMA_TUNING.animation.scrollParticleRate;
+        // Let the formed Kofun silhouette face the visitor regardless of the
+        // cloud's ambient spin: the shader counter-rotates the targets.
+        particleUniforms.uKofunCancelY.value = particles.rotation.y;
 
         composer.render();
         frameId = requestAnimationFrame(render);
@@ -319,6 +369,8 @@
         particleMaterial.dispose();
         composer.dispose();
         environmentTexture.dispose();
+        jadeBell?.dispose();
+        jadeBell = null;
         renderer.dispose();
       };
     };

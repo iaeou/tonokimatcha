@@ -97,6 +97,98 @@ export function createBreathRevealOptions(
   };
 }
 
+export interface KintsugiOptions {
+  /** Draw duration for the gold stroke, in seconds. */
+  duration: number;
+  /** Easing curve. */
+  ease: string;
+  /** Line width relative to the heading's font size. */
+  widthEm: number;
+  /** SVG viewBox height in px-ish units (the wobble amplitude lives inside). */
+  height: number;
+  /** Stroke width in viewBox units. */
+  strokeWidth: number;
+  /** Deterministic seed for the wavering path. */
+  seed: number;
+}
+
+/**
+ * Defaults for the kintsugi underline.
+ *
+ * A thin gold seam drawn beneath the heading before the words finish rising —
+ * the repaired-crack gesture, not a text-decoration underline. Width is
+ * intentionally shorter than the heading (4.5em) so it reads as a mark, and
+ * the 1.1 s draw overlaps the tail of the word rise.
+ */
+export function createKintsugiOptions(overrides: Partial<KintsugiOptions> = {}): KintsugiOptions {
+  return {
+    duration: 1.1,
+    ease: TONOKI_REVEAL_EASE,
+    widthEm: 4.5,
+    height: 8,
+    strokeWidth: 1.1,
+    seed: 7,
+    ...overrides
+  };
+}
+
+/**
+ * Deterministic wavering path for the kintsugi seam: three cubic segments
+ * whose control points drift vertically by an LCG-seeded wobble, like a crack
+ * filled by hand rather than a ruled line. Pure and testable; `width` is the
+ * viewBox width, `height` the viewBox height the wobble stays inside.
+ */
+export function createKintsugiPathD(width: number, height: number, seed: number): string {
+  let state = (seed || 1) >>> 0;
+  const next = () => {
+    state = (state * 1664525 + 1013904223) >>> 0;
+    return state / 4294967295;
+  };
+
+  const mid = height / 2;
+  const wobble = height * 0.32;
+  const y = () => (mid + (next() - 0.5) * 2 * wobble).toFixed(2);
+  const segment = width / 3;
+
+  let d = `M 0 ${y()}`;
+  for (let index = 0; index < 3; index += 1) {
+    const x0 = segment * index;
+    d += ` C ${(x0 + segment * 0.35).toFixed(2)} ${y()}, ${(x0 + segment * 0.65).toFixed(2)} ${y()}, ${(x0 + segment).toFixed(2)} ${y()}`;
+  }
+
+  return d;
+}
+
+/**
+ * Build the kintsugi SVG element (browser only). Uses `pathLength="1"` so the
+ * draw-on animation is a simple dashoffset 1 → 0 without measuring.
+ */
+export function createKintsugiElement(opts: KintsugiOptions): {
+  svg: SVGSVGElement;
+  path: SVGPathElement;
+} {
+  const xmlns = 'http://www.w3.org/2000/svg';
+  const viewWidth = 100;
+  const svg = document.createElementNS(xmlns, 'svg');
+
+  svg.setAttribute('viewBox', `0 0 ${viewWidth} ${opts.height}`);
+  svg.setAttribute('aria-hidden', 'true');
+  svg.classList.add('kintsugi-line');
+  svg.style.width = `${opts.widthEm}em`;
+  svg.style.height = `${opts.height}px`;
+
+  const path = document.createElementNS(xmlns, 'path');
+  path.setAttribute('d', createKintsugiPathD(viewWidth, opts.height, opts.seed));
+  path.setAttribute('pathLength', '1');
+  path.setAttribute('fill', 'none');
+  path.setAttribute('stroke', 'currentColor');
+  path.setAttribute('stroke-width', String(opts.strokeWidth));
+  path.setAttribute('stroke-linecap', 'round');
+
+  svg.appendChild(path);
+  return { svg, path };
+}
+
 /**
  * Pre-hide state passed to `gsap.set()` for word spans in rise mode.
  *
@@ -231,6 +323,11 @@ export interface TypographyRevealParams {
   /** Which effect to apply. Defaults to `rise`. */
   mode?: RevealMode;
   /**
+   * For `rise` mode: draw a thin gold kintsugi seam beneath the heading as the
+   * words rise. The seam inherits `currentColor` from `.kintsugi-line` (gold).
+   */
+  kintsugi?: boolean;
+  /**
    * For `breath` mode: the target resting letter-spacing. Defaults to the
    * element's computed `letter-spacing` read at mount, but passing it
    * explicitly avoids a layout read and is more reliable for em-relative
@@ -271,11 +368,21 @@ export const typographyReveal: Action<HTMLElement, TypographyRevealParams | unde
     const opts = createRiseRevealOptions();
     const innerSpans = splitElementIntoWordSpans(node);
 
+    let kintsugiPath: SVGPathElement | null = null;
+    if (params?.kintsugi) {
+      const kintsugiOpts = createKintsugiOptions();
+      const { svg, path } = createKintsugiElement(kintsugiOpts);
+      node.appendChild(svg);
+      kintsugiPath = path;
+    }
+
     if (!reduced) {
       for (const span of innerSpans) {
         span.style.transform = `translateY(${opts.riseFromPercent}%)`;
       }
       node.style.letterSpacing = opts.letterSpacingFrom;
+      kintsugiPath?.style.setProperty('stroke-dasharray', '1');
+      kintsugiPath?.style.setProperty('stroke-dashoffset', '1');
     }
 
     (async () => {
@@ -310,6 +417,19 @@ export const typographyReveal: Action<HTMLElement, TypographyRevealParams | unde
         },
         '<'
       );
+      if (kintsugiPath) {
+        const kintsugiOpts = createKintsugiOptions();
+        // Start the seam as the last words are still settling.
+        tl.to(
+          kintsugiPath,
+          {
+            strokeDashoffset: 0,
+            duration: kintsugiOpts.duration,
+            ease: kintsugiOpts.ease
+          },
+          `-=${opts.duration * 0.5}`
+        );
+      }
 
       const stopObserving = observeReveal(node, () => tl.play());
 

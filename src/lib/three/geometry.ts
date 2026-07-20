@@ -77,6 +77,85 @@ export function createLineageParticlePositions({ count, spread, seed }: Particle
   return positions;
 }
 
+interface KofunOptions {
+  count: number;
+  seed: number;
+  scale: number;
+  jitter: number;
+  /** Vertical shift in local space (counters the cloud's positionY offset). */
+  offsetY?: number;
+}
+
+/**
+ * Kofun constellation targets — the keyhole silhouette of a zenpō-kōen-fun
+ * (front-square, rear-round imperial mound like the Daisenryō Kofun), traced
+ * as points along its perimeter for the lineage particles to migrate into.
+ *
+ * Layout in local particle space, facing the camera (XY plane):
+ *   - the round rear mound: a circle of radius 0.62·scale centered above,
+ *   - the square front: a trapezoid flaring from the circle down to the base.
+ *
+ * ~58% of the points walk the circle, the rest walk the trapezoid perimeter,
+ * with a deterministic LCG jitter so it reads as a constellation, not a wire.
+ */
+export function createKofunConstellationPositions({
+  count,
+  seed,
+  scale,
+  jitter,
+  offsetY = 0
+}: KofunOptions) {
+  const positions = new Float32Array(count * 3);
+  let state = (seed + 331) >>> 0;
+  const next = () => {
+    state = (state * 1664525 + 1013904223) >>> 0;
+    return state / 4294967295;
+  };
+
+  const circleRadius = 0.62 * scale;
+  const circleCenterY = 0.38 * scale;
+  const trapezoidTopY = circleCenterY - circleRadius * 0.72;
+  const trapezoidBottomY = -0.78 * scale;
+  const trapezoidTopHalf = 0.34 * scale;
+  const trapezoidBottomHalf = 0.52 * scale;
+  const circleShare = 0.58;
+
+  for (let index = 0; index < count; index += 1) {
+    const base = index * 3;
+    const onCircle = index / count < circleShare;
+    let x: number;
+    let y: number;
+
+    if (onCircle) {
+      const angle = next() * Math.PI * 2;
+      x = Math.cos(angle) * circleRadius;
+      y = circleCenterY + Math.sin(angle) * circleRadius;
+    } else {
+      // Walk the trapezoid perimeter: left edge, bottom, right edge.
+      const t = next();
+      if (t < 0.35) {
+        const k = t / 0.35;
+        x = -(trapezoidTopHalf + (trapezoidBottomHalf - trapezoidTopHalf) * k);
+        y = trapezoidTopY + (trapezoidBottomY - trapezoidTopY) * k;
+      } else if (t < 0.65) {
+        const k = (t - 0.35) / 0.3;
+        x = -trapezoidBottomHalf + trapezoidBottomHalf * 2 * k;
+        y = trapezoidBottomY;
+      } else {
+        const k = (t - 0.65) / 0.35;
+        x = trapezoidBottomHalf - (trapezoidBottomHalf - trapezoidTopHalf) * k;
+        y = trapezoidBottomY + (trapezoidTopY - trapezoidBottomY) * k;
+      }
+    }
+
+    positions[base] = x + (next() - 0.5) * 2 * jitter * scale;
+    positions[base + 1] = y + offsetY + (next() - 0.5) * 2 * jitter * scale;
+    positions[base + 2] = (next() - 0.5) * 2 * jitter * scale;
+  }
+
+  return positions;
+}
+
 export function createLineageParticleGeometry(options: ParticleOptions) {
   const geometry = new BufferGeometry();
   const randoms = new Float32Array(options.count * 3);
@@ -99,6 +178,19 @@ export function createLineageParticleGeometry(options: ParticleOptions) {
   geometry.setAttribute('position', new Float32BufferAttribute(createLineageParticlePositions(options), 3));
   geometry.setAttribute('aRandom', new Float32BufferAttribute(randoms, 3));
   geometry.setAttribute('aSize', new Float32BufferAttribute(sizes, 1));
+  geometry.setAttribute(
+    'aKofun',
+    new Float32BufferAttribute(
+      createKofunConstellationPositions({
+        count: options.count,
+        seed: options.seed,
+        scale: MAGATAMA_TUNING.particles.kofun.scale,
+        jitter: MAGATAMA_TUNING.particles.kofun.jitter,
+        offsetY: MAGATAMA_TUNING.particles.kofun.offsetY
+      }),
+      3
+    )
+  );
   return geometry;
 }
 
