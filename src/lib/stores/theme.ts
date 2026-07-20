@@ -9,8 +9,10 @@ export function isTheme(value: unknown): value is Theme {
   return value === 'light' || value === 'dark';
 }
 
+export const DEFAULT_THEME: Theme = 'dark';
+
 export function getInitialTheme(savedTheme: unknown): Theme {
-  return isTheme(savedTheme) ? savedTheme : 'light';
+  return isTheme(savedTheme) ? savedTheme : DEFAULT_THEME;
 }
 
 export function getNextTheme(theme: Theme): Theme {
@@ -18,7 +20,7 @@ export function getNextTheme(theme: Theme): Theme {
 }
 
 function readStoredTheme(): Theme {
-  if (!browser) return 'light';
+  if (!browser) return DEFAULT_THEME;
   return getInitialTheme(window.localStorage.getItem(STORAGE_KEY));
 }
 
@@ -31,7 +33,7 @@ function applyTheme(theme: Theme) {
 }
 
 function createThemeStore() {
-  const { subscribe, set, update } = writable<Theme>('light');
+  const { subscribe, set, update } = writable<Theme>(DEFAULT_THEME);
 
   return {
     subscribe,

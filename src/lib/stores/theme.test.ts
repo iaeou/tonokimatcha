@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { getInitialTheme, getNextTheme, isTheme } from './theme';
+import { DEFAULT_THEME, getInitialTheme, getNextTheme, isTheme } from './theme';
 
 describe('isTheme', () => {
   test('accepts only supported Tonoki themes', () => {
@@ -11,12 +11,15 @@ describe('isTheme', () => {
 });
 
 describe('getInitialTheme', () => {
-  test('defaults to light when no saved theme exists', () => {
-    expect(getInitialTheme(null)).toBe('light');
+  test('defaults to ceremonial dark when no saved theme exists', () => {
+    expect(DEFAULT_THEME).toBe('dark');
+    expect(getInitialTheme(null)).toBe('dark');
+    expect(getInitialTheme('system')).toBe('dark');
   });
 
   test('uses a saved supported theme', () => {
     expect(getInitialTheme('dark')).toBe('dark');
+    expect(getInitialTheme('light')).toBe('light');
   });
 });
 

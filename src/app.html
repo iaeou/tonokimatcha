@@ -1,7 +1,20 @@
 <!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="utf-8" />
+    <script>
+      // Apply the saved theme before first paint to avoid a flash.
+      // Keep in sync with STORAGE_KEY / DEFAULT_THEME in src/lib/stores/theme.ts.
+      try {
+        var tonokiTheme = localStorage.getItem('tonoki-theme');
+        if (tonokiTheme === 'light' || tonokiTheme === 'dark') {
+          document.documentElement.dataset.theme = tonokiTheme;
+        }
+        document.documentElement.style.colorScheme = document.documentElement.dataset.theme;
+      } catch (error) {
+        /* storage unavailable: keep the dark default */
+      }
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
