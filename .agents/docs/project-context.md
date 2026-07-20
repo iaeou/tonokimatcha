@@ -26,8 +26,7 @@ The project is now a working SvelteKit baseline with:
 
 - Global layout rendering a fixed Three.js scene behind the page content.
 - Navigation, footer, landing content, collection cards, and club request route at `/club`.
-- Vanilla CSS theme system with light as default and dark as the previous moss/ink palette.
-- Theme toggle persisted with `localStorage` via `src/lib/stores/theme.ts`.
+- Vanilla CSS theme system with **ceremonial dark as the default**; the saved `localStorage['tonoki-theme']` preference is applied by an inline `app.html` script before first paint (no FOUC). Store in `src/lib/stores/theme.ts` (`DEFAULT_THEME`).
 - Fluid typography tokens and Google webfont stacks with system fallbacks in `src/lib/styles/typography.css`.
 - Procedural Magatama geometry with a stout-comma bezier silhouette, circular suspension hole, and centralized tuning in `src/lib/three/magatama-tuning.ts`. The current material uses translucent mid-hisui jade (`color: 0x2e6b3e`, `opacity: 0.3`, `roughness: 0.2`, `transmission: 0.5`, `thickness: 0.3`, `ior: 1.61`, `clearcoat: 0.9`) and renders at restrained museum proportions via reduced scene scales (~45% viewport height on desktop).
 - Procedural HDRI environment (`RoomEnvironment` baked through `PMREMGenerator` into `scene.environment`, no external `.hdr` asset) so the Magatama's `transmission`/`clearcoat` refract real lighting. Intensity and Y-rotation tunable under `MAGATAMA_TUNING.environment`.
@@ -39,7 +38,14 @@ The project is now a working SvelteKit baseline with:
 - Focused Vitest coverage for theme logic, hero animation options, Three.js config, Magatama geometry, and particle attributes.
 - Branded webfont pairing — Cormorant Garamond for English ceremonial display, Noto Serif JP as the mincho heritage fallback, and Zen Kaku Gothic New + Inter for body/UI text — loaded via Google Fonts with `preconnect` and `display=swap`.
 - Vite manualChunks splits `three` and `gsap` into their own async chunks so the initial page shell loads independently of WebGL.
-- Typography reveal effects on headings and eyebrows via `src/lib/animations/typography-reveal.ts` (`typographyReveal` Svelte action). `rise` mode splits headings into per-word mask spans and animates them up while the heading's `letter-spacing` tightens from `-0.02em` to rest. `breath` mode (used on `.eyebrow`) eases `letter-spacing` from `0em` to its resting value (e.g. `0.18em`) with a subtle opacity fade. Both are IntersectionObserver-triggered once, respect `prefers-reduced-motion`, and pre-hide synchronously so there's no flash before GSAP loads.
+- Typography reveal via `src/lib/animations/typography-reveal.ts` (`typographyReveal` Svelte action). The live mode is `sumi`: per-letter blur/opacity/scale reveal (ink crystallising on washi), used on the hero h1/eyebrow and all Section h2s/eyebrows; h2s also draw a `kintsugi` gold seam (deterministic SVG `pathLength` dashoffset). Legacy `rise`/`breath` modes remain in the module but are unused, pending deletion after Jaume's sign-off. IntersectionObserver-triggered once, reduced-motion-safe, synchronous pre-hide.
+- Ghost kanji watermarks (樹/玉/陵) behind each Section headline via `kanji-drift.ts` — huge Noto Serif JP characters scrubbed 0 → 7% opacity → 0 with a downward drift across the section.
+- Reading-band focus via `focus-scrub.ts` on section bodies: paragraph-like elements scrub opacity 0.24 → 1 between `top 92%` and `top 58%`, 1:1 with scroll.
+- Scroll-reactive scene: the camera dollies along `createCameraPath()` (damped offsets, `animation.cameraDolly`), and scroll velocity briefly boosts bloom/grain/particle size (`MAGATAMA_TUNING.velocity`).
+- Kofun constellation: while scrolling The Lineage, the lineage particles migrate into the Daisenryō keyhole silhouette (`createKofunConstellationPositions`, `aKofun` attribute, counter-rotated via `uKofunCancelY` to face the visitor), peaking mid-section and dissolving on exit. Tuning under `particles.kofun`.
+- Pointer wind: the particle cloud parts around the cursor (gaussian falloff in `vortex.vert`, `particles.wind` tuning), gentler while the constellation holds.
+- Sonic Magatama: dragging the bead strikes quiet jade-bell tones — `src/lib/audio/jade-bell.ts`, Tone.js FMSynth → -16 dB → 5.5 s reverb, D-minor pentatonic picked by pointer height, strikes gated by drag distance + time. Tone.js loads lazily on the first grab (gesture unlocks the AudioContext). Timbre knobs in `JADE_BELL_TUNING`.
+- Ceremonial cursor trail: `CursorTrail.svelte` fixed-canvas overlay + pure logic in `cursor-trail.ts` — gold ink motes dissolve behind fine pointers; disabled for touch and reduced motion.
 - The latest visual reference is `.agents/docs/magatama-reference-geometry-2026-05-26.jpg`; older transient WebGL screenshots were removed to keep the agent docs focused.
 
 ## Known Local Development Note
