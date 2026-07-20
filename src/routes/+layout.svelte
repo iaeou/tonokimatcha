@@ -8,6 +8,7 @@
   import Navigation from '$lib/components/Navigation.svelte';
   import Footer from '$lib/components/Footer.svelte';
   import CursorTrail from '$lib/components/CursorTrail.svelte';
+  import CursorPointer from '$lib/components/CursorPointer.svelte';
 
   let { children } = $props();
 
@@ -46,6 +47,7 @@
 
 <Scene />
 <CursorTrail />
+<CursorPointer />
 <Navigation />
 
 <main class="site-shell">
