@@ -90,7 +90,7 @@ describe('createEnvironmentSettings', () => {
   test('exposes a defensive copy of the HDRI environment tuning', () => {
     const settings = createEnvironmentSettings();
 
-    expect(settings).toEqual({ intensity: 0.85, rotationY: 2.1 });
+    expect(settings).toEqual({ intensity: 0.42, rotationY: 2.1 });
     expect(settings).not.toBe(createEnvironmentSettings());
   });
 });

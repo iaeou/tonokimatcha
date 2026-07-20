@@ -33,7 +33,7 @@ export const MAGATAMA_TUNING = {
   // HDRI-style environment (procedural RoomEnvironment via PMREM)
   // Scene.svelte -> scene.environment
   environment: {
-    intensity: 0.85,          // scene.environmentIntensity; how much the env lights/refracts
+    intensity: 0.42,          // scene.environmentIntensity; how much the env lights/refracts
     rotationY: 2.1,           // radians; rotates reflections around the bead
   },
 
@@ -58,7 +58,7 @@ export const MAGATAMA_TUNING = {
   // Scene.svelte -> ambientLight / keyLight
   lighting: {
     ambientColor: 0xf4efe4,     // ceremonial white
-    ambientIntensity: 0.52,
+    ambientIntensity: 0.34,   // lowered when the HDRI env arrived (env now supplies fill light)
     keyLightColor: 0x00a86b,    // hisui jade
     keyLightIntensity: 2.2,
     keyLightX: 5,

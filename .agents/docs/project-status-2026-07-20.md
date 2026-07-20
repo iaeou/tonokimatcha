@@ -35,9 +35,13 @@ Note: transparency over the page background is preserved (alpha renderer + HalfF
 
 The Cowork outputs mount does not allow file deletion (EPERM on unlink), which breaks `svelte-kit sync`. Run build phases from a `/tmp` mirror (persists across bash calls; background processes do NOT survive a call — run rsync/install in foreground).
 
+## Visual Tuning Pass (same day, browser via Chrome MCP + dev server on host Mac)
+
+- `environment.intensity` 0.85 → 0.42 and `lighting.ambientIntensity` 0.52 → 0.34: at 0.85 the env over-lit the bead. In light theme the bead reads intentionally pale (opacity 0.3 over cream — established design); dark theme is where the change shines: deep polished jade, transmission glow on the lower belly, restrained bloom glints, subtle premultiplied grain. No console errors; bloom 0.75/0.62 and grain 0.14 kept as shipped.
+- Screenshot workflow note: the hero photo lazy-loads OVER the canvas — screenshot the Magatama from lower sections (e.g. The Lineage) after ~10 scroll ticks; keyboard scrolling (Home/cmd+Up) does not move Lenis, use mouse-wheel scroll or reload.
+
 ## Still Open
 
-- Visual tuning pass of bloom/grain/env values in browser (Jaume to eyeball).
 - Real Kofun media, Haniwa/Sueki `.glb`, provenance visuals, SEO, accessibility QA, deployment.
 - Pinned horizontal Collection gallery with per-product Magatama tinting.
 - Supabase backend for `/club` with invitation-code access (next roadmap item).
