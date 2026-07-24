@@ -1,3 +1,4 @@
+import { DoubleSide } from 'three';
 import type {
   MeshPhysicalMaterialParameters,
   MeshStandardMaterialParameters,
@@ -18,7 +19,12 @@ export function createLowPolyMaterialOptions(): MeshStandardMaterialParameters {
     flatShading: MAGATAMA_TUNING.lowPoly.flatShading,
     roughness: MAGATAMA_TUNING.lowPoly.roughness,
     metalness: MAGATAMA_TUNING.lowPoly.metalness,
-    envMapIntensity: MAGATAMA_TUNING.lowPoly.envMapIntensity
+    envMapIntensity: MAGATAMA_TUNING.lowPoly.envMapIntensity,
+    // The source artwork's facets aren't consistently wound, so a handful of
+    // front triangles face away and get culled — reading as hollow gaps. The
+    // bead is a small opaque mesh, so render both sides: every facet shows
+    // regardless of its winding, and flat shading flips normals per fragment.
+    side: DoubleSide
   };
 }
 

@@ -169,5 +169,7 @@ describe('createLowPolyMaterialOptions', () => {
     expect(opts.roughness).toBeGreaterThan(0.4);
     expect(opts.metalness).toBeLessThan(0.2);
     expect(opts.envMapIntensity).toBeGreaterThan(0);
+    // DoubleSide (2): the artwork's mixed winding must not cull facets to holes.
+    expect(opts.side).toBe(2);
   });
 });
