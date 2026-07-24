@@ -1,6 +1,26 @@
-import type { MeshPhysicalMaterialParameters, WebGLRendererParameters } from 'three';
+import type {
+  MeshPhysicalMaterialParameters,
+  MeshStandardMaterialParameters,
+  WebGLRendererParameters
+} from 'three';
 import type { Theme } from '$lib/stores/theme';
 import { MAGATAMA_TUNING } from './magatama-tuning';
+
+/**
+ * Material for the faceted low-poly Magatama. Vertex colors carry the artwork,
+ * so this is a plain flat-shaded standard surface — a matte stone that catches
+ * a little HDRI sheen on each facet. Theme-independent: the greens + gold read
+ * on both the cream and ink stages.
+ */
+export function createLowPolyMaterialOptions(): MeshStandardMaterialParameters {
+  return {
+    vertexColors: true,
+    flatShading: MAGATAMA_TUNING.lowPoly.flatShading,
+    roughness: MAGATAMA_TUNING.lowPoly.roughness,
+    metalness: MAGATAMA_TUNING.lowPoly.metalness,
+    envMapIntensity: MAGATAMA_TUNING.lowPoly.envMapIntensity
+  };
+}
 
 interface DragRotationInput {
   movementX: number;

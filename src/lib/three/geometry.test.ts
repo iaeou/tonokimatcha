@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest';
 import {
   createKofunConstellationPositions,
   createLineageParticleGeometry,
+  createMagatamaLowPolyGeometry,
   createMagatamaShape,
   createLineageParticlePositions
 } from './geometry';
@@ -122,5 +123,32 @@ describe('kofun geometry attribute', () => {
   test('lineage geometry carries aKofun constellation targets', () => {
     const geometry = createLineageParticleGeometry({ count: 8, spread: 3, seed: 1500 });
     expect(geometry.getAttribute('aKofun').count).toBe(8);
+  });
+});
+
+
+describe('createMagatamaLowPolyGeometry', () => {
+  test('builds a non-indexed vertex-colored faceted bead within its local bounds', () => {
+    const geometry = createMagatamaLowPolyGeometry();
+    const position = geometry.getAttribute('position');
+    const color = geometry.getAttribute('color');
+
+    expect(geometry.index).toBeNull();
+    expect(position.count).toBeGreaterThan(300);
+    expect(position.count % 3).toBe(0);
+    expect(color.count).toBe(position.count);
+
+    geometry.computeBoundingBox();
+    const box = geometry.boundingBox!;
+    // ~3.9 tall, centered, with real extruded depth for the rim.
+    expect(box.max.y - box.min.y).toBeGreaterThan(3);
+    expect(Math.abs(box.max.y + box.min.y)).toBeLessThan(0.05);
+    expect(box.max.z - box.min.z).toBeGreaterThan(0.3);
+
+    // Colors are normalized linear RGB in [0, 1].
+    for (let i = 0; i < color.array.length; i += 1) {
+      expect(color.array[i]).toBeGreaterThanOrEqual(0);
+      expect(color.array[i]).toBeLessThanOrEqual(1);
+    }
   });
 });

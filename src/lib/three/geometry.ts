@@ -8,6 +8,27 @@ import {
   Vector3
 } from 'three';
 import { MAGATAMA_TUNING } from './magatama-tuning';
+import {
+  MAGATAMA_LOWPOLY_COLORS,
+  MAGATAMA_LOWPOLY_POSITIONS
+} from './magatama-lowpoly-data';
+
+/**
+ * Faceted low-poly Magatama, baked from the brand's `texture.svg` artwork
+ * (27 colored facets → front + back faces + a unioned side rim). Non-indexed
+ * geometry so `flatShading` gives each facet its own crisp normal, and a
+ * per-vertex `color` attribute carries the artwork's greens + gold straight
+ * onto the mesh. Consumed by a vertex-colored MeshStandardMaterial in the
+ * scene; scaled to taste there like the procedural bead.
+ */
+export function createMagatamaLowPolyGeometry() {
+  const geometry = new BufferGeometry();
+  geometry.setAttribute('position', new Float32BufferAttribute(MAGATAMA_LOWPOLY_POSITIONS, 3));
+  geometry.setAttribute('color', new Float32BufferAttribute(MAGATAMA_LOWPOLY_COLORS, 3));
+  geometry.computeVertexNormals();
+  geometry.computeBoundingSphere();
+  return geometry;
+}
 
 interface ParticleOptions {
   count: number;

@@ -25,6 +25,7 @@
           HalfFloatType,
           Mesh,
           MeshPhysicalMaterial,
+          MeshStandardMaterial,
           NormalBlending,
           PMREMGenerator,
           PerspectiveCamera,
@@ -42,12 +43,18 @@
         { BloomEffect, EffectComposer, EffectPass, NoiseEffect, RenderPass },
         { default: gsap },
         { ScrollTrigger },
-        { createCameraPath, createLineageParticleGeometry, createMagatamaGeometry },
+        {
+          createCameraPath,
+          createLineageParticleGeometry,
+          createMagatamaGeometry,
+          createMagatamaLowPolyGeometry
+        },
         {
           TONOKI_COLORS,
           createBloomOptions,
           createEnvironmentSettings,
           createGrainOptions,
+          createLowPolyMaterialOptions,
           createMagatamaDragRotationDelta,
           createMagatamaMaterialOptions,
           createMagatamaThemeMaterialOptions,
@@ -107,8 +114,17 @@
       composer.addPass(renderPass);
       composer.addPass(effectPass);
 
-      const magatamaMaterial = new MeshPhysicalMaterial(createMagatamaMaterialOptions());
-      const magatama = new Mesh(createMagatamaGeometry(), magatamaMaterial);
+      // The bead is either the faceted low-poly form (baked from texture.svg)
+      // or the smooth jade bead, chosen by the tuning flag. Low-poly is opaque
+      // vertex-colored stone; the jade path stays theme-reactive.
+      const useLowPoly = MAGATAMA_TUNING.lowPoly.enabled;
+      const magatamaMaterial = useLowPoly
+        ? new MeshStandardMaterial(createLowPolyMaterialOptions())
+        : new MeshPhysicalMaterial(createMagatamaMaterialOptions());
+      const magatama = new Mesh(
+        useLowPoly ? createMagatamaLowPolyGeometry() : createMagatamaGeometry(),
+        magatamaMaterial
+      );
 
       magatama.rotation.set(MAGATAMA_TUNING.animation.baseRotation.x, MAGATAMA_TUNING.animation.baseRotation.y, MAGATAMA_TUNING.animation.baseRotation.z);
       scene.add(magatama);
@@ -157,11 +173,15 @@
         particleMaterial.blending = theme === 'light' ? NormalBlending : AdditiveBlending;
         particleMaterial.needsUpdate = true;
 
-        // The Magatama itself is theme-aware: alpha-translucent stone in the
-        // dark hall, dense refractive jade on the light stage.
-        magatamaMaterial.setValues(createMagatamaThemeMaterialOptions(theme));
-        magatamaMaterial.needsUpdate = true;
-        scene.environmentIntensity = createEnvironmentSettings(theme).intensity;
+        // The faceted low-poly bead carries its own vertex colors and reads on
+        // both stages, so only the smooth jade bead swaps material per theme.
+        if (!useLowPoly && magatamaMaterial instanceof MeshPhysicalMaterial) {
+          magatamaMaterial.setValues(createMagatamaThemeMaterialOptions(theme));
+          magatamaMaterial.needsUpdate = true;
+        }
+        scene.environmentIntensity = useLowPoly
+          ? MAGATAMA_TUNING.lowPoly.envMapIntensity
+          : createEnvironmentSettings(theme).intensity;
       };
 
       const themeObserver = new MutationObserver(syncSceneTheme);
@@ -238,7 +258,8 @@
         camera.position.copy(cameraBase);
         magatama.position.x = width > 760 ? MAGATAMA_TUNING.layout.positionXDesktop : width > 620 ? MAGATAMA_TUNING.layout.positionXTablet : MAGATAMA_TUNING.layout.positionXMobile;
         magatama.position.y = width > 620 ? MAGATAMA_TUNING.layout.positionYWide : MAGATAMA_TUNING.layout.positionYNarrow;
-        magatama.scale.setScalar(width > 760 ? MAGATAMA_TUNING.layout.scaleDesktop : width > 620 ? MAGATAMA_TUNING.layout.scaleTablet : MAGATAMA_TUNING.layout.scaleMobile);
+        const baseScale = width > 760 ? MAGATAMA_TUNING.layout.scaleDesktop : width > 620 ? MAGATAMA_TUNING.layout.scaleTablet : MAGATAMA_TUNING.layout.scaleMobile;
+        magatama.scale.setScalar(baseScale * (useLowPoly ? MAGATAMA_TUNING.lowPoly.scaleBoost : 1));
         camera.updateProjectionMatrix();
       };
 

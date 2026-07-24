@@ -30,6 +30,24 @@ export const MAGATAMA_TUNING = {
     ior: 1.61,                  // refractive index; glass ~= 1.5, diamond ~= 2.4
   },
 
+  // Faceted low-poly Magatama (baked from texture.svg). This is the active
+  // look; the jade `material`/`materialLight`/`materialDark` above now feed
+  // only the unused smooth path. Vertex colors come from the artwork, so the
+  // material is a plain flat-shaded standard surface — matte stone with a
+  // touch of sheen from the HDRI. Same for both themes (the greens read on
+  // cream and ink alike).
+  // scene-config.ts -> createLowPolyMaterialOptions()
+  // Scene.svelte -> magatama mesh
+  lowPoly: {
+    enabled: true,              // false = fall back to the smooth jade bead
+    roughness: 0.62,            // matte faceted stone
+    metalness: 0.05,
+    flatShading: true,          // crisp per-facet normals (the low-poly look)
+    envMapIntensity: 0.9,       // how much the HDRI sheens the facets
+    edgeDarken: 0.5,            // rim/edge color multiplier (baked into data)
+    scaleBoost: 1.12,           // slightly larger than the jade bead to match presence
+  },
+
   // Theme-specific material overrides, merged over `material` and applied by
   // the theme observer in Scene.svelte. In the dark hall the cream page is
   // absent, so alpha translucency reads as deep stone; on the light stage the

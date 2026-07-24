@@ -4,6 +4,7 @@ import {
   createBloomOptions,
   createEnvironmentSettings,
   createGrainOptions,
+  createLowPolyMaterialOptions,
   createMagatamaMaterialOptions,
   createMagatamaThemeMaterialOptions,
   createMagatamaDragRotationDelta,
@@ -155,5 +156,18 @@ describe('createEnvironmentSettings theme awareness', () => {
     expect(createEnvironmentSettings('dark').intensity).toBeCloseTo(0.42);
     expect(createEnvironmentSettings('light').intensity).toBeCloseTo(0.58);
     expect(createEnvironmentSettings('light').rotationY).toBeCloseTo(2.1);
+  });
+});
+
+
+describe('createLowPolyMaterialOptions', () => {
+  test('is a flat-shaded vertex-colored matte stone that catches HDRI sheen', () => {
+    const opts = createLowPolyMaterialOptions();
+
+    expect(opts.vertexColors).toBe(true);
+    expect(opts.flatShading).toBe(true);
+    expect(opts.roughness).toBeGreaterThan(0.4);
+    expect(opts.metalness).toBeLessThan(0.2);
+    expect(opts.envMapIntensity).toBeGreaterThan(0);
   });
 });
