@@ -43,8 +43,8 @@ export const MAGATAMA_TUNING = {
     roughness: 0.62,            // matte faceted stone
     metalness: 0.05,
     flatShading: true,          // crisp per-facet normals (the low-poly look)
-    envMapIntensity: 0.9,       // how much the HDRI sheens the facets
-    edgeDarken: 0.5,            // rim/edge color multiplier (baked into data)
+    envMapIntensity: 0.6,       // how much the HDRI sheens the facets (lower = darks stay dark)
+    edgeDarken: 0.62,           // rim/edge color multiplier (baked into data)
     scaleBoost: 1.12,           // slightly larger than the jade bead to match presence
   },
 
