@@ -3,10 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <script>
-      // Apply the saved theme before first paint to avoid a flash.
+      // Apply an explicitly chosen theme before first paint to avoid a flash.
       // Keep in sync with STORAGE_KEY / DEFAULT_THEME in src/lib/stores/theme.ts.
+      // Only a deliberate visitor choice is honoured here; without one the
+      // ceremonial dark default in the <html> tag stands.
       try {
-        var tonokiTheme = localStorage.getItem('tonoki-theme');
+        var tonokiTheme = localStorage.getItem('tonoki-theme-choice');
         if (tonokiTheme === 'light' || tonokiTheme === 'dark') {
           document.documentElement.dataset.theme = tonokiTheme;
         }

@@ -1,8 +1,8 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
-  import { theme } from '$lib/stores/theme';
+  import { DEFAULT_THEME, theme, type Theme } from '$lib/stores/theme';
 
-  let currentTheme = $state<'light' | 'dark'>('light');
+  let currentTheme = $state<Theme>(DEFAULT_THEME);
 
   const unsubscribe = theme.subscribe((value) => {
     currentTheme = value;

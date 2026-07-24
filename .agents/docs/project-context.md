@@ -20,13 +20,13 @@ Tonoki Matcha is planned as a high-end SvelteKit digital museum for a luxury mat
 
 ## Current Implementation Snapshot
 
-Last reviewed: 2026-07-20.
+Last reviewed: 2026-07-25.
 
 The project is now a working SvelteKit baseline with:
 
 - Global layout rendering a fixed Three.js scene behind the page content.
 - Navigation, footer, landing content, collection cards, and club request route at `/club`.
-- Vanilla CSS theme system with **ceremonial dark as the default**; the saved `localStorage['tonoki-theme']` preference is applied by an inline `app.html` script before first paint (no FOUC). Store in `src/lib/stores/theme.ts` (`DEFAULT_THEME`).
+- Vanilla CSS theme system with **ceremonial dark as the default**. Only an explicit toggle press is persisted, under `localStorage['tonoki-theme-choice']`, and an inline `app.html` script applies it before first paint (no FOUC). Store in `src/lib/stores/theme.ts` (`DEFAULT_THEME`, `STORAGE_KEY`). The legacy `tonoki-theme` key auto-persisted resolved defaults — which pinned early visitors to light forever — so `initialize()` deletes it on load. Never persist a theme the visitor did not choose.
 - Fluid typography tokens and Google webfont stacks with system fallbacks in `src/lib/styles/typography.css`.
 - Procedural Magatama geometry with a stout-comma bezier silhouette, circular suspension hole, and centralized tuning in `src/lib/three/magatama-tuning.ts`. The current material uses translucent mid-hisui jade (`color: 0x2e6b3e`, `opacity: 0.3`, `roughness: 0.2`, `transmission: 0.5`, `thickness: 0.3`, `ior: 1.61`, `clearcoat: 0.9`) and renders at restrained museum proportions via reduced scene scales (~45% viewport height on desktop).
 - Procedural HDRI environment (`RoomEnvironment` baked through `PMREMGenerator` into `scene.environment`, no external `.hdr` asset) so the Magatama's `transmission`/`clearcoat` refract real lighting. Intensity and Y-rotation tunable under `MAGATAMA_TUNING.environment`.
