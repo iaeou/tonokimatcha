@@ -2,27 +2,45 @@
   import Hero from '$lib/components/Hero.svelte';
   import Section from '$lib/components/Section.svelte';
 
-  const collection = [
+  const leaf = {
+    name: 'Tonoki Ceremonial',
+    degree: 'Single Degree',
+    description:
+      'One tea only. First-harvest leaf, shade-grown and stone-milled, held to a single uncompromised standard. There is no second tier beneath it.',
+    marks: [
+      { label: 'Harvest', value: 'First flush, hand-picked' },
+      { label: 'Milling', value: 'Granite stone, 30g per hour' },
+      { label: 'Certificate', value: 'TKC-0001' }
+    ]
+  };
+
+  const vessels = [
     {
-      name: 'Kofun Imperial',
-      degree: 'Koicha',
-      description: 'Hand-harvested, stone-milled, numbered editions reserved for solemn service.',
-      certificate: 'TKI-1500',
-      milling: 'Milled within 21 days of admission'
+      key: 'A',
+      name: 'The Single Serving',
+      format: '2 g sachet',
+      description:
+        'One bowl, sealed at the mill. Individual foil sachet that protects the leaf from light and air until the moment of service.',
+      image: '/images/packaging/sachet-2g.webp',
+      alt: 'Individual 2 gram matcha sachets'
     },
     {
-      name: 'Hisui Ceremonial',
-      degree: 'Usucha',
-      description: 'The gold standard of jade liquid: vivid, quiet, and exacting in texture.',
-      certificate: 'THC-0001',
-      milling: 'Monthly micro-lot release'
+      key: 'B',
+      name: 'The Vessel',
+      format: '25 sachets · refined paper tube',
+      description:
+        'Twenty-five single servings held in a seamless paper tube. The travelling form: a month of ceremony, carried without ceremony.',
+      image: '/images/packaging/tube-25.webp',
+      alt: 'Refined paper tube containing twenty-five matcha sachets'
     },
     {
-      name: 'Sakai Premium',
-      degree: 'Heritage Usucha',
-      description: 'An homage to Sakai, the commercial heart of tea and the memory of Sen no Rikyu.',
-      certificate: 'TSP-SAKAI',
-      milling: 'Partner allocation only'
+      key: 'C',
+      name: 'The Reserve',
+      format: '30 g hermetic pouch',
+      description:
+        'The house format for those who measure their own bowl. Hermetically sealed, resealable, sized for daily practice.',
+      image: '/images/packaging/pouch-30g.webp',
+      alt: 'Hermetic 30 gram matcha pouch'
     }
   ];
 </script>
@@ -46,23 +64,35 @@
   </div>
 </Section>
 
-<Section id="collection" eyebrow="The Collection" title="Product Degrees" kanji="玉">
+<Section id="collection" eyebrow="The Leaf" title="A Single Degree" kanji="玉">
+  <article class="leaf-panel">
+    <p class="leaf-panel__type">{leaf.degree}</p>
+    <h3>{leaf.name}</h3>
+    <p class="leaf-panel__lede">{leaf.description}</p>
+    <dl class="certificate">
+      {#each leaf.marks as mark}
+        <div>
+          <dt>{mark.label}</dt>
+          <dd>{mark.value}</dd>
+        </div>
+      {/each}
+    </dl>
+  </article>
+</Section>
+
+<Section id="vessels" eyebrow="The Vessels" title="Three Presentations" kanji="器">
+  <p class="vessels-lede">
+    The tea does not change. Only the vessel that carries it to the bowl.
+  </p>
   <div class="collection-grid">
-    {#each collection as item}
-      <article class="degree-card">
-        <p class="degree-card__type">{item.degree}</p>
-        <h3>{item.name}</h3>
-        <p>{item.description}</p>
-        <dl class="certificate">
-          <div>
-            <dt>Certificate</dt>
-            <dd>{item.certificate}</dd>
-          </div>
-          <div>
-            <dt>Milling</dt>
-            <dd>{item.milling}</dd>
-          </div>
-        </dl>
+    {#each vessels as vessel}
+      <article class="vessel-card">
+        <figure class="vessel-card__media">
+          <img src={vessel.image} alt={vessel.alt} loading="lazy" decoding="async" />
+        </figure>
+        <p class="vessel-card__type"><span aria-hidden="true">{vessel.key}</span> {vessel.format}</p>
+        <h3>{vessel.name}</h3>
+        <p>{vessel.description}</p>
       </article>
     {/each}
   </div>

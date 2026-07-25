@@ -14,8 +14,9 @@ Tonoki Matcha is planned as a high-end SvelteKit digital museum for a luxury mat
 
 - The Threshold: landing hero with cinematic Kofun atmosphere and Magatama focus.
 - The Lineage: heritage narrative around Tonoki-no-muraji, the Dignified Tree, Haniwa, Sueki, and Daisenryo Kofun.
-- The Collection: Kofun Imperial, Hisui Ceremonial, and Sakai Premium.
-- The Guardian: private club and B2B ambassador request flow.
+- The Leaf: a single degree, Tonoki Ceremonial. There is no product ladder — one tea, highest grade only.
+- The Vessels: three presentations of that same tea — 2 g individual sachet (A), refined paper tube of 25 sachets (B), 30 g hermetic pouch (C).
+- The Guardian: custom request, Tonoki Club, and B2B ambassador flow.
 - Eternal Legacy: legal, certifications, scarcity policy, and closing sign-off.
 
 ## Current Implementation Snapshot
@@ -25,7 +26,8 @@ Last reviewed: 2026-07-25.
 The project is now a working SvelteKit baseline with:
 
 - Global layout rendering a fixed Three.js scene behind the page content.
-- Navigation, footer, landing content, collection cards, and club request route at `/club`.
+- Navigation, footer, landing content, and club request route at `/club`.
+- Single-product model (2026-07-25): the landing page carries `#collection` ("The Leaf / A Single Degree", one `.leaf-panel` for Tonoki Ceremonial, cert `TKC-0001`) and `#vessels` ("The Vessels / Three Presentations", `.vessel-card` grid for the 2 g sachet, 25-sachet tube, and 30 g pouch, kanji 器). Quality and packaging are deliberately separate sections — collapsing them back into one grid reintroduces the "three degrees" misreading. The `#collection` anchor is retained for inbound links. Packaging photos in `static/images/packaging/` are unbranded supplier samples pending real photography.
 - Vanilla CSS theme system with **light as the default** (Jaume's call on 2026-07-25: the sanctuary opens in daylight paper). Only an explicit toggle press is persisted, under `localStorage['tonoki-theme-choice']`, and an inline `app.html` script applies it before first paint (no FOUC). Store in `src/lib/stores/theme.ts` (`DEFAULT_THEME`, `STORAGE_KEY`). The legacy `tonoki-theme` key auto-persisted resolved defaults, pinning returning visitors to a stale theme, so `initialize()` deletes it on load. Never persist a theme the visitor did not choose — otherwise future default changes can never reach anyone who already visited.
 - Fluid typography tokens and Google webfont stacks with system fallbacks in `src/lib/styles/typography.css`.
 - Procedural Magatama geometry with a stout-comma bezier silhouette, circular suspension hole, and centralized tuning in `src/lib/three/magatama-tuning.ts`. The current material uses translucent mid-hisui jade (`color: 0x2e6b3e`, `opacity: 0.3`, `roughness: 0.2`, `transmission: 0.5`, `thickness: 0.3`, `ior: 1.61`, `clearcoat: 0.9`) and renders at restrained museum proportions via reduced scene scales (~45% viewport height on desktop).
