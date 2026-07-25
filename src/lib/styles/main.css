@@ -586,12 +586,24 @@ textarea {
 .vessel-detail {
   display: grid;
   gap: var(--space-4);
+  align-items: start;
   width: min(100%, var(--content-width));
   margin: 0 auto;
+  padding-top: var(--space-5);
+}
+
+@media (min-width: 760px) {
+  .vessel-detail {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    padding-top: 0;
+  }
 }
 
 .vessel-detail__media {
   margin: 0;
+  /* Capped against the viewport: at full content width a 4:5 photograph would
+     stand taller than the screen and bury the text under it. */
+  max-height: 62svh;
   aspect-ratio: 4 / 5;
   overflow: hidden;
   border: 1px solid var(--color-line);
