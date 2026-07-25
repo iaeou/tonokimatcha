@@ -1,5 +1,6 @@
 import { browser } from '$app/environment';
 import { writable } from 'svelte/store';
+import { startTypedViewTransition } from '$lib/animations/view-transitions';
 
 export type Theme = 'light' | 'dark';
 
@@ -49,32 +50,22 @@ function applyTheme(theme: Theme, { persist = false }: { persist?: boolean } = {
 
 export type ToggleOrigin = { x: number; y: number };
 
-type DocumentWithViewTransition = Document & {
-  startViewTransition?: (callback: () => void) => { finished: Promise<void> };
-};
-
-function prefersReducedMotion() {
-  return browser && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-}
-
 /**
  * Runs the theme swap inside a View Transition so the new theme is revealed by
  * a blurred circle growing from the toggle. Falls back to an instant swap when
  * the API is missing or the visitor asked for reduced motion.
  */
 function withCircleBlurTransition(origin: ToggleOrigin | undefined, swap: () => void) {
-  const doc = browser ? (document as DocumentWithViewTransition) : null;
-
-  if (!doc?.startViewTransition || prefersReducedMotion()) {
+  if (!browser) {
     swap();
     return;
   }
 
   const { x, y } = origin ?? { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-  doc.documentElement.style.setProperty('--theme-transition-x', `${x}px`);
-  doc.documentElement.style.setProperty('--theme-transition-y', `${y}px`);
+  document.documentElement.style.setProperty('--theme-transition-x', `${x}px`);
+  document.documentElement.style.setProperty('--theme-transition-y', `${y}px`);
 
-  doc.startViewTransition(swap);
+  startTypedViewTransition({ update: swap, types: ['theme'] });
 }
 
 function createThemeStore() {

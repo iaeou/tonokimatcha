@@ -131,17 +131,17 @@ textarea {
 /* Theme swap: a blurred circle grows from the toggle and reveals the new theme.
    The soft edge comes from an SVG radial gradient used as a mask, so the reveal
    never shows a hard clip-path edge. */
-::view-transition-group(root) {
+:root[data-view-transition='theme']::view-transition-group(root) {
   animation-duration: 900ms;
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-::view-transition-old(root) {
+:root[data-view-transition='theme']::view-transition-old(root) {
   animation: none;
   z-index: -1;
 }
 
-::view-transition-new(root) {
+:root[data-view-transition='theme']::view-transition-new(root) {
   animation: theme-circle-blur 900ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3CradialGradient id='g'%3E%3Cstop offset='55%25' stop-color='white'/%3E%3Cstop offset='100%25' stop-color='white' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='50' fill='url(%23g)'/%3E%3C/svg%3E")
     var(--theme-transition-x, 50%) var(--theme-transition-y, 50%) / 0 0 no-repeat;
@@ -163,10 +163,116 @@ textarea {
   }
 }
 
+/* Room-to-room navigation. The header, brand, toggle and footer are only named
+   while a navigation transition is running: naming them permanently would carve
+   them out of the theme circle above and cut a hole in the reveal. */
+:root[data-view-transition='forward'] .navigation,
+:root[data-view-transition='backward'] .navigation {
+  view-transition-name: hall-header;
+}
+
+:root[data-view-transition='forward'] .navigation__brand,
+:root[data-view-transition='backward'] .navigation__brand {
+  view-transition-name: hall-brand;
+}
+
+:root[data-view-transition='forward'] .theme-toggle,
+:root[data-view-transition='backward'] .theme-toggle {
+  view-transition-name: hall-toggle;
+}
+
+:root[data-view-transition='forward'] .footer,
+:root[data-view-transition='backward'] .footer {
+  view-transition-name: hall-footer;
+}
+
+/* The Magatama keeps its own life: WebGL is captured as a flat image during a
+   transition, so freezing it mid-fade reads as a glitch. Leaving it out of the
+   snapshot lets the scene keep rendering underneath the moving halls. */
+:root[data-view-transition='forward'] .webgl-stage,
+:root[data-view-transition='backward'] .webgl-stage {
+  view-transition-name: none;
+}
+
+:root[data-view-transition='forward']::view-transition-old(root),
+:root[data-view-transition='backward']::view-transition-old(root),
+:root[data-view-transition='forward']::view-transition-new(root),
+:root[data-view-transition='backward']::view-transition-new(root) {
+  animation-duration: 620ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Entering a deeper hall: the old room recedes and lifts away, the new one
+   rises into place. Going back simply reverses the gesture. */
+:root[data-view-transition='forward']::view-transition-old(root) {
+  animation-name: hall-depart-forward;
+}
+
+:root[data-view-transition='forward']::view-transition-new(root) {
+  animation-name: hall-arrive-forward;
+}
+
+:root[data-view-transition='backward']::view-transition-old(root) {
+  animation-name: hall-depart-backward;
+}
+
+:root[data-view-transition='backward']::view-transition-new(root) {
+  animation-name: hall-arrive-backward;
+}
+
+/* Named furniture morphs between rooms rather than cross-fading with them. */
+::view-transition-group(hall-header),
+::view-transition-group(hall-brand),
+::view-transition-group(hall-toggle),
+::view-transition-group(hall-footer) {
+  animation-duration: 620ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+::view-transition-old(hall-header),
+::view-transition-new(hall-header),
+::view-transition-old(hall-footer),
+::view-transition-new(hall-footer) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+@keyframes hall-depart-forward {
+  to {
+    opacity: 0;
+    transform: translateY(-2.5vh) scale(0.985);
+    filter: blur(6px);
+  }
+}
+
+@keyframes hall-arrive-forward {
+  from {
+    opacity: 0;
+    transform: translateY(3vh) scale(1.012);
+    filter: blur(8px);
+  }
+}
+
+@keyframes hall-depart-backward {
+  to {
+    opacity: 0;
+    transform: translateY(2.5vh) scale(1.012);
+    filter: blur(6px);
+  }
+}
+
+@keyframes hall-arrive-backward {
+  from {
+    opacity: 0;
+    transform: translateY(-3vh) scale(0.985);
+    filter: blur(8px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  ::view-transition-group(root),
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
     animation: none;
   }
 }

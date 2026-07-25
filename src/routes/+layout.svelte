@@ -4,6 +4,12 @@
   import { onMount } from 'svelte';
   import { onNavigate } from '$app/navigation';
   import { initSmoothScroll } from '$lib/animations/smooth-scroll';
+  import {
+    getNavigationDirection,
+    prefersReducedMotion,
+    startTypedViewTransition,
+    supportsViewTransitions
+  } from '$lib/animations/view-transitions';
   import Scene from '$lib/three/Scene.svelte';
   import Navigation from '$lib/components/Navigation.svelte';
   import Footer from '$lib/components/Footer.svelte';
@@ -30,16 +36,27 @@
     };
   });
 
-  // Ceremonial room-to-room transition: a slow cross-fade between routes,
-  // like moving into another hall of the museum. Falls back to instant
-  // navigation where the View Transitions API is unavailable.
+  // Ceremonial room-to-room transition. The hall slides in the direction the
+  // visitor is travelling while the header, brand and footer stay put — they
+  // are named for the duration of the transition, so they morph instead of
+  // flickering. Falls back to instant navigation where the API is missing or
+  // motion is unwelcome.
   onNavigate((navigation) => {
-    if (!document.startViewTransition) return;
+    if (!supportsViewTransitions() || prefersReducedMotion()) return;
+
+    const direction = getNavigationDirection(
+      navigation.from?.url.pathname,
+      navigation.to?.url.pathname,
+      navigation.type
+    );
 
     return new Promise((resolve) => {
-      document.startViewTransition(async () => {
-        resolve();
-        await navigation.complete;
+      startTypedViewTransition({
+        types: [direction],
+        update: async () => {
+          resolve();
+          await navigation.complete;
+        }
       });
     });
   });
