@@ -517,9 +517,83 @@ textarea {
   color: var(--color-muted);
 }
 
+/* Available to any label that must be read but not seen. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .vessel-card {
+  position: relative;
+  /* A column so the action line can be pushed to the foot of every card:
+     three invitations at the same height read as one row, not three
+     afterthoughts trailing paragraphs of different lengths. */
+  display: flex;
+  flex-direction: column;
   border-top: 1px solid color-mix(in srgb, var(--color-gold) 42%, transparent);
   padding-top: var(--space-3);
+}
+
+.vessel-card__open {
+  align-self: start;
+  margin-top: auto;
+  padding-top: var(--space-3);
+  border-bottom-color: color-mix(in srgb, var(--color-gold) 50%, transparent);
+  transition:
+    border-color 220ms var(--ease-ceremony),
+    color 220ms var(--ease-ceremony);
+}
+
+/* Stretched over the whole card, so the photograph and the text are part of
+   the target without adding a second focusable element. */
+.vessel-card__open::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.vessel-card__open-mark {
+  display: inline-block;
+  margin-left: 0.5rem;
+  transition: transform 260ms var(--ease-ceremony);
+}
+
+.vessel-card:hover .vessel-card__open,
+.vessel-card__open:focus-visible {
+  border-bottom-color: var(--color-gold);
+}
+
+.vessel-card:hover .vessel-card__open-mark {
+  transform: translateX(0.25rem);
+}
+
+.vessel-card__open:focus-visible {
+  outline: 1px solid var(--color-gold);
+  outline-offset: 0.35rem;
+}
+
+/* The photograph answers the pointer too, so the whole card reads as one
+   object rather than a picture sitting next to a link. */
+.vessel-card__media img {
+  transition:
+    transform 520ms var(--ease-ceremony),
+    filter 320ms var(--ease-ceremony);
+}
+
+.vessel-card:hover .vessel-card__media img {
+  transform: scale(1.02);
+  filter: saturate(0.95) contrast(1.04);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vessel-card:hover .vessel-card__media img,
+  .vessel-card:hover .vessel-card__open-mark {
+    transform: none;
+  }
 }
 
 .vessel-card h3 {

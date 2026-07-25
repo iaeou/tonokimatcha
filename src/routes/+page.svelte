@@ -93,20 +93,28 @@
   </p>
   <div class="collection-grid">
     {#each vessels as vessel}
+      <!-- The whole card is the target, but only the action line is focusable:
+           its ::after is stretched across the card, so there is one link, one
+           focus ring, and a real URL in the context menu. -->
       <article class="vessel-card" data-vessel={vessel.slug}>
         <figure class="vessel-card__media">
           <img src={vessel.image} alt={vessel.alt} loading="lazy" decoding="async" />
         </figure>
         <p class="vessel-card__type"><span aria-hidden="true">{vessel.key}</span> {vessel.format}</p>
-        <h3>
-          <a href={`/vessels/${vessel.slug}`} onclick={(event) => open(event, vessel)}>
-            {vessel.name}
-          </a>
-        </h3>
+        <h3>{vessel.name}</h3>
         <p>{vessel.description}</p>
         {#if vessel.note}
           <p class="vessel-card__note">{vessel.note}</p>
         {/if}
+        <a
+          class="text-link vessel-card__open"
+          href={`/vessels/${vessel.slug}`}
+          onclick={(event) => open(event, vessel)}
+        >
+          Open the vessel
+          <span class="vessel-card__open-mark" aria-hidden="true">→</span>
+          <span class="visually-hidden">: {vessel.name}</span>
+        </a>
       </article>
     {/each}
   </div>
