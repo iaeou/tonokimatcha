@@ -20,7 +20,10 @@
   type="button"
   aria-label={currentTheme === 'light' ? 'Switch to dark theme' : 'Switch to light theme'}
   aria-pressed={currentTheme === 'dark'}
-  onclick={() => theme.toggle()}
+  onclick={(event) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    theme.toggle({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+  }}
 >
   <span class="theme-toggle__icon" aria-hidden="true"></span>
 </button>
