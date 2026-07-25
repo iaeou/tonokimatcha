@@ -4,20 +4,24 @@ Date: 2026-07-25
 
 ## Summary
 
-Fixed the sticky light theme. `DEFAULT_THEME` was already `dark`, but returning visitors still loaded light because the store persisted whatever theme it resolved at startup.
+Two changes to the theme system: the default is now **light** (Jaume's call), and the store no longer persists a theme the visitor did not explicitly choose.
 
-## The Bug
+## Default Theme: Light
 
-`theme.initialize()` called `applyTheme()`, which unconditionally wrote to `localStorage`. Anyone who visited while light was still the default got `tonoki-theme: light` written permanently, even though they never touched the toggle. The later switch to a dark default could never reach them: storage always won.
+`DEFAULT_THEME` is now `'light'`, matching `<html data-theme="light">` in `app.html`. Dark remains available through the toggle and keeps its own Magatama material tuning.
+
+## The Persistence Bug
+
+`theme.initialize()` called `applyTheme()`, which unconditionally wrote to `localStorage`. Every visitor got the resolved theme written permanently even when they never touched the toggle — so any later change of default could never reach them: storage always won. This is what made the earlier dark default appear not to apply.
 
 ## Fix
 
 - `src/lib/stores/theme.ts`:
   - `applyTheme(theme, { persist })` — persistence is now opt-in. `initialize()` applies without writing; only `set()` and `toggle()` persist.
   - New `STORAGE_KEY = 'tonoki-theme-choice'`, holding explicit choices only.
-  - `LEGACY_STORAGE_KEY = 'tonoki-theme'` is removed on `initialize()`, so every visitor carrying an auto-persisted value is reset once to the ceremonial dark default. Self-healing — no manual cache clearing needed.
-- `src/app.html`: the pre-paint script reads `tonoki-theme-choice`. Without an explicit choice, the `data-theme="dark"` on `<html>` stands.
-- `src/lib/components/ThemeToggle.svelte`: local `$state` seeds from `DEFAULT_THEME` instead of a hardcoded `'light'`, so the `aria-label`/`aria-pressed` are correct before `initialize()` runs.
+  - `LEGACY_STORAGE_KEY = 'tonoki-theme'` is removed on `initialize()`, so every visitor carrying an auto-persisted value is reset once to the current default. Self-healing — no manual cache clearing needed.
+- `src/app.html`: the pre-paint script reads `tonoki-theme-choice`. Without an explicit choice, the `data-theme="light"` on `<html>` stands.
+- `src/lib/components/ThemeToggle.svelte`: local `$state` seeds from `DEFAULT_THEME` rather than a hardcoded literal, so the `aria-label`/`aria-pressed` stay correct before `initialize()` runs and survive future default changes.
 
 ## Current Verification
 
@@ -27,7 +31,7 @@ Fixed the sticky light theme. `DEFAULT_THEME` was already `dark`, but returning 
 
 ## Note
 
-Theme preference is intentionally not tied to `prefers-color-scheme`: the sanctuary opens dark for everyone, and the toggle is a deliberate act.
+Theme preference is intentionally not tied to `prefers-color-scheme`: the sanctuary opens in light for everyone, and switching is a deliberate act.
 
 ## Still Open
 

@@ -21,7 +21,7 @@ export function isTheme(value: unknown): value is Theme {
   return value === 'light' || value === 'dark';
 }
 
-export const DEFAULT_THEME: Theme = 'dark';
+export const DEFAULT_THEME: Theme = 'light';
 
 export function getInitialTheme(savedTheme: unknown): Theme {
   return isTheme(savedTheme) ? savedTheme : DEFAULT_THEME;

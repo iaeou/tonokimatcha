@@ -1,12 +1,12 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <script>
       // Apply an explicitly chosen theme before first paint to avoid a flash.
       // Keep in sync with STORAGE_KEY / DEFAULT_THEME in src/lib/stores/theme.ts.
       // Only a deliberate visitor choice is honoured here; without one the
-      // ceremonial dark default in the <html> tag stands.
+      // light default in the <html> tag stands.
       try {
         var tonokiTheme = localStorage.getItem('tonoki-theme-choice');
         if (tonokiTheme === 'light' || tonokiTheme === 'dark') {
@@ -14,7 +14,7 @@
         }
         document.documentElement.style.colorScheme = document.documentElement.dataset.theme;
       } catch (error) {
-        /* storage unavailable: keep the dark default */
+        /* storage unavailable: keep the light default */
       }
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1" />

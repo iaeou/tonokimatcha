@@ -3,7 +3,7 @@
   import Section from '$lib/components/Section.svelte';
 </script>
 
-<Section eyebrow="The Guardian" title="Private Club">
+<Section eyebrow="The Guardian" title="Tonoki Club">
   <div class="narrative-grid">
     <p>
       Admission is reserved for invited patrons, hospitality partners, and cultural institutions

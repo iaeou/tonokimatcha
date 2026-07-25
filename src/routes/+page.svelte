@@ -68,7 +68,7 @@
   </div>
 </Section>
 
-<Section id="guardian" eyebrow="The Guardian" title="Private Admission" kanji="陵">
+<Section id="guardian" eyebrow="The Guardian" title="Custom Request" kanji="陵">
   <div class="guardian-panel">
     <p>
       Admission requests are reviewed for cultural fit, storage discipline, and the seriousness of

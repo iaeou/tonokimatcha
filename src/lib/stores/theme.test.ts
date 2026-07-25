@@ -18,10 +18,10 @@ describe('isTheme', () => {
 });
 
 describe('getInitialTheme', () => {
-  test('defaults to ceremonial dark when no saved theme exists', () => {
-    expect(DEFAULT_THEME).toBe('dark');
-    expect(getInitialTheme(null)).toBe('dark');
-    expect(getInitialTheme('system')).toBe('dark');
+  test('defaults to light when no saved theme exists', () => {
+    expect(DEFAULT_THEME).toBe('light');
+    expect(getInitialTheme(null)).toBe('light');
+    expect(getInitialTheme('system')).toBe('light');
   });
 
   test('uses a saved supported theme', () => {
