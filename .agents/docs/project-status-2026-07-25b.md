@@ -28,6 +28,8 @@ Three formats, no hierarchy between them. Reuses `.collection-grid` (1 col → 3
 | B | The Vessel | refined paper tube, 25 sachets |
 | C | The Reserve | 30 g hermetic pouch |
 
+Format A is sold **both** loose and inside the tube. Loose carries a minimum order of 100 sachets — surfaced on the card as *"Offered loose from one hundred sachets, or held inside the tube."* This is the only commercial constraint stated anywhere on the landing page, so it is written as a condition of service rather than a pricing rule; `.vessel-card__note` gives it a hairline rule and muted weight so it reads as a footnote, not a badge. `Vessel.note` is optional — B and C carry none.
+
 Section lede: *"The tea does not change. Only the vessel that carries it to the bowl."* This is the load-bearing line — it prevents the three cards from being read as three qualities, which is exactly the confusion the old section created.
 
 Kanji watermark for the new section is 器 (*ki*, vessel), consistent with 樹 / 玉 / 陵.
@@ -69,5 +71,4 @@ The `#collection` id was deliberately kept so existing inbound anchors do not br
 ## Still Open
 
 - Real product photography to replace the supplier samples.
-- Confirm whether the 2 g sachet is also sold loose or only inside the tube — the current copy implies both are orderable.
 - Carried over: Jaume's eye on the six third-pass effects (delete `rise`/`breath` once approved); `JADE_BELL_TUNING` timbre + mute toggle; `/club` backend with Supabase + invitation codes.

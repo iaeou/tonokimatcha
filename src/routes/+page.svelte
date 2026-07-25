@@ -14,13 +14,24 @@
     ]
   };
 
-  const vessels = [
+  type Vessel = {
+    key: string;
+    name: string;
+    format: string;
+    description: string;
+    note?: string;
+    image: string;
+    alt: string;
+  };
+
+  const vessels: Vessel[] = [
     {
       key: 'A',
       name: 'The Single Serving',
       format: '2 g sachet',
       description:
         'One bowl, sealed at the mill. Individual foil sachet that protects the leaf from light and air until the moment of service.',
+      note: 'Offered loose from one hundred sachets, or held inside the tube.',
       image: '/images/packaging/sachet-2g.webp',
       alt: 'Individual 2 gram matcha sachets'
     },
@@ -93,6 +104,9 @@
         <p class="vessel-card__type"><span aria-hidden="true">{vessel.key}</span> {vessel.format}</p>
         <h3>{vessel.name}</h3>
         <p>{vessel.description}</p>
+        {#if vessel.note}
+          <p class="vessel-card__note">{vessel.note}</p>
+        {/if}
       </article>
     {/each}
   </div>

@@ -15,7 +15,7 @@ Tonoki Matcha is planned as a high-end SvelteKit digital museum for a luxury mat
 - The Threshold: landing hero with cinematic Kofun atmosphere and Magatama focus.
 - The Lineage: heritage narrative around Tonoki-no-muraji, the Dignified Tree, Haniwa, Sueki, and Daisenryo Kofun.
 - The Leaf: a single degree, Tonoki Ceremonial. There is no product ladder — one tea, highest grade only.
-- The Vessels: three presentations of that same tea — 2 g individual sachet (A), refined paper tube of 25 sachets (B), 30 g hermetic pouch (C).
+- The Vessels: three presentations of that same tea — 2 g individual sachet (A, sold loose from a 100-sachet minimum or inside the tube), refined paper tube of 25 sachets (B), 30 g hermetic pouch (C).
 - The Guardian: custom request, Tonoki Club, and B2B ambassador flow.
 - Eternal Legacy: legal, certifications, scarcity policy, and closing sign-off.
 
