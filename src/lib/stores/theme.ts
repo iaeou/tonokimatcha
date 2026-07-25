@@ -1,6 +1,6 @@
 import { browser } from '$app/environment';
 import { writable } from 'svelte/store';
-import { startTypedViewTransition } from '$lib/animations/view-transitions';
+import { setRevealOrigin, startTypedViewTransition } from '$lib/animations/view-transitions';
 
 export type Theme = 'light' | 'dark';
 
@@ -61,10 +61,7 @@ function withCircleBlurTransition(origin: ToggleOrigin | undefined, swap: () => 
     return;
   }
 
-  const { x, y } = origin ?? { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-  document.documentElement.style.setProperty('--theme-transition-x', `${x}px`);
-  document.documentElement.style.setProperty('--theme-transition-y', `${y}px`);
-
+  setRevealOrigin(origin);
   startTypedViewTransition({ update: swap, types: ['theme'] });
 }
 

@@ -8,7 +8,25 @@
  * footer permanently would carve them out of the theme circle and break it.
  */
 
-export type ViewTransitionType = 'theme' | 'forward' | 'backward';
+export type ViewTransitionType = 'theme' | 'forward' | 'backward' | 'vessel' | 'ceremony';
+
+/**
+ * Point the blurred circle at whatever the visitor just touched. Both the
+ * theme swap and the ceremony steps grow their reveal from these coordinates,
+ * so the gesture always starts under the hand rather than at the centre of
+ * the screen.
+ */
+export function setRevealOrigin(origin: { x: number; y: number } | undefined) {
+  const { x, y } = origin ?? { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+  document.documentElement.style.setProperty('--reveal-x', `${x}px`);
+  document.documentElement.style.setProperty('--reveal-y', `${y}px`);
+}
+
+/** The centre of an element, in viewport coordinates. */
+export function centreOf(element: Element): { x: number; y: number } {
+  const rect = element.getBoundingClientRect();
+  return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+}
 
 export type ViewTransitionOptions = {
   update: () => void | Promise<void>;

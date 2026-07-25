@@ -16,8 +16,9 @@ Tonoki Matcha is planned as a high-end SvelteKit digital museum for a luxury mat
 - The Lineage: heritage narrative around Tonoki-no-muraji, the Dignified Tree, Haniwa, Sueki, and Daisenryo Kofun.
 - The Leaf: a single degree, Tonoki Ceremonial. There is no product ladder — one tea, highest grade only.
 - The Vessels: three presentations of that same tea — 2 g individual sachet (A, sold loose from a 100-sachet minimum or inside the tube), refined paper tube of 25 sachets (B), 30 g hermetic pouch (C).
+- The Ceremony: the four movements of service — warm the bowl, sift, whisk, serve. Timings and temperatures are provisional pending Jaume's confirmation.
 - The Guardian: custom request, Tonoki Club, and B2B ambassador flow.
-- Eternal Legacy: legal, certifications, scarcity policy, and closing sign-off.
+- Eternal Legacy: legal, certifications, scarcity policy, and closing sign-off. Lives at `/legacy` with `#scarcity`, `#certification`, and `#privacy`; the privacy copy is explicitly provisional pending legal review.
 
 ## Current Implementation Snapshot
 
@@ -36,7 +37,12 @@ The project is now a working SvelteKit baseline with:
 - GPU particle system using custom vortex shaders for earth-to-jade lineage transition.
 - GSAP hero reveal, Magatama floating animation, ambient pointer rotation, drag-only multi-axis Magatama rotation, and ScrollTrigger links.
 - Lenis smooth scrolling via `src/lib/animations/smooth-scroll.ts`: lazily imported, GSAP ticker drives `lenis.raf`, `ScrollTrigger.update` on scroll, `anchors: true` for in-page cues, native touch scrolling preserved (`syncTouch: false`), fully disabled under `prefers-reduced-motion`. Tuning lives in `createSmoothScrollOptions()`.
-- Route-level View Transitions in `src/routes/+layout.svelte` (`onNavigate` + `document.startViewTransition`) with ceremonial cross-fade keyframes in `main.css`, reduced-motion guard, and instant fallback where the API is unsupported.
+- View Transitions are centralised in `src/lib/animations/view-transitions.ts`. Every transition is *typed* (`theme`, `forward`, `backward`, `vessel`, `ceremony`) and the type is mirrored onto `documentElement.dataset.viewTransition`, because `:active-view-transition-type()` is newer than the API itself and would silently drop the styling in browsers that can still run the transition. All CSS keys off `:root[data-view-transition='…']`.
+  - Theme swap (`theme`): a blurred circle grows from the toggle, an SVG radial-gradient mask animated by `circle-blur-reveal`. Size and position animate together so the circle stays centred on the press; origin comes from `--reveal-x` / `--reveal-y` via `setRevealOrigin()`.
+  - Navigation (`forward` / `backward`): direction is derived from path depth, with a browser back gesture always reading as backward. Header, brand, toggle, footer and the certification seal take `view-transition-name` **only during navigation** — naming them permanently carves them out of the root snapshot and punches a hole in the theme circle. The WebGL stage is excluded from the snapshot (`view-transition-name: none`) so the Magatama keeps rendering instead of freezing as a flat image.
+  - Vessels (`vessel`): opening a vessel is shallow routing (`pushState` + `page.state.vessel`) so the URL stays linkable and the back gesture closes it; the card's photograph and the panel's share a per-slug name and morph. `/vessels/[slug]` also exists as a real hall for direct visits and no-JS. A card yields its name whenever a detail is on screen — one name may only be claimed once per snapshot, or the whole transition aborts.
+  - Ceremony (`ceremony`): the four movements swap with the same circle-blur mask, grown from the numeral pressed. The state change is flushed with `await tick()` inside the transition callback, otherwise Svelte's async DOM update lands after the snapshot.
+  - Everything degrades to an instant update where the API is missing or `prefers-reduced-motion: reduce` is set.
 - Focused Vitest coverage for theme logic, hero animation options, Three.js config, Magatama geometry, and particle attributes.
 - Branded webfont pairing — Cormorant Garamond for English ceremonial display, Noto Serif JP as the mincho heritage fallback, and Zen Kaku Gothic New + Inter for body/UI text — loaded via Google Fonts with `preconnect` and `display=swap`.
 - Vite manualChunks splits `three` and `gsap` into their own async chunks so the initial page shell loads independently of WebGL.

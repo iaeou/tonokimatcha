@@ -10,6 +10,7 @@
       <a href="/#collection">The Leaf</a>
       <a href="/#vessels">Vessels</a>
       <a href="/club">Club</a>
+      <a href="/legacy">Legacy</a>
     </nav>
     <ThemeToggle />
   </div>

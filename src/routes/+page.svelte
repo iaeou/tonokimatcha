@@ -1,6 +1,12 @@
 <script lang="ts">
+  import { pushState } from '$app/navigation';
+  import { page } from '$app/state';
+  import Ceremony from '$lib/components/Ceremony.svelte';
   import Hero from '$lib/components/Hero.svelte';
   import Section from '$lib/components/Section.svelte';
+  import VesselDetail from '$lib/components/VesselDetail.svelte';
+  import { startTypedViewTransition } from '$lib/animations/view-transitions';
+  import { vessels, type Vessel } from '$lib/data/vessels';
 
   const leaf = {
     name: 'Tonoki Ceremonial',
@@ -14,46 +20,36 @@
     ]
   };
 
-  type Vessel = {
-    key: string;
-    name: string;
-    format: string;
-    description: string;
-    note?: string;
-    image: string;
-    alt: string;
-  };
+  const openVessel = $derived(page.state.vessel);
 
-  const vessels: Vessel[] = [
-    {
-      key: 'A',
-      name: 'The Single Serving',
-      format: '2 g sachet',
-      description:
-        'One bowl, sealed at the mill. Individual foil sachet that protects the leaf from light and air until the moment of service.',
-      note: 'Offered loose from one hundred sachets, or held inside the tube.',
-      image: '/images/packaging/sachet-2g.webp',
-      alt: 'Individual 2 gram matcha sachets'
-    },
-    {
-      key: 'B',
-      name: 'The Vessel',
-      format: '25 sachets · refined paper tube',
-      description:
-        'Twenty-five single servings held in a seamless paper tube. The travelling form: a month of ceremony, carried without ceremony.',
-      image: '/images/packaging/tube-25.webp',
-      alt: 'Refined paper tube containing twenty-five matcha sachets'
-    },
-    {
-      key: 'C',
-      name: 'The Reserve',
-      format: '30 g hermetic pouch',
-      description:
-        'The house format for those who measure their own bowl. Hermetically sealed, resealable, sized for daily practice.',
-      image: '/images/packaging/pouch-30g.webp',
-      alt: 'Hermetic 30 gram matcha pouch'
+  /**
+   * Opening a vessel is a change of state, not of place: the card's image
+   * morphs into the detail panel while the landing page stays underneath.
+   * The URL still changes, so the vessel remains linkable and the browser's
+   * back gesture closes it. Without JavaScript the same link simply loads
+   * `/vessels/<slug>` as its own hall.
+   */
+  function open(event: MouseEvent, vessel: Vessel) {
+    // Let modified clicks (new tab, download, middle button) behave natively.
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) {
+      return;
     }
-  ];
+
+    event.preventDefault();
+
+    startTypedViewTransition({
+      types: ['vessel'],
+      // The vessel is already in hand — no need to fetch the hall's data.
+      update: () => pushState(`/vessels/${vessel.slug}`, { vessel })
+    });
+  }
+
+  function close() {
+    startTypedViewTransition({
+      types: ['vessel'],
+      update: () => history.back()
+    });
+  }
 </script>
 
 <Hero />
@@ -97,12 +93,16 @@
   </p>
   <div class="collection-grid">
     {#each vessels as vessel}
-      <article class="vessel-card">
+      <article class="vessel-card" data-vessel={vessel.slug}>
         <figure class="vessel-card__media">
           <img src={vessel.image} alt={vessel.alt} loading="lazy" decoding="async" />
         </figure>
         <p class="vessel-card__type"><span aria-hidden="true">{vessel.key}</span> {vessel.format}</p>
-        <h3>{vessel.name}</h3>
+        <h3>
+          <a href={`/vessels/${vessel.slug}`} onclick={(event) => open(event, vessel)}>
+            {vessel.name}
+          </a>
+        </h3>
         <p>{vessel.description}</p>
         {#if vessel.note}
           <p class="vessel-card__note">{vessel.note}</p>
@@ -110,6 +110,33 @@
       </article>
     {/each}
   </div>
+</Section>
+
+{#if openVessel}
+  <!-- The opened vessel sits over the hall it came from. Escape and the
+       browser's back gesture both close it, since the state is a history entry. -->
+  <div
+    class="vessel-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-label={openVessel.name}
+    tabindex="-1"
+  >
+    <VesselDetail vessel={openVessel} onclose={close} />
+  </div>
+{/if}
+
+<svelte:window
+  onkeydown={(event) => {
+    if (event.key === 'Escape' && openVessel) close();
+  }}
+/>
+
+<Section id="ceremony" eyebrow="The Ceremony" title="Four Movements" kanji="点">
+  <p class="vessels-lede">
+    The same two grams, handled in the same order, every time. The order is the recipe.
+  </p>
+  <Ceremony />
 </Section>
 
 <Section id="guardian" eyebrow="The Guardian" title="Custom Request" kanji="陵">
