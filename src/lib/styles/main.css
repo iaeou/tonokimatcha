@@ -233,6 +233,39 @@ textarea {
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* The record beside the photograph is named too, so it can rise as the vessel
+   opens and settle back as it closes instead of blinking out with the page. */
+:root[data-view-transition='vessel'] .vessel-detail__body {
+  view-transition-name: vessel-body;
+}
+
+::view-transition-group(vessel-body) {
+  animation-duration: 520ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+::view-transition-new(vessel-body) {
+  animation: vessel-body-in 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+::view-transition-old(vessel-body) {
+  animation: vessel-body-out 380ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes vessel-body-in {
+  from {
+    opacity: 0;
+    transform: translateY(1.5vh);
+  }
+}
+
+@keyframes vessel-body-out {
+  to {
+    opacity: 0;
+    transform: translateY(1vh);
+  }
+}
+
 /* The certification seal travels: the footer mark on the way in becomes the
    certification panel inside the Eternal Legacy hall. The footer only claims
    the name while the hall's own seal is absent — two elements sharing a

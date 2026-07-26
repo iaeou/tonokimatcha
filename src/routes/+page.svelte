@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tick } from 'svelte';
   import { pushState } from '$app/navigation';
   import { page } from '$app/state';
   import Ceremony from '$lib/components/Ceremony.svelte';
@@ -52,22 +53,41 @@
     });
   }
 
+  /** Resolves once the history entry has actually been popped. */
+  function stepBack() {
+    return new Promise<void>((resolve) => {
+      window.addEventListener('popstate', () => resolve(), { once: true });
+      history.back();
+    });
+  }
+
+  function close() {
+    const target = scrollBeforeOpen;
+    scrollBeforeOpen = 0;
+
+    startTypedViewTransition({
+      types: ['vessel'],
+      update: async () => {
+        await stepBack();
+        // Inside the callback, so the incoming snapshot already has the grid
+        // back under the panel. Restore it afterwards and the photograph would
+        // morph towards a card that is not on screen yet — which is exactly
+        // what made closing feel like a cut.
+        if (target) window.scrollTo({ top: target, behavior: 'instant' });
+        await tick();
+      }
+    });
+  }
+
+  // The browser's own back gesture closes the vessel without passing through
+  // close(), so the reading position is put back here instead.
   $effect(() => {
     if (openVessel || !scrollBeforeOpen) return;
 
     const target = scrollBeforeOpen;
     scrollBeforeOpen = 0;
-    // After the transition has committed, so the restored position is not
-    // captured as part of the outgoing snapshot.
     requestAnimationFrame(() => window.scrollTo({ top: target, behavior: 'instant' }));
   });
-
-  function close() {
-    startTypedViewTransition({
-      types: ['vessel'],
-      update: () => history.back()
-    });
-  }
 </script>
 
 <Hero />
