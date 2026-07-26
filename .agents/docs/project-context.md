@@ -22,12 +22,14 @@ Tonoki Matcha is planned as a high-end SvelteKit digital museum for a luxury mat
 
 ## Current Implementation Snapshot
 
-Last reviewed: 2026-07-25.
+Last reviewed: 2026-07-26.
 
 The project is now a working SvelteKit baseline with:
 
 - Global layout rendering a fixed Three.js scene behind the page content.
-- Navigation, footer, landing content, and club request route at `/club`.
+- Navigation, footer, landing content, club request route at `/club`, the Eternal Legacy hall at `/legacy`, and a hall per presentation at `/vessels/[slug]`.
+- Vessel data lives in `src/lib/data/vessels.ts` (`Vessel`, `vessels`, `findVessel`) so the landing card and its detail panel cannot drift apart. Slugs are both the URL and the `view-transition-name`, so a collision would break deep links *and* abort the morph — there is a test guarding uniqueness.
+- Vessel cards carry a permanent action line, `OPEN THE VESSEL →` (Jaume's call, 2026-07-26: hover does not exist on touch, so the invitation must be visible at rest). The whole card is the target via an `::after` stretched from that link, which needs `z-index: 1` to sit above the photograph's hover `scale()`. Opened, the photograph is a `<button>` that closes the vessel.
 - Single-product model (2026-07-25): the landing page carries `#collection` ("The Leaf / A Single Degree", one `.leaf-panel` for Tonoki Ceremonial, cert `TKC-0001`) and `#vessels` ("The Vessels / Three Presentations", `.vessel-card` grid for the 2 g sachet, 25-sachet tube, and 30 g pouch, kanji 器). Quality and packaging are deliberately separate sections — collapsing them back into one grid reintroduces the "three degrees" misreading. The `#collection` anchor is retained for inbound links. Packaging photos in `static/images/packaging/` are unbranded supplier samples pending real photography.
 - Vanilla CSS theme system with **light as the default** (Jaume's call on 2026-07-25: the sanctuary opens in daylight paper). Only an explicit toggle press is persisted, under `localStorage['tonoki-theme-choice']`, and an inline `app.html` script applies it before first paint (no FOUC). Store in `src/lib/stores/theme.ts` (`DEFAULT_THEME`, `STORAGE_KEY`). The legacy `tonoki-theme` key auto-persisted resolved defaults, pinning returning visitors to a stale theme, so `initialize()` deletes it on load. Never persist a theme the visitor did not choose — otherwise future default changes can never reach anyone who already visited.
 - Fluid typography tokens and Google webfont stacks with system fallbacks in `src/lib/styles/typography.css`.
@@ -42,8 +44,9 @@ The project is now a working SvelteKit baseline with:
   - Navigation (`forward` / `backward`): direction is derived from path depth, with a browser back gesture always reading as backward. Header, brand, toggle, footer and the certification seal take `view-transition-name` **only during navigation** — naming them permanently carves them out of the root snapshot and punches a hole in the theme circle. The WebGL stage is excluded from the snapshot (`view-transition-name: none`) so the Magatama keeps rendering instead of freezing as a flat image.
   - Vessels (`vessel`): opening a vessel is shallow routing (`pushState` + `page.state.vessel`) so the URL stays linkable and the back gesture closes it; the card's photograph and the panel's share a per-slug name and morph. `/vessels/[slug]` also exists as a real hall for direct visits and no-JS. A card yields its name whenever a detail is on screen — one name may only be claimed once per snapshot, or the whole transition aborts.
   - Ceremony (`ceremony`): the four movements swap with the same circle-blur mask, grown from the numeral pressed. The state change is flushed with `await tick()` inside the transition callback, otherwise Svelte's async DOM update lands after the snapshot.
+  - Closing a vessel restores the reading position **inside** the transition callback, after awaiting the `popstate` — smooth scrolling means the browser's own restoration lands at the top. Restoring afterwards leaves the incoming snapshot captured at the top of the page, the destination card off screen, and the closing morph with nowhere to travel; that is what makes closing feel like a cut. The browser's back gesture never passes through `close()`, so an effect covers that path.
   - Everything degrades to an instant update where the API is missing or `prefers-reduced-motion: reduce` is set.
-- Focused Vitest coverage for theme logic, hero animation options, Three.js config, Magatama geometry, and particle attributes.
+- Focused Vitest coverage for theme logic, hero animation options, Three.js config, Magatama geometry, particle attributes, navigation direction, transition-type mirroring, and vessel data integrity.
 - Branded webfont pairing — Cormorant Garamond for English ceremonial display, Noto Serif JP as the mincho heritage fallback, and Zen Kaku Gothic New + Inter for body/UI text — loaded via Google Fonts with `preconnect` and `display=swap`.
 - Vite manualChunks splits `three` and `gsap` into their own async chunks so the initial page shell loads independently of WebGL.
 - Typography reveal via `src/lib/animations/typography-reveal.ts` (`typographyReveal` Svelte action). The live mode is `sumi`: per-letter blur/opacity/scale reveal (ink crystallising on washi), used on the hero h1/eyebrow and all Section h2s/eyebrows; h2s also draw a `kintsugi` gold seam (deterministic SVG `pathLength` dashoffset). Legacy `rise`/`breath` modes remain in the module but are unused, pending deletion after Jaume's sign-off. IntersectionObserver-triggered once, reduced-motion-safe, synchronous pre-hide.
@@ -57,6 +60,8 @@ The project is now a working SvelteKit baseline with:
 - The latest visual reference is `.agents/docs/magatama-reference-geometry-2026-05-26.jpg`; older transient WebGL screenshots were removed to keep the agent docs focused.
 
 ## Known Local Development Note
+
+Only ever run **one** dev server on port 5173. Two at once serve the HTML from one instance and the client modules from the other; the bundle then fails to load and every effect dies together — cursor, GSAP, Lenis, transitions — with nothing wrong in the source. If the site suddenly looks inert, check `lsof -ti:5173` before suspecting the code, and start with `--strictPort` so a collision is loud rather than silent.
 
 The workspace path contains `##`:
 
