@@ -29,6 +29,13 @@
    * back gesture closes it. Without JavaScript the same link simply loads
    * `/vessels/<slug>` as its own hall.
    */
+  /**
+   * Where the visitor was standing when the vessel was opened. Smooth scrolling
+   * runs the page from its own loop, so the browser's restoration on the way
+   * back lands at the top instead of the grid — the shelf is put back by hand.
+   */
+  let scrollBeforeOpen = 0;
+
   function open(event: MouseEvent, vessel: Vessel) {
     // Let modified clicks (new tab, download, middle button) behave natively.
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) {
@@ -36,6 +43,7 @@
     }
 
     event.preventDefault();
+    scrollBeforeOpen = window.scrollY;
 
     startTypedViewTransition({
       types: ['vessel'],
@@ -43,6 +51,16 @@
       update: () => pushState(`/vessels/${vessel.slug}`, { vessel })
     });
   }
+
+  $effect(() => {
+    if (openVessel || !scrollBeforeOpen) return;
+
+    const target = scrollBeforeOpen;
+    scrollBeforeOpen = 0;
+    // After the transition has committed, so the restored position is not
+    // captured as part of the outgoing snapshot.
+    requestAnimationFrame(() => window.scrollTo({ top: target, behavior: 'instant' }));
+  });
 
   function close() {
     startTypedViewTransition({
@@ -123,12 +141,19 @@
 {#if openVessel}
   <!-- The opened vessel sits over the hall it came from. Escape and the
        browser's back gesture both close it, since the state is a history entry. -->
+  <!-- svelte-ignore a11y_click_events_have_key_events -->
   <div
     class="vessel-overlay"
     role="dialog"
     aria-modal="true"
     aria-label={openVessel.name}
     tabindex="-1"
+    onclick={(event) => {
+      // Only the ground around the vessel closes it — clicks that landed on
+      // the panel itself belong to the panel. The keyboard has Escape and the
+      // photograph is a real button, so no keyboard handler is missing here.
+      if (event.target === event.currentTarget) close();
+    }}
   >
     <VesselDetail vessel={openVessel} onclose={close} />
   </div>

@@ -11,9 +11,22 @@
 </script>
 
 <article class="vessel-detail" data-vessel={vessel.slug}>
-  <figure class="vessel-detail__media">
-    <img src={vessel.image} alt={vessel.alt} />
-  </figure>
+  {#if onclose}
+    <!-- Opened over the hall, the photograph is the lid: pressing it closes
+         the vessel again. A real button, so it answers the keyboard too. -->
+    <button
+      class="vessel-detail__media vessel-detail__media--closes"
+      type="button"
+      aria-label="Close the vessel"
+      onclick={onclose}
+    >
+      <img src={vessel.image} alt={vessel.alt} />
+    </button>
+  {:else}
+    <figure class="vessel-detail__media">
+      <img src={vessel.image} alt={vessel.alt} />
+    </figure>
+  {/if}
 
   <div class="vessel-detail__body">
     <p class="vessel-detail__type"><span aria-hidden="true">{vessel.key}</span> {vessel.format}</p>

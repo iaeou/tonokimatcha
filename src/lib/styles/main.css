@@ -553,6 +553,9 @@ textarea {
 .vessel-card__open::after {
   content: '';
   position: absolute;
+  /* Above the photograph: the hover scale gives the image its own stacking
+     context, which would otherwise swallow clicks meant for the link. */
+  z-index: 1;
   inset: 0;
 }
 
@@ -689,6 +692,21 @@ textarea {
   height: 100%;
   object-fit: cover;
   filter: saturate(0.86) contrast(1.02);
+}
+
+/* As a button the photograph must not inherit button chrome — only the
+   pointer and a focus ring betray that it can be pressed. */
+.vessel-detail__media--closes {
+  display: block;
+  width: 100%;
+  padding: 0;
+  background: color-mix(in srgb, var(--color-void) 58%, transparent);
+  cursor: pointer;
+}
+
+.vessel-detail__media--closes:focus-visible {
+  outline: 1px solid var(--color-gold);
+  outline-offset: 0.35rem;
 }
 
 .vessel-detail__body {
