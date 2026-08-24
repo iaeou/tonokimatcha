@@ -85,8 +85,26 @@ textarea {
 }
 
 .navigation__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
   font-family: var(--font-serif);
   font-size: 1.125rem;
+}
+
+/* Two stacked words, set solid: the wordmark reads as one block rather than
+   two lines of running text, and the magatama beside it is sized off that
+   block so mark and name always share the same cap-to-baseline height. */
+.navigation__brand-name {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.navigation__brand-mark {
+  flex-shrink: 0;
+  width: auto;
+  height: 2em;
 }
 
 .navigation__actions {
