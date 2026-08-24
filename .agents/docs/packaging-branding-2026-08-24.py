@@ -123,61 +123,92 @@ def quad_apply(photo, label, quad, opacity=1.0, blur=2.0, shade=None):
     return Image.fromarray(np.clip(out, 0, 255).astype(np.uint8))
 
 
+def label_lockup(width, ink=(30, 29, 24)):
+    """Header lockup: 'Matcha / Tonoki' left-aligned, two lines at line-height 1,
+    magatama mark at the right sized to the full two-line height."""
+    # size the type so the finished lockup is `width` wide
+    fs = int(width * 0.30)
+    t1 = text_img('Matcha', (F400, fs), fs * 0.012, ink + (255,))
+    t2 = text_img('Tonoki', (F400, fs), fs * 0.012, ink + (255,))
+    tw = max(t1.width, t2.width)
+    lead = int(fs * 0.30)                     # gap between the two lines
+    th = t1.height + lead + t2.height
+    mark = render_mark(th)
+    gap = int(th * 0.16)
+    W, H = tw + gap + mark.width, th
+    im = Image.new('RGBA', (W, H), (0, 0, 0, 0))
+    im.paste(t1, (0, 0), t1)
+    im.paste(t2, (0, t1.height + lead), t2)
+    im.paste(mark, (tw + gap, 0), mark)
+    return im
+
+
 # ---------------------------------------------------------------------------
-# Placements used for the 2026-08-24 pass. Run from a folder holding the three
-# source photos as PNG (decoded from static/images/packaging/*.webp) plus
-# magatama-mark.svg and cormorant-300.ttf. Writes out/*.webp at q=80.
+# Placements for the 2026-08-24 pass (revised: header lockup, after Jaume's own
+# edit of sachet-2g set the house style -- "Matcha / Tonoki" in title case,
+# left-aligned, two lines at line-height 1, mark to the right at the full
+# two-line height, exactly like the site navigation).
+#
+# Run from a folder holding tube-25.png / pouch-30g.png / pouch-30g-flat.png
+# (decoded from static/images/packaging/*.webp), magatama-mark.svg and
+# cormorant-400.ttf. Writes out/*.webp at q=80.
 #
 #   fonts:  npm pack @fontsource/cormorant-garamond  ->  woff2 -> ttf (fontTools)
+#           (Google Fonts is not reachable from the sandbox)
 #   deps :  pillow numpy cairosvg fonttools brotli
+#
+# sachet-2g.webp is NOT produced here -- it is Jaume's own edit.
 # ---------------------------------------------------------------------------
 
 def run():
     import os, math
     os.makedirs('out', exist_ok=True)
 
-    # --- tube-25: paper cylinder, label follows the curvature -----------------
+    # --- tube-25: paper cylinder, lockup follows the curvature ---------------
     ph = Image.open('tube-25.png')
-    lab = label_stacked(900)
+    lab = label_lockup(1600)
     def tube_edges(y):
         t = (y - 2100) / 900.0
         return (898 + 153 * t, 1773 - 156 * t)
-    arc, y0 = 0.46, 2010
+    arc, y0 = 0.52, 2180
     xl, xr = tube_edges(y0)
     screen_w = math.sin(math.pi * arc / 2) * (xr - xl)
     h = int(screen_w * lab.height / lab.width)
-    cylinder_apply(ph, lab, y0, y0 + h, tube_edges, arc=arc, opacity=0.92,
+    cylinder_apply(ph, lab, y0, y0 + h, tube_edges, arc=arc, opacity=0.94,
                    blur=2.2).save('out/tube-25.webp', 'WEBP', quality=80, method=6)
 
     # --- pouch-30g: standing pouch, near-flat panel with taper ---------------
     ph = Image.open('pouch-30g.png')
-    lab = label_stacked(1000)
+    lab = label_lockup(1600)
     def pouch_edges(y):
         t = (y - 1792) / 1024.0
         return (855 + 145 * t, 2250 - 175 * t)
-    yt = 1980
+    yt = 2180
     xl, xr = pouch_edges(yt)
-    LW = 0.50 * (xr - xl)
+    LW = 0.62 * (xr - xl)
     ct = (xl + xr) / 2
     yb = yt + LW * lab.height / lab.width
     xl2, xr2 = pouch_edges(yb)
     LWb = LW * (xr2 - xl2) / (xr - xl)
     cb = (xl2 + xr2) / 2
     quad = [(ct - LW / 2, yt), (ct + LW / 2, yt), (cb + LWb / 2, yb), (cb - LWb / 2, yb)]
-    quad_apply(ph, lab, quad, opacity=0.90, blur=2.4).save(
+    quad_apply(ph, lab, quad, opacity=0.92, blur=2.4).save(
         'out/pouch-30g.webp', 'WEBP', quality=80, method=6)
 
     # --- pouch-30g-flat: lying down, full perspective quad -------------------
+    # face corners measured off the photo: short (zipper) edge TL->TR
     ph = Image.open('pouch-30g-flat.png')
-    lab = label_stacked(1000)
+    lab = label_lockup(1600)
     TL = np.array([630, 1041.]); TR = np.array([1832, 853.])
     BR = np.array([2793, 2472.]); BL = np.array([1378, 2965.])
     def P(u, v):
         top = TL + (TR - TL) * u
         bot = BL + (BR - BL) * u
         return tuple(top + (bot - top) * v)
-    quad = [P(0.26, 0.28), P(0.74, 0.28), P(0.74, 0.645), P(0.26, 0.645)]
-    quad_apply(ph, lab, quad, opacity=0.88, blur=2.6).save(
+    u0, u1, v0 = 0.19, 0.81, 0.36
+    v1 = v0 + (u1 - u0) * 1217 / 1882 * lab.height / lab.width   # keep aspect
+    quad = [P(u0, v0), P(u1, v0), P(u1, v1), P(u0, v1)]
+    quad_apply(ph, lab, quad, opacity=0.90, blur=2.6).save(
         'out/pouch-30g-flat.webp', 'WEBP', quality=80, method=6)
 
 
