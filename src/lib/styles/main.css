@@ -795,11 +795,51 @@ textarea {
   margin-top: var(--space-4);
 }
 
+.ceremony {
+  gap: var(--space-3);
+}
+
+.ceremony__ways {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.ceremony__way {
+  border: 0;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  padding: 0 0 0.3rem;
+  color: color-mix(in srgb, var(--color-ink) 45%, transparent);
+  cursor: pointer;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transition:
+    color 220ms var(--ease-ceremony),
+    border-color 220ms var(--ease-ceremony);
+}
+
+.ceremony__way:hover {
+  color: var(--color-ink);
+}
+
+.ceremony__way[aria-pressed='true'] {
+  border-bottom-color: var(--color-gold);
+  color: var(--color-ink);
+}
+
+.ceremony__kicker {
+  margin: 0;
+  max-width: 34rem;
+  color: var(--color-muted);
+}
+
 .ceremony__numerals {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-3);
-  margin: 0;
+  margin: var(--space-2) 0 0;
   padding: 0;
   list-style: none;
 }

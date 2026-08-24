@@ -185,9 +185,10 @@
   }}
 />
 
-<Section id="ceremony" eyebrow="The Ceremony" title="Four Movements" kanji="点">
+<Section id="ceremony" eyebrow="The Ceremony" title="Three Ways" kanji="点">
   <p class="vessels-lede">
-    The same two grams, handled in the same order, every time. The order is the recipe.
+    The same two grams, whether it takes fifteen seconds or fifteen minutes. A bottle and a hard
+    shake is a legitimate way to drink this tea.
   </p>
   <Ceremony />
 </Section>
