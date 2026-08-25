@@ -7,7 +7,7 @@
     "dev": "node scripts/run-clean-path.mjs vite --host 0.0.0.0",
     "build": "node scripts/run-clean-path.mjs vite build",
     "preview": "node scripts/run-clean-path.mjs vite preview",
-    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check": "node scripts/run-clean-path.mjs svelte-kit sync && node scripts/run-clean-path.mjs svelte-check --tsconfig ./tsconfig.json",
     "test": "node scripts/run-clean-path.mjs vitest run"
   },
   "devDependencies": {
