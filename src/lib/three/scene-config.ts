@@ -28,6 +28,28 @@ export function createLowPolyMaterialOptions(): MeshStandardMaterialParameters {
   };
 }
 
+/**
+ * Material for the illustrated Magatama. Like the low-poly bead it carries its
+ * artwork in vertex colors, so this is a plain standard surface — but smooth
+ * shaded, not flat: the slab's bevel is a rounded edge and faceting it would
+ * turn the one curved surface in the object into a row of chips.
+ *
+ * `DoubleSide` is load-bearing here, not defensive. The back paint keeps the
+ * front's winding so that it lands on the same footprint, which leaves it
+ * facing away from the camera that sees it; rendering both sides is what lets
+ * three flip the normal per fragment and light it correctly.
+ */
+export function createIconMaterialOptions(): MeshStandardMaterialParameters {
+  return {
+    vertexColors: true,
+    flatShading: false,
+    roughness: MAGATAMA_TUNING.icon.roughness,
+    metalness: MAGATAMA_TUNING.icon.metalness,
+    envMapIntensity: MAGATAMA_TUNING.icon.envMapIntensity,
+    side: DoubleSide
+  };
+}
+
 interface DragRotationInput {
   movementX: number;
   movementY: number;

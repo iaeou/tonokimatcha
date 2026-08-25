@@ -1,17 +1,27 @@
 import {
+  BufferAttribute,
   BufferGeometry,
   CatmullRomCurve3,
+  Color,
   ExtrudeGeometry,
   Float32BufferAttribute,
   Path,
   Shape,
+  ShapeGeometry,
+  Vector2,
   Vector3
 } from 'three';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { MAGATAMA_TUNING } from './magatama-tuning';
 import {
   MAGATAMA_LOWPOLY_COLORS,
   MAGATAMA_LOWPOLY_POSITIONS
 } from './magatama-lowpoly-data';
+import {
+  MAGATAMA_ICON_BEVEL_SIZE,
+  MAGATAMA_ICON_LAYERS,
+  type MagatamaIconLayer
+} from './magatama-icon-data';
 
 /**
  * Faceted low-poly Magatama, baked from the brand's `texture.svg` artwork
@@ -27,6 +37,109 @@ export function createMagatamaLowPolyGeometry() {
   geometry.setAttribute('color', new Float32BufferAttribute(MAGATAMA_LOWPOLY_COLORS, 3));
   geometry.computeVertexNormals();
   geometry.computeBoundingSphere();
+  return geometry;
+}
+
+function iconShapes(contours: number[][][]) {
+  const ring = (flat: number[]) => {
+    const points: Vector2[] = [];
+    for (let index = 0; index < flat.length; index += 2) {
+      points.push(new Vector2(flat[index], flat[index + 1]));
+    }
+    return points;
+  };
+
+  return contours.map((polygon) => {
+    const shape = new Shape(ring(polygon[0]));
+    for (let hole = 1; hole < polygon.length; hole += 1) {
+      shape.holes.push(new Path(ring(polygon[hole])));
+    }
+    return shape;
+  });
+}
+
+function paintIconColor(geometry: BufferGeometry, hex: string) {
+  // Vertex colors feed a linear pipeline, so the artwork's sRGB values have to
+  // be converted or every green comes out washed.
+  const color = new Color(hex).convertSRGBToLinear();
+  const count = geometry.attributes.position.count;
+  const colors = new Float32Array(count * 3);
+
+  for (let index = 0; index < count; index += 1) {
+    colors[index * 3] = color.r;
+    colors[index * 3 + 1] = color.g;
+    colors[index * 3 + 2] = color.b;
+  }
+
+  geometry.setAttribute('color', new BufferAttribute(colors, 3));
+  // ExtrudeGeometry and ShapeGeometry disagree on UVs and on indexing;
+  // mergeGeometries refuses a mismatched set, so both are stripped flat.
+  geometry.deleteAttribute('uv');
+  return geometry.index ? geometry.toNonIndexed() : geometry;
+}
+
+/**
+ * Illustrated Magatama, built from the drawn brand logo the header carries
+ * (`static/matchaTonoki-logo.svg`, baked into `magatama-icon-data.ts`).
+ *
+ * Made the way an enamel pin is: one bevelled ink-colored slab, with the
+ * artwork's colors laid flat on its two faces. The ink outline is not a layer
+ * — the paint is inset, and the slab showing through around it *is* the line,
+ * so the outline wraps the bevel instead of stopping dead at the edge.
+ *
+ * Paint sits `paintGap` proud of each face, stacked in the artwork's own draw
+ * order so the ink details stay above the color they sit on. The back takes
+ * only the color fills: no face, no blush — the reverse of a pin.
+ */
+export function createMagatamaIconGeometry() {
+  const { depth, bevelThickness, bevelSegments, paintGap } = MAGATAMA_TUNING.icon;
+  const layers = MAGATAMA_ICON_LAYERS;
+  const base = layers.find((layer: MagatamaIconLayer) => layer.role === 'base');
+
+  if (!base) throw new Error('magatama-icon-data is missing its base layer');
+
+  const slab = new ExtrudeGeometry(iconShapes(base.contours), {
+    depth,
+    bevelEnabled: true,
+    bevelThickness,
+    bevelSize: MAGATAMA_ICON_BEVEL_SIZE,
+    bevelOffset: 0,
+    bevelSegments,
+    steps: 1
+  });
+
+  slab.center();
+  slab.computeBoundingBox();
+
+  const frontZ = slab.boundingBox?.max.z ?? 0;
+  const backZ = slab.boundingBox?.min.z ?? 0;
+  const parts = [paintIconColor(slab, base.color)];
+
+  for (const layer of layers) {
+    if (layer.role === 'base') continue;
+
+    const paint = new ShapeGeometry(iconShapes(layer.contours), 1);
+    const lift = paintGap * layer.tier;
+
+    // `tier`, not draw index: nothing within a tier overlaps, so two steps are
+    // enough, and the ink stays a hair off the color instead of the last layer
+    // floating a twentieth of the bead above its face.
+    //
+    // Back paint is left unrotated on purpose. It shares the front's footprint,
+    // and the material draws both sides, so three flips the normal per fragment
+    // for the camera that sees it; rotating it to face outward would mirror it
+    // off the silhouette.
+    paint.translate(0, 0, layer.role === 'front' ? frontZ + lift : backZ - lift);
+    parts.push(paintIconColor(paint, layer.color));
+  }
+
+  const geometry = mergeGeometries(parts, false);
+
+  if (!geometry) throw new Error('magatama icon layers failed to merge');
+
+  geometry.computeVertexNormals();
+  geometry.computeBoundingSphere();
+
   return geometry;
 }
 

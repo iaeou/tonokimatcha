@@ -47,6 +47,7 @@
           createCameraPath,
           createLineageParticleGeometry,
           createMagatamaGeometry,
+          createMagatamaIconGeometry,
           createMagatamaLowPolyGeometry
         },
         {
@@ -54,6 +55,7 @@
           createBloomOptions,
           createEnvironmentSettings,
           createGrainOptions,
+          createIconMaterialOptions,
           createLowPolyMaterialOptions,
           createMagatamaDragRotationDelta,
           createMagatamaMaterialOptions,
@@ -114,15 +116,24 @@
       composer.addPass(renderPass);
       composer.addPass(effectPass);
 
-      // The bead is either the faceted low-poly form (baked from texture.svg)
-      // or the smooth jade bead, chosen by the tuning flag. Low-poly is opaque
-      // vertex-colored stone; the jade path stays theme-reactive.
-      const useLowPoly = MAGATAMA_TUNING.lowPoly.enabled;
-      const magatamaMaterial = useLowPoly
-        ? new MeshStandardMaterial(createLowPolyMaterialOptions())
-        : new MeshPhysicalMaterial(createMagatamaMaterialOptions());
+      // Three beads exist; the tuning flags pick one, most specific first.
+      // `icon` is the drawn logo character (active), `lowPoly` the faceted
+      // stone it replaced, and the fallback is the smooth jade bead. Only that
+      // last one is theme-reactive — the other two carry vertex colors that
+      // read on both stages.
+      const useIcon = MAGATAMA_TUNING.icon.enabled;
+      const useLowPoly = !useIcon && MAGATAMA_TUNING.lowPoly.enabled;
+      const magatamaMaterial = useIcon
+        ? new MeshStandardMaterial(createIconMaterialOptions())
+        : useLowPoly
+          ? new MeshStandardMaterial(createLowPolyMaterialOptions())
+          : new MeshPhysicalMaterial(createMagatamaMaterialOptions());
       const magatama = new Mesh(
-        useLowPoly ? createMagatamaLowPolyGeometry() : createMagatamaGeometry(),
+        useIcon
+          ? createMagatamaIconGeometry()
+          : useLowPoly
+            ? createMagatamaLowPolyGeometry()
+            : createMagatamaGeometry(),
         magatamaMaterial
       );
 
@@ -173,12 +184,15 @@
         particleMaterial.blending = theme === 'light' ? NormalBlending : AdditiveBlending;
         particleMaterial.needsUpdate = true;
 
-        // The faceted low-poly bead carries its own vertex colors and reads on
-        // both stages, so only the smooth jade bead swaps material per theme.
-        if (!useLowPoly && magatamaMaterial instanceof MeshPhysicalMaterial) {
+        // Both vertex-colored beads read on either stage, so only the smooth
+        // jade bead swaps material per theme.
+        if (magatamaMaterial instanceof MeshPhysicalMaterial) {
           magatamaMaterial.setValues(createMagatamaThemeMaterialOptions(theme));
           magatamaMaterial.needsUpdate = true;
         }
+        // The icon keeps the theme-aware environment: the cream stage needs the
+        // stronger reflection for its enamel to register, exactly as the jade
+        // bead did. Only the low-poly stone pins its own fixed intensity.
         scene.environmentIntensity = useLowPoly
           ? MAGATAMA_TUNING.lowPoly.envMapIntensity
           : createEnvironmentSettings(theme).intensity;
@@ -259,7 +273,12 @@
         magatama.position.x = width > 760 ? MAGATAMA_TUNING.layout.positionXDesktop : width > 620 ? MAGATAMA_TUNING.layout.positionXTablet : MAGATAMA_TUNING.layout.positionXMobile;
         magatama.position.y = width > 620 ? MAGATAMA_TUNING.layout.positionYWide : MAGATAMA_TUNING.layout.positionYNarrow;
         const baseScale = width > 760 ? MAGATAMA_TUNING.layout.scaleDesktop : width > 620 ? MAGATAMA_TUNING.layout.scaleTablet : MAGATAMA_TUNING.layout.scaleMobile;
-        magatama.scale.setScalar(baseScale * (useLowPoly ? MAGATAMA_TUNING.lowPoly.scaleBoost : 1));
+        const presence = useIcon
+          ? MAGATAMA_TUNING.icon.scaleBoost
+          : useLowPoly
+            ? MAGATAMA_TUNING.lowPoly.scaleBoost
+            : 1;
+        magatama.scale.setScalar(baseScale * presence);
         camera.updateProjectionMatrix();
       };
 

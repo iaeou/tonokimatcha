@@ -30,9 +30,30 @@ export const MAGATAMA_TUNING = {
     ior: 1.61,                  // refractive index; glass ~= 1.5, diamond ~= 2.4
   },
 
-  // Faceted low-poly Magatama (baked from texture.svg). This is the active
-  // look; the jade `material`/`materialLight`/`materialDark` above now feed
-  // only the unused smooth path. Vertex colors come from the artwork, so the
+  // Illustrated Magatama, built from the drawn brand logo the header carries
+  // (static/matchaTonoki-logo.svg -> magatama-icon-data.ts). This is the ACTIVE
+  // look as of 2026-08-25: the giant bead is now the same character as the
+  // icon. Set `enabled: false` to fall back to the faceted low-poly stone.
+  // geometry.ts -> createMagatamaIconGeometry()
+  // scene-config.ts -> createIconMaterialOptions()
+  icon: {
+    enabled: true,
+    depth: 0.42,                // slab thickness before the bevel
+    bevelThickness: 0.2,        // how far the rounded edge bulges in z
+    bevelSegments: 8,           // roundness of that edge
+    paintGap: 0.004,            // z-step between stacked paint layers
+    roughness: 0.62,            // matte enamel, not plastic
+    metalness: 0.05,
+    // Low on purpose. The ink is only ~2.5% albedo, so at the jade key's 2.2
+    // any real environment sheen lifts the outline to mid-grey and the drawing
+    // loses its black line. The greens are bright enough not to miss it.
+    envMapIntensity: 0.25,
+    scaleBoost: 1,              // presence relative to the jade bead
+  },
+
+  // Faceted low-poly Magatama (baked from texture.svg). Superseded by `icon`
+  // above but kept selectable; the jade `material`/`materialLight`/
+  // `materialDark` feed the unused smooth path. Vertex colors come from the artwork, so the
   // material is a plain flat-shaded standard surface — matte stone with a
   // touch of sheen from the HDRI. Same for both themes (the greens read on
   // cream and ink alike).
