@@ -87,24 +87,29 @@ textarea {
 .navigation__brand {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-1);
-  font-family: var(--font-serif);
-  font-size: 1.125rem;
 }
 
-/* Two stacked words, set solid: the wordmark reads as one block rather than
-   two lines of running text, and the magatama beside it is sized off that
-   block so mark and name always share the same cap-to-baseline height. */
-.navigation__brand-name {
-  display: flex;
-  flex-direction: column;
-  line-height: 1;
-}
-
-.navigation__brand-mark {
-  flex-shrink: 0;
+/* The brand is the drawn lockup, not set type: stone left, Matcha over Tonoki
+   right. 2.25rem is the height the old two-line wordmark occupied (1.125rem
+   set solid), so the header keeps its proportions. */
+.navigation__brand-logo {
+  display: block;
   width: auto;
-  height: 2em;
+  height: 2.25rem;
+}
+
+/* Only the ink differs between the two files; the stone is identical. The
+   swap is display, not a fetch, so it lands with the theme circle. */
+.navigation__brand-logo--dark {
+  display: none;
+}
+
+:root[data-theme='dark'] .navigation__brand-logo--light {
+  display: none;
+}
+
+:root[data-theme='dark'] .navigation__brand-logo--dark {
+  display: block;
 }
 
 .navigation__actions {

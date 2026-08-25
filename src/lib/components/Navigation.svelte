@@ -4,17 +4,24 @@
 
 <header class="navigation">
   <a class="navigation__brand" href="/" aria-label="Matcha Tonoki home">
-    <span class="navigation__brand-name">
-      <span>Matcha</span>
-      <span>Tonoki</span>
-    </span>
+    <!-- Both variants ship so the theme swap is a CSS display switch on an
+         already-decoded image. Fetching the dark file on first toggle would
+         blink the mark out mid-reveal. -->
     <img
-      class="navigation__brand-mark"
-      src="/images/magatama-mark.svg"
+      class="navigation__brand-logo navigation__brand-logo--light"
+      src="/matchaTonoki-logo-nav.svg"
       alt=""
       aria-hidden="true"
-      width="398"
-      height="501"
+      width="568"
+      height="208"
+    />
+    <img
+      class="navigation__brand-logo navigation__brand-logo--dark"
+      src="/matchaTonoki-logo-nav-dark.svg"
+      alt=""
+      aria-hidden="true"
+      width="568"
+      height="208"
     />
   </a>
   <div class="navigation__actions">

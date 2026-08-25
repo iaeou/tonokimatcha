@@ -22,12 +22,14 @@ Tonoki Matcha is planned as a high-end SvelteKit digital museum for a luxury mat
 
 ## Current Implementation Snapshot
 
-Last reviewed: 2026-08-24.
+Last reviewed: 2026-08-25.
 
 The project is now a working SvelteKit baseline with:
 
 - Global layout rendering a fixed Three.js scene behind the page content.
-- Navigation wordmark (2026-08-24): **Matcha Tonoki**, two words stacked in a `line-height: 1` flex column, with a miniature Magatama beside it from `static/images/magatama-mark.svg` — the same low-poly artwork the WebGL bead is baked from, re-cropped to a tight viewBox so it leaves no dead space. The mark is sized `height: 2em` so it always matches the two-line block's cap-to-baseline height, and is `aria-hidden` since the anchor's `aria-label` already names it. Note the brand order now differs from the footer, hero copy and page titles, which still read "Tonoki Matcha" — see `project-status-2026-08-24b.md`; unresolved, do not "fix" either side without Jaume.
+- Navigation lockup (2026-08-25): the header is Jaume's drawn logo, not set type. Master artwork is `static/matchaTonoki-logo.svg` (934×705, 36 outlined paths; wordmark + kanji share fill `#241813`, the stone uses its own greens plus outline `#070605`). The header uses two derived files, `static/matchaTonoki-logo-nav.svg` and `…-nav-dark.svg` — kanji dropped, stone scaled to the two-line height and moved to the **left** of the words, viewBox cropped, ink `#241813` on light and `#f4efe4` on dark. Both are in the DOM and CSS hides one per `data-theme`, because `<img src>` cannot be switched from CSS and fetching on first toggle would blink the mark out mid theme-reveal. Height `2.25rem` = what the old two-line wordmark occupied. Regenerate both from the master; never hand-edit one variant.
+- **The packaging no longer matches the header** (2026-08-25). `packaging-branding-2026-08-24.py` composited the *previous* lockup — faceted low-poly `magatama-mark.svg` plus Cormorant Garamond type — onto the tube and both pouches. The header now carries the illustrated rounded stone and outlined geometric lettering. `magatama-mark.svg` is still live for that script. Closing the gap is a separate pass; see `project-status-2026-08-25.md`. Related and open: the WebGL hero bead is still the faceted stone, so two drawings of the same object appear on one page.
+- Brand order is still split: the header and packaging say **Matcha Tonoki**, while the footer, hero copy and page titles say *Tonoki Matcha*. Unresolved — do not "fix" either side without Jaume.
 - Navigation, footer, landing content, club request route at `/club`, the Eternal Legacy hall at `/legacy`, and a hall per presentation at `/vessels/[slug]`.
 - Vessel data lives in `src/lib/data/vessels.ts` (`Vessel`, `vessels`, `findVessel`) so the landing card and its detail panel cannot drift apart. Slugs are both the URL and the `view-transition-name`, so a collision would break deep links *and* abort the morph — there is a test guarding uniqueness.
 - Vessel cards carry a permanent action line, `OPEN THE VESSEL →` (Jaume's call, 2026-07-26: hover does not exist on touch, so the invitation must be visible at rest). The whole card is the target via an `::after` stretched from that link, which needs `z-index: 1` to sit above the photograph's hover `scale()`. Opened, the photograph is a `<button>` that closes the vessel.
