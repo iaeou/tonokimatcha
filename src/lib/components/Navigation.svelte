@@ -4,11 +4,11 @@
 
 <header class="navigation">
   <a class="navigation__brand" href="/" aria-label="Matcha Tonoki home">
-    <!-- Both variants ship so the theme swap is a CSS display switch on an
-         already-decoded image. Fetching the dark file on first toggle would
-         blink the mark out mid-reveal. -->
+    <!-- Both variants of each mark ship so the theme swap is a CSS display
+         switch on an already-decoded image. Fetching the dark file on first
+         toggle would blink the brand out mid-reveal. -->
     <img
-      class="navigation__brand-logo navigation__brand-logo--light"
+      class="navigation__brand-logo navigation__brand--light"
       src="/matchaTonoki-logo-nav.svg"
       alt=""
       aria-hidden="true"
@@ -16,12 +16,28 @@
       height="208"
     />
     <img
-      class="navigation__brand-logo navigation__brand-logo--dark"
+      class="navigation__brand-logo navigation__brand--dark"
       src="/matchaTonoki-logo-nav-dark.svg"
       alt=""
       aria-hidden="true"
       width="568"
       height="208"
+    />
+    <img
+      class="navigation__brand-kanji navigation__brand--light"
+      src="/matchaTonoki-kanji.svg"
+      alt=""
+      aria-hidden="true"
+      width="178"
+      height="317"
+    />
+    <img
+      class="navigation__brand-kanji navigation__brand--dark"
+      src="/matchaTonoki-kanji-dark.svg"
+      alt=""
+      aria-hidden="true"
+      width="178"
+      height="317"
     />
   </a>
   <div class="navigation__actions">

@@ -4,7 +4,7 @@ Date: 2026-08-25
 
 ## Summary
 
-Jaume supplied a drawn logo — `static/matchaTonoki-logo.svg` — and it replaces the header lockup that was set in type. The header is now artwork: the illustrated Magatama on the **left**, `Matcha` over `Tonoki` to its right. Two files ship, one per theme, because the wordmark's ink is unreadable on the dark ground as drawn.
+Jaume supplied a drawn logo — `static/matchaTonoki-logo.svg` — and it replaces the header lockup that was set in type. The header is now artwork: the illustrated Magatama on the **left**, `Matcha` over `Tonoki` to its right, and the kanji standing to the right of both as a separate file. Two files ship per mark, one per theme, because the wordmark's ink is unreadable on the dark ground as drawn.
 
 ## The Supplied File
 
@@ -23,38 +23,50 @@ That the ink is exactly `#241813` on all 14 lettering paths and appears nowhere 
 Jaume's calls, taken on a render of all three options:
 
 - **Icon left**, wordmark right. The previous lockup had it on the right.
-- **No kanji.** In the artwork the kanji sits centred *below* the wordmark and the stone is drawn tall enough to span both. Beside a left-hand icon it has no natural home, and at header size it is a smudge — legible only if the header grows to about 5rem, from 2.25rem now. It stays in the master file for print and large uses.
+- **Kanji kept, but cut out into its own file.** In the master artwork it sits centred *below* the wordmark, with the stone drawn tall enough to span both — an arrangement that means nothing once the stone moves to the left. Extracted to `matchaTonoki-kanji.svg` it is placed independently: to the right of the lockup, at the lockup's own height. That is what makes it work at 2.25rem instead of needing a 5rem header — it is set beside two lines of type rather than under them, so it gets the full brand height to itself instead of a third of it.
 - **2.25rem tall**, which is exactly what the old two-line wordmark occupied (1.125rem set solid), so the header keeps its proportions.
 - **Two files**, not one inlined SVG with `currentColor`.
 
-## The Two Files
+## The Four Files
 
-`static/matchaTonoki-logo-nav.svg` and `…-nav-dark.svg`, both generated from the master:
+Two marks, each in a light and a dark variant, all four generated from the master.
+
+### The lockup — `matchaTonoki-logo-nav.svg`, `…-nav-dark.svg`
 
 - The kanji's two paths are dropped.
 - The stone is scaled to the wordmark's two-line height (`196.4 / 552.6 = 0.3554`) and placed left, with a 44-unit gap.
 - viewBox is cropped to what remains, `58.6 71.9 567.8 208.4`.
 - Ink is `#241813` in the light file and `#f4efe4` — `--color-ink` on dark — in the dark one. Everything else is byte-identical.
 
-Both are 15.9 KB and differ only in that colour. If the artwork changes, regenerate both from the master rather than editing either by hand; the generator is a dozen lines and the measured bboxes above are its only inputs.
+Both are 15.9 KB and differ only in that colour.
+
+### The kanji — `matchaTonoki-kanji.svg`, `…-kanji-dark.svg`
+
+Its two paths lifted out, viewBox cropped to `141.2 317.4 178.3 317.1`, same ink substitution. 2.3 KB each.
+
+Rendered at the lockup's `2.25rem`, its crown lands on `Matcha`'s cap height and its foot on `Tonoki`'s baseline — the two-line block and the character measure out to the same height, so no per-element nudging is needed. It was checked at 85% and 70% as well; both float, because the alignment at the ends is what makes it read as set rather than placed.
+
+If the artwork changes, regenerate all four from the master rather than editing any by hand; the generator is a dozen lines and the measured bboxes above are its only inputs.
 
 ### Why both are in the DOM
 
 `<img>` `src` cannot be switched from CSS, and the theme is a `data-theme` attribute rather than `prefers-color-scheme`, so `<picture>` with a media query cannot see it either. Both images are therefore rendered and one is hidden:
 
 ```css
-.navigation__brand-logo--dark { display: none; }
-:root[data-theme='dark'] .navigation__brand-logo--light { display: none; }
-:root[data-theme='dark'] .navigation__brand-logo--dark { display: block; }
+.navigation__brand--dark { display: none; }
+:root[data-theme='dark'] .navigation__brand--light { display: none; }
+:root[data-theme='dark'] .navigation__brand--dark { display: block; }
 ```
 
-The swap is then a `display` flip on an image the browser already decoded. Fetching the dark file on first toggle would blink the mark out in the middle of the theme circle's reveal — the one moment the eye is on that corner of the screen. The cost is one extra 15.9 KB request per load, which gzips to a fraction of that.
+The theme classes are deliberately on `.navigation__brand--light` / `--dark` rather than on a per-mark name, so the lockup and the kanji are switched by one pair of rules and a third mark would need no new CSS.
+
+The swap is then a `display` flip on an image the browser already decoded. Fetching the dark file on first toggle would blink the mark out in the middle of the theme circle's reveal — the one moment the eye is on that corner of the screen. The cost is one extra copy of each mark per load — 18.2 KB across the two unused files, which gzips to a fraction of that.
 
 An inlined SVG with `fill: currentColor` would have been one file and no second request. Jaume chose two files for the simpler markup; the trade is recorded here so the choice is legible later.
 
 ## Verification
 
-Rendered at 2× in both themes at 1000px and 390px against the real tokens. The lockup holds at both widths, the dark variant's cream ink sits clean on `#080b07`, and the stone's black outline needs no theme treatment — a bright `#b5d238` body carries it on either ground.
+Rendered at 2× in both themes at 1000px and 390px against the real tokens. The lockup and kanji hold at both widths, the dark variant's cream ink sits clean on `#080b07`, and the stone's black outline needs no theme treatment — a bright `#b5d238` body carries it on either ground.
 
 **Not verified by the toolchain.** `node_modules/` is still absent, the same gap recorded in the three previous entries, so `svelte-check`, `npm test` and `npm run build` did not run. Markup, CSS and two static assets; no module boundary touched. Run `npm install` then `npm run check && npm test && npm run build`.
 
@@ -74,5 +86,5 @@ Also unresolved: whether the WebGL bead in the hero should become this rounded s
 ## Still Open
 
 - Carried over from `2026-08-24b`: the header says **Matcha Tonoki**, while `Footer.svelte`, the hero subtitle, and the `<title>` tags on `/legacy` and `/vessels/[slug]` still say *Tonoki Matcha*. The drawn logo makes the header's order the brand's, which strengthens the case for renaming the copy — still Jaume's call, still untouched.
-- `static/favicon.svg` is still the placeholder concentric circles. The stone alone, cropped out of the master, is the obvious favicon now.
+- `static/favicon.svg` is still the placeholder concentric circles. The stone alone, cropped out of the master the same way the kanji was, is the obvious favicon now.
 - Carried over: real product photography; the Cold/Hot recipe figures; `JADE_BELL_TUNING` timbre + mute toggle; `/club` backend.

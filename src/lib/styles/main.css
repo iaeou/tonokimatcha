@@ -87,6 +87,7 @@ textarea {
 .navigation__brand {
   display: inline-flex;
   align-items: center;
+  gap: var(--space-1);
 }
 
 /* The brand is the drawn lockup, not set type: stone left, Matcha over Tonoki
@@ -98,17 +99,27 @@ textarea {
   height: 2.25rem;
 }
 
-/* Only the ink differs between the two files; the stone is identical. The
-   swap is display, not a fetch, so it lands with the theme circle. */
-.navigation__brand-logo--dark {
+/* The kanji is a separate file so it can be placed and sized on its own — in
+   the master artwork it sits centred *below* the wordmark, which has no
+   meaning beside a left-hand stone. At the lockup's full height its crown
+   lands on Matcha's cap and its foot on Tonoki's baseline. */
+.navigation__brand-kanji {
+  display: block;
+  width: auto;
+  height: 2.25rem;
+}
+
+/* Only the ink differs between each pair; the stone is identical. The swap is
+   display, not a fetch, so it lands with the theme circle. */
+.navigation__brand--dark {
   display: none;
 }
 
-:root[data-theme='dark'] .navigation__brand-logo--light {
+:root[data-theme='dark'] .navigation__brand--light {
   display: none;
 }
 
-:root[data-theme='dark'] .navigation__brand-logo--dark {
+:root[data-theme='dark'] .navigation__brand--dark {
   display: block;
 }
 
