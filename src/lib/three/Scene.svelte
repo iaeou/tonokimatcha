@@ -54,6 +54,8 @@
           TONOKI_COLORS,
           createBloomOptions,
           createEnvironmentSettings,
+          createFarewellSettings,
+          computeFarewellOpacity,
           createGrainOptions,
           createIconMaterialOptions,
           createLowPolyMaterialOptions,
@@ -392,9 +394,41 @@
         }
       });
 
+      // Farewell: the bead dissolves on the approach to the closing hall, so
+      // the final request is never asked from under a floating stone. Both
+      // edges of the window sit below the fold — by the time The Guardian is
+      // on screen the stone is already gone.
+      const farewellSettings = createFarewellSettings();
+      let farewellProgress = 0;
+      let farewellTrigger: ScrollTrigger | null = null;
+
+      if (farewellSettings.enabled && document.querySelector(farewellSettings.trigger)) {
+        farewellTrigger = ScrollTrigger.create({
+          trigger: farewellSettings.trigger,
+          start: farewellSettings.start,
+          end: farewellSettings.end,
+          onUpdate: (self) => {
+            farewellProgress = self.progress;
+          }
+        });
+      }
+
       const render = () => {
         const time = performance.now() * 0.001;
         particleUniforms.uTime.value = time;
+
+        // Apply the farewell. `transparent` is only switched on while the
+        // stone is actually fading: leaving it on permanently would put an
+        // opaque mesh through the transparent pass for the whole page.
+        const farewellOpacity = computeFarewellOpacity(farewellProgress);
+        const fading = farewellOpacity < 1;
+
+        if (magatamaMaterial.transparent !== fading) {
+          magatamaMaterial.transparent = fading;
+          magatamaMaterial.needsUpdate = true;
+        }
+        magatamaMaterial.opacity = farewellOpacity;
+        magatama.visible = farewellOpacity > farewellSettings.hideBelow;
 
         magatama.rotation.set(
           scrollRotation.x + pointer.y * MAGATAMA_TUNING.animation.pointerParallaxX + dragRotation.x,
@@ -458,6 +492,7 @@
         floatTween.kill();
         scrollTween.kill();
         vortexTween.kill();
+        farewellTrigger?.kill();
         ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
         window.removeEventListener('resize', resize);
         window.removeEventListener('pointermove', handlePointerMove);

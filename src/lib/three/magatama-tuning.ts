@@ -51,6 +51,22 @@ export const MAGATAMA_TUNING = {
     scaleBoost: 1,              // presence relative to the jade bead
   },
 
+  // Farewell — the bead withdraws before the closing hall.
+  //
+  // The Guardian is where the visitor is asked for something, and the stone
+  // shouldn't be hovering over that request. It dissolves during the approach
+  // and is fully gone by the time the section starts to appear: the fade both
+  // begins and ends while `trigger` is still below the fold.
+  // scene-config.ts -> createFarewellSettings() / computeFarewellOpacity()
+  // Scene.svelte -> farewell ScrollTrigger + render loop
+  farewell: {
+    enabled: true,
+    trigger: '#guardian',       // the last section
+    start: 'top bottom+=70%',   // begins ~0.7 viewport before the hall arrives
+    end: 'top bottom+=5%',      // fully transparent just before it enters
+    hideBelow: 0.02,            // opacity under this -> mesh.visible = false
+  },
+
   // Faceted low-poly Magatama (baked from texture.svg). Superseded by `icon`
   // above but kept selectable; the jade `material`/`materialLight`/
   // `materialDark` feed the unused smooth path. Vertex colors come from the artwork, so the

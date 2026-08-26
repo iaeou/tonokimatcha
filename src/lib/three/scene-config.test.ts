@@ -1,8 +1,10 @@
 import { describe, expect, test } from 'vitest';
 import {
   TONOKI_COLORS,
+  computeFarewellOpacity,
   createBloomOptions,
   createEnvironmentSettings,
+  createFarewellSettings,
   createGrainOptions,
   createLowPolyMaterialOptions,
   createMagatamaMaterialOptions,
@@ -171,5 +173,55 @@ describe('createLowPolyMaterialOptions', () => {
     expect(opts.envMapIntensity).toBeGreaterThan(0);
     // DoubleSide (2): the artwork's mixed winding must not cull facets to holes.
     expect(opts.side).toBe(2);
+  });
+});
+
+describe('createFarewellSettings', () => {
+  test('targets the closing hall and finishes while it is still below the fold', () => {
+    const settings = createFarewellSettings();
+
+    expect(settings.enabled).toBe(true);
+    expect(settings.trigger).toBe('#guardian');
+    // Both edges are offsets past the viewport bottom, so the stone is gone
+    // before The Guardian is on screen at all.
+    expect(settings.start).toMatch(/^top bottom\+=/);
+    expect(settings.end).toMatch(/^top bottom\+=/);
+
+    const offset = (edge: string) => Number(edge.replace('top bottom+=', '').replace('%', ''));
+    expect(offset(settings.start)).toBeGreaterThan(offset(settings.end));
+    expect(offset(settings.end)).toBeGreaterThanOrEqual(0);
+  });
+
+  test('hands back a defensive copy', () => {
+    expect(createFarewellSettings()).not.toBe(createFarewellSettings());
+  });
+});
+
+describe('computeFarewellOpacity', () => {
+  test('runs from fully present to fully gone across the window', () => {
+    expect(computeFarewellOpacity(0)).toBe(1);
+    expect(computeFarewellOpacity(1)).toBe(0);
+  });
+
+  test('never brightens as the visitor scrolls on', () => {
+    let previous = Infinity;
+
+    for (let step = 0; step <= 20; step += 1) {
+      const opacity = computeFarewellOpacity(step / 20);
+      expect(opacity).toBeLessThanOrEqual(previous);
+      previous = opacity;
+    }
+  });
+
+  test('eases rather than fading linearly, so the stone holds then leaves', () => {
+    // Smoothstep is symmetric about the midpoint and flatter at both ends.
+    expect(computeFarewellOpacity(0.5)).toBeCloseTo(0.5);
+    expect(computeFarewellOpacity(0.15)).toBeGreaterThan(1 - 0.15);
+    expect(computeFarewellOpacity(0.85)).toBeLessThan(1 - 0.85);
+  });
+
+  test('clamps scroll progress that overshoots the window', () => {
+    expect(computeFarewellOpacity(-3)).toBe(1);
+    expect(computeFarewellOpacity(4)).toBe(0);
   });
 });

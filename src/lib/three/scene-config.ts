@@ -50,6 +50,28 @@ export function createIconMaterialOptions(): MeshStandardMaterialParameters {
   };
 }
 
+/**
+ * Scroll window for the bead's farewell, read by the ScrollTrigger in the
+ * scene. Both edges sit below the fold, so the stone finishes dissolving
+ * before the closing hall is on screen at all.
+ */
+export function createFarewellSettings() {
+  return { ...MAGATAMA_TUNING.farewell };
+}
+
+/**
+ * Bead opacity across the farewell, `progress` running 0 → 1 over that
+ * window. Smoothstep rather than linear: the stone holds its presence for a
+ * beat, then leaves quickly, instead of spending the whole approach as a
+ * half-there ghost. Clamped, so callers can hand it raw scroll progress.
+ */
+export function computeFarewellOpacity(progress: number): number {
+  const clamped = Math.min(Math.max(progress, 0), 1);
+  const eased = clamped * clamped * (3 - 2 * clamped);
+
+  return 1 - eased;
+}
+
 interface DragRotationInput {
   movementX: number;
   movementY: number;

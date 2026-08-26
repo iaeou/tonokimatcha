@@ -85,3 +85,69 @@ That last pair is what actually guards the bake: the bevel constant and the data
 - The mouth's pink still reads as a dark slot at oblique angles.
 - The brand-order split; `static/favicon.svg` still the concentric-circles placeholder — `ico-magatama.svg` is a one-line answer to it.
 - Cold/Hot recipe figures; `JADE_BELL_TUNING`; the `/club` backend.
+
+---
+
+# Addendum — the bead's farewell (same day)
+
+Jaume asked for the stone to become transparent and hide completely *before*
+the last section is reached. The Guardian is where the visitor is asked for
+something, and a bead hovering over that request competes with it.
+
+## What was added
+
+`MAGATAMA_TUNING.farewell` — one block, five values:
+
+| key | value | why |
+| --- | --- | --- |
+| `trigger` | `#guardian` | the closing hall |
+| `start` | `top bottom+=70%` | fade opens ~0.7 viewport before the hall arrives |
+| `end` | `top bottom+=5%` | fully transparent just before it enters |
+| `hideBelow` | `0.02` | under this the mesh leaves the render entirely |
+| `enabled` | `true` | flip to keep the stone through the whole page |
+
+Both edges are offsets *past* the viewport bottom, which is the whole point:
+the window opens and closes while `#guardian` is still below the fold, so the
+stone is gone before the section is on screen at all rather than dissolving
+on top of it.
+
+Two pure functions in `scene-config.ts` carry the logic:
+`createFarewellSettings()` (defensive copy of the tuning) and
+`computeFarewellOpacity(progress)`. The latter is a smoothstep rather than a
+linear ramp — the stone holds its presence for a beat and then leaves, instead
+of spending the entire approach as a half-there ghost.
+
+`Scene.svelte` creates a plain `ScrollTrigger` over that window (no scrub
+needed; `onUpdate` hands back progress directly) and applies the result in the
+render loop. Two details worth keeping:
+
+- `material.transparent` is toggled **only while actually fading**. Leaving it
+  on permanently would push an opaque mesh through the transparent pass for
+  the entire page for the sake of a few hundred pixels of scroll.
+- Below `hideBelow` the mesh's `visible` goes false, so "hidden" means not
+  drawn, not "drawn at 1% alpha".
+
+The trigger is killed explicitly on teardown alongside the existing tweens.
+
+## Verification
+
+`npm test` — 103 passed, 1 skipped, 13 files (7 new tests: the window's shape,
+monotonicity of the fade, the easing, and clamping of overshooting progress).
+`npm run check` — 0 errors, the 2 standing `CursorPointer` warnings.
+`npm run build` — clean.
+
+In-browser on the dark stage, walking the scroll down: full presence through
+The Vessels; visibly translucent through The Ceremony; completely absent by the
+time 陵 and *Begin sponsorship request* are on screen. Reversible on the way
+back up. No console errors.
+
+## Note for whoever picks this up
+
+`localhost:5173` was serving a different project this session — the Tonoki dev
+server was run on `--port 5199`. Also `window.lenis` is only a version stamp,
+not the instance, so there is no programmatic `scrollTo`: drive the page with
+real wheel events and measure with `getBoundingClientRect()`.
+
+The particle cloud still crosses into The Guardian. Only the bead was asked
+for, and it is the only thing that leaves — say the word if the dust should
+withdraw with it.
