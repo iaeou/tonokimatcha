@@ -103,8 +103,8 @@
       ceramics, and the immense quiet of the Daisenryo Kofun.
     </p>
     <p>
-      Nothing here behaves like a store. The experience is arranged as a private museum: slow
-      admission, documented provenance, and ceremonial restraint.
+      This is arranged like a small museum: documented provenance, room around each object. But
+      the tea is meant to be drunk, not admired — we would rather you served it than shelved it.
     </p>
   </div>
 </Section>

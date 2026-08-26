@@ -64,7 +64,8 @@
       Before history was written, we were here.
     </h1>
     <p class="hero__text hero-subtitle">
-From the sacred land of Osaka to the essence of jade: Tonoki Matcha is the art of transforming an ancestral lineage into a liquid jewel of absolute purity.
+      Tonoki is one tea from the shaded fields of Osaka: first-harvest leaf, stone-milled, held to
+      a single standard. Whisk it in a bowl or shake it in a bottle — it is the same two grams.
     </p>
     <a class="hero__cue" href="#lineage">Scroll to explore</a>
   </div>

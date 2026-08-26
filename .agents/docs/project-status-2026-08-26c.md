@@ -46,3 +46,25 @@ The rest of the tone question, in order of damage — none of it touched, all of
 - The packaging still carries the faceted mark and Cormorant type. If the site softens and the packaging does not, the split widens.
 - The brand-order split: header and packaging say *Matcha Tonoki*, footer and page titles say *Tonoki Matcha*.
 - Cold/Hot recipe figures; `JADE_BELL_TUNING`; the `/club` backend.
+
+---
+
+## Second Pass, Same Day — The Lineage and the Hero's Subtitle
+
+Jaume looked at The Guardian on the dev server and approved the register, so the next two items on the list were spent.
+
+**The Lineage, third paragraph.** *"Nothing here behaves like a store. The experience is arranged as a private museum: slow admission, documented provenance, and ceremonial restraint."* → *"This is arranged like a small museum: documented provenance, room around each object. But the tea is meant to be drunk, not admired — we would rather you served it than shelved it."*
+
+The old sentence had stopped being true twice over: there is a hundred-unit minimum on the sachet and a way of drinking it that is a bottle and a shake. It also promised *slow admission* on a site whose own argument is now that the tea is easy. The museum stays as a description of the room, not as a barrier.
+
+**The hero.** The `h1` is untouched, and that is a decision rather than an omission: *"Before history was written, we were here"* is the material register — grave and precise about the tea and the place — which is exactly the half of the voice that does not move. The subtitle was the problem, because it is where a first-time visitor decides what this is and it answered *"a liquid jewel of absolute purity"*.
+
+*"From the sacred land of Osaka to the essence of jade: Tonoki Matcha is the art of transforming an ancestral lineage into a liquid jewel of absolute purity."* → *"Tonoki is one tea from the shaded fields of Osaka: first-harvest leaf, stone-milled, held to a single standard. Whisk it in a bowl or shake it in a bottle — it is the same two grams."*
+
+It now sets up the two halls that follow — one degree, three ways — instead of describing an abstraction. Two rejected alternatives, for the record: a bolder `h1` (*"Older than the writing, and easier than you think"*, with the cue as *"Come in"*), which makes the two-register joke in one line but spends the Kofun's gravity to do it; and a surgical edit that kept the old shape and only removed the jewel.
+
+**Brand-order note:** the new subtitle says plain **Tonoki**, not *Tonoki Matcha*. That is one fewer place in the split inventory, and it was chosen precisely because it does not have to take a side. The footer and the page titles still say *Tonoki Matcha*; that decision is still Jaume's.
+
+**Verification:** `npm run check` 0 errors, `npm test` 103 passed / 1 skipped, `npm run build` clean.
+
+**Still open**, minus the two spent: the pink `#e672a5` as an accent token; the packaging's old mark; the brand order; Cold/Hot figures; `JADE_BELL_TUNING`; the `/club` backend.
