@@ -6,12 +6,12 @@
 <Section eyebrow="The Guardian" title="Tonoki Club">
   <div class="narrative-grid">
     <p>
-      Admission is reserved for invited patrons, hospitality partners, and cultural institutions
-      able to preserve Tonoki's handling standards.
+      The club is how tearooms, restaurants, shops and private hosts buy Tonoki: in the quantity
+      they need, in the packaging that suits the way they serve it.
     </p>
     <p>
-      Requests are treated as sponsorship inquiries, not transactions. A guardian reviews each
-      institution, intended ceremony, and storage context before access is considered.
+      Tell us where the tea will be poured and how much of it you go through. A guardian reads
+      every request and answers either way, even when the answer is that we cannot do it yet.
     </p>
   </div>
 

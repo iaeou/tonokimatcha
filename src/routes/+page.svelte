@@ -193,12 +193,13 @@
   <Ceremony />
 </Section>
 
-<Section id="guardian" eyebrow="The Guardian" title="Custom Request" kanji="陵">
+<Section id="guardian" eyebrow="The Guardian" title="By Request" kanji="陵">
   <div class="guardian-panel">
     <p>
-      Admission requests are reviewed for cultural fit, storage discipline, and the seriousness of
-      the service context.
+      Tearooms, restaurants and shops order Tonoki in their own quantities and their own
+      packaging. Tell us what you need and who it is for, and we will tell you honestly whether we
+      can make it.
     </p>
-    <a class="text-link" href="/club">Begin sponsorship request</a>
+    <a class="text-link" href="/club">Start a request</a>
   </div>
 </Section>

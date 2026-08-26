@@ -1,11 +1,11 @@
-<form class="membership-form" aria-label="Sponsorship request">
+<form class="membership-form" aria-label="Request form">
   <label>
     Name
     <input name="name" autocomplete="name" />
   </label>
 
   <label>
-    Institution
+    Business or institution
     <input name="institution" autocomplete="organization" />
   </label>
 
@@ -14,5 +14,5 @@
     <textarea name="request" rows="5"></textarea>
   </label>
 
-  <button type="submit">Request Sponsorship</button>
+  <button type="submit">Send request</button>
 </form>

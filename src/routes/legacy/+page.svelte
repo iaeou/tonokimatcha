@@ -88,6 +88,6 @@
   </div>
 
   <div class="guardian-panel">
-    <a class="text-link" href="/club">Begin sponsorship request</a>
+    <a class="text-link" href="/club">Start a request</a>
   </div>
 </Section>
