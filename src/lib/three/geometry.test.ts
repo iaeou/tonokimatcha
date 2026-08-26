@@ -2,10 +2,12 @@ import { describe, expect, test } from 'vitest';
 import {
   createKofunConstellationPositions,
   createLineageParticleGeometry,
+  createMagatamaIconGeometry,
   createMagatamaLowPolyGeometry,
   createMagatamaShape,
   createLineageParticlePositions
 } from './geometry';
+import { MAGATAMA_ICON_BEVEL_SIZE, MAGATAMA_ICON_LAYERS } from './magatama-icon-data';
 
 describe('createMagatamaShape', () => {
   test('creates a closed bezier silhouette with a single suspension hole', () => {
@@ -150,5 +152,91 @@ describe('createMagatamaLowPolyGeometry', () => {
       expect(color.array[i]).toBeGreaterThanOrEqual(0);
       expect(color.array[i]).toBeLessThanOrEqual(1);
     }
+  });
+});
+
+describe('createMagatamaIconGeometry', () => {
+  const base = MAGATAMA_ICON_LAYERS.find((layer) => layer.role === 'base')!;
+
+  const boundsOf = (layer: { contours: number[][][] }) => {
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+
+    for (const polygon of layer.contours) {
+      for (const ring of polygon) {
+        for (let i = 0; i < ring.length; i += 2) {
+          minX = Math.min(minX, ring[i]);
+          maxX = Math.max(maxX, ring[i]);
+          minY = Math.min(minY, ring[i + 1]);
+          maxY = Math.max(maxY, ring[i + 1]);
+        }
+      }
+    }
+
+    return { minX, minY, maxX, maxY };
+  };
+
+  test('carries exactly one base slab, painted on both faces', () => {
+    expect(MAGATAMA_ICON_LAYERS.filter((layer) => layer.role === 'base')).toHaveLength(1);
+    expect(base.tier).toBe(0);
+    expect(MAGATAMA_ICON_LAYERS.some((layer) => layer.role === 'front')).toBe(true);
+    expect(MAGATAMA_ICON_LAYERS.some((layer) => layer.role === 'back')).toBe(true);
+  });
+
+  test('keeps the mouth off the reverse of the pin', () => {
+    const backColors = MAGATAMA_ICON_LAYERS.filter((layer) => layer.role === 'back').map(
+      (layer) => layer.color
+    );
+
+    expect(backColors).not.toContain('#e672a5');
+  });
+
+  test('paints in two tiers so nothing floats off the face', () => {
+    const tiers = new Set(
+      MAGATAMA_ICON_LAYERS.filter((layer) => layer.role !== 'base').map((layer) => layer.tier)
+    );
+
+    expect([...tiers].sort()).toEqual([1, 2]);
+  });
+
+  test('clips every paint layer inside the bevel it was baked against', () => {
+    // Paint that crossed the bevel would hang off the rounded edge in mid-air,
+    // so the data and the extrusion have to agree on one number.
+    //
+    // The slack is the bake's own simplify tolerance (0.15 artwork units,
+    // ~0.0044 here): it moves the slab's extreme points inward as readily as
+    // the paint's, so the two edges coincide only to within it.
+    const slack = 0.005;
+    const slab = boundsOf(base);
+
+    for (const layer of MAGATAMA_ICON_LAYERS) {
+      if (layer.role === 'base') continue;
+
+      const paint = boundsOf(layer);
+      expect(paint.minX).toBeGreaterThanOrEqual(slab.minX + MAGATAMA_ICON_BEVEL_SIZE - slack);
+      expect(paint.maxX).toBeLessThanOrEqual(slab.maxX - MAGATAMA_ICON_BEVEL_SIZE + slack);
+      expect(paint.minY).toBeGreaterThanOrEqual(slab.minY + MAGATAMA_ICON_BEVEL_SIZE - slack);
+      expect(paint.maxY).toBeLessThanOrEqual(slab.maxY - MAGATAMA_ICON_BEVEL_SIZE + slack);
+    }
+  });
+
+  test("builds one vertex-colored mesh in the low-poly bake's own space", () => {
+    const geometry = createMagatamaIconGeometry();
+    const position = geometry.getAttribute('position');
+    const color = geometry.getAttribute('color');
+
+    expect(color).toBeDefined();
+    expect(color.count).toBe(position.count);
+
+    geometry.computeBoundingBox();
+    const box = geometry.boundingBox!;
+
+    // Same 2.9 x 4.0 x 0.83 envelope the faceted stone occupied, so every
+    // `layout` knob in the tuning carries over untouched.
+    expect(box.max.x - box.min.x).toBeCloseTo(2.9, 1);
+    expect(box.max.y - box.min.y).toBeCloseTo(4.0, 1);
+    expect(box.max.z - box.min.z).toBeCloseTo(0.83, 1);
   });
 });
