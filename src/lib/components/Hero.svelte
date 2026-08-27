@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { createBackdropOpacities } from '$lib/animations/hero-backdrop';
   import { createHeroRevealOptions } from '$lib/animations/hero-reveal';
   import { typographyReveal } from '$lib/animations/typography-reveal';
 
@@ -7,10 +8,19 @@
   let heroContent: HTMLDivElement;
 
   onMount(() => {
+    // The hall that ends the relay. Its live position is what withdraws the
+    // drawing, so the handoff keeps pace with the copy instead of a guess.
+    const closingHall = document.querySelector('#collection');
+
     const updateImageFade = () => {
-      const progress = Math.min(Math.max(window.scrollY / (window.innerHeight * 1.35), 0), 1);
-      const easedProgress = progress * progress * (3 - 2 * progress);
-      heroSection.style.setProperty('--hero-image-opacity', String(1 - easedProgress));
+      const { photo, drawing } = createBackdropOpacities({
+        scrollY: window.scrollY,
+        viewportHeight: window.innerHeight,
+        closingHallTop: closingHall?.getBoundingClientRect().top ?? null
+      });
+
+      heroSection.style.setProperty('--hero-image-opacity', String(photo));
+      heroSection.style.setProperty('--hero-drawing-opacity', String(drawing));
     };
 
     updateImageFade();
@@ -41,7 +51,7 @@
 
 <section class="hero" aria-labelledby="threshold-title" bind:this={heroSection}>
   <figure class="hero__figure" aria-hidden="true">
-    <picture>
+    <picture class="hero__photo">
       <source srcset="/images/home-header2-m.webp" media="(max-width: 767px)" type="image/webp" />
       <img
         class="hero__image"
@@ -51,6 +61,24 @@
         fetchpriority="high"
       />
     </picture>
+    <!-- Osaka, drawn. It arrives only once the photograph has withdrawn, so it
+         yields the connection to the photograph, which is the first paint.
+         The figure covers the viewport, so `lazy` alone would not hold it
+         back — the low priority is what keeps it out of the way. -->
+    <img
+      class="hero__drawing"
+      fetchpriority="low"
+      src="/images/osaka-skyline-1200.webp"
+      srcset="
+        /images/osaka-skyline-768.webp   768w,
+        /images/osaka-skyline-1200.webp 1200w,
+        /images/osaka-skyline-1600.webp 1600w
+      "
+      sizes="100vw"
+      alt=""
+      loading="lazy"
+      decoding="async"
+    />
   </figure>
   <div class="hero__content" bind:this={heroContent}>
     <p class="eyebrow" use:typographyReveal={{ mode: 'sumi' }}>

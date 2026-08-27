@@ -446,6 +446,9 @@ textarea {
 
 .hero {
   --hero-image-opacity: 1;
+  --hero-drawing-opacity: 0;
+  /* How dark the ink lands at full arrival. The one knob for the drawing. */
+  --hero-drawing-ink: 0.38;
 
   position: relative;
   display: grid;
@@ -460,13 +463,15 @@ textarea {
   z-index: 0;
   inset: 0;
   margin: 0;
-  opacity: var(--hero-image-opacity);
-  transition: opacity 80ms linear;
-  will-change: opacity;
+  /* Each layer carries its own opacity now: the figure only holds them while
+     the relay moves the threshold from the photograph to the drawing. The
+     isolation keeps the drawing's blending inside this group. */
+  isolation: isolate;
 }
 
 .hero__figure::after {
   position: absolute;
+  z-index: 1;
   inset: 0;
   background:
     linear-gradient(
@@ -481,9 +486,41 @@ textarea {
 }
 
 .hero__figure picture {
+  position: absolute;
+  z-index: 0;
   display: block;
+  inset: 0;
   width: 100%;
   height: 100%;
+  opacity: var(--hero-image-opacity);
+  transition: opacity 80ms linear;
+  will-change: opacity;
+}
+
+/* Osaka as ink, not as a second photograph: the drawing's white paper is
+   multiplied away into the cream and only the lines remain. It sits above
+   the veil, which exists to keep the hero copy legible over the photograph
+   and would otherwise wash the left half of the city out. */
+.hero__drawing {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom center;
+  opacity: calc(var(--hero-drawing-opacity) * var(--hero-drawing-ink));
+  mix-blend-mode: multiply;
+  transition: opacity 80ms linear;
+  will-change: opacity;
+  pointer-events: none;
+}
+
+/* In the dark hall the ink is inverted to light and screened, so the city is
+   drawn out of the void instead of blotting it. */
+:root[data-theme='dark'] .hero__drawing {
+  filter: invert(1);
+  mix-blend-mode: screen;
 }
 
 .hero__image {
