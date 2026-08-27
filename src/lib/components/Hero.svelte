@@ -92,7 +92,7 @@
       Before history was written, we were here.
     </h1>
     <p class="hero__text hero-subtitle">
-      Matcha Tonoki is one tea from the shaded fields of Osaka: first-harvest leaf, stone-milled, held to
+      Matcha Tonoki is one tea from the shaded fields of Kagoshima: first-harvest leaf, stone-milled, held to
       a single standard. Whisk it in a bowl or shake it in a bottle — it is the same two grams.
     </p>
     <a class="hero__cue" href="#lineage">Scroll to explore</a>

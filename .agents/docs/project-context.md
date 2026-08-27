@@ -1,6 +1,6 @@
-# Tonoki Matcha Digital Sanctuary
+# Matcha Tonoki Digital Sanctuary
 
-Tonoki Matcha is planned as a high-end SvelteKit digital museum for a luxury matcha brand rooted in Japan's Kofun era. The experience should prioritize restraint, negative space, ceremonial language, and invitation-only access rather than commerce.
+Matcha Tonoki (brand order settled 2026-08-27 — never "Tonoki Matcha") is a high-end SvelteKit digital museum for a luxury matcha brand rooted in Japan's Kofun era. The experience should prioritize restraint, negative space, ceremonial language, and invitation-only access rather than commerce.
 
 ## Technical Direction
 
@@ -14,7 +14,7 @@ Tonoki Matcha is planned as a high-end SvelteKit digital museum for a luxury mat
 
 - The Threshold: landing hero with cinematic Kofun atmosphere and Magatama focus.
 - The Lineage: heritage narrative around Tonoki-no-muraji, the Dignified Tree, Haniwa, Sueki, and Daisenryo Kofun.
-- The Leaf: a single degree, Tonoki Ceremonial. There is no product ladder — one tea, highest grade only. Sourcing is named here: organic ichibancha (first flush, once a year) from **Horiguchi Seicha, Kagoshima**. The heritage in The Lineage is the *name's* — Tonoki-no-muraji, Sakai, the Kofun — while the field is Kagoshima's; the copy keeps those two facts in different sections on purpose and never implies the leaf grows in Osaka.
+- The Leaf: a single degree, Tonoki Ceremonial. There is no product ladder — one tea, highest grade only. Sourcing is named here: organic ichibancha (first flush, once a year) from **Horiguchi Seicha, Kagoshima**. The heritage in The Lineage is the *name's* — Tonoki-no-muraji, Sakai, the Kofun — while the field is Kagoshima's. Nothing on the site may say the leaf grows in Osaka: the hero subtitle claimed "the shaded fields of Osaka" until 2026-08-27 and had to be corrected to Kagoshima. Osaka is the lineage and the drawn skyline; Kagoshima is the field. Keep them apart.
 - The Vessels: three presentations of that same tea — 2 g individual sachet (A, sold loose from a 100-sachet minimum or inside the tube), refined paper tube of 25 sachets (B), 30 g hermetic pouch (C).
 - The Ceremony: three ways to prepare the same 2 g — Cold (sachet into a 33 cl bottle, shake hard, keeps a day in the fridge), Hot (same gesture in an insulated bottle at ~80 °C), and Ceremony (the long way: warm the bowl, sift, whisk, serve). The two everyday ways are written plainly on purpose; ease of preparation is a selling point of the sachet, not a compromise. Timings and temperatures are provisional pending Jaume's confirmation.
 - The Guardian: custom request, Tonoki Club, and B2B ambassador flow.
