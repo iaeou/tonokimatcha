@@ -26,8 +26,8 @@ export const vessels: Vessel[] = [
     description:
       'One bowl, sealed at the mill. Individual foil sachet that protects the leaf from light and air until the moment of service.',
     note: 'Offered loose from one hundred sachets, or held inside the tube.',
-    image: '/images/packaging/sachet-2g.webp',
-    alt: 'Individual 2 gram matcha sachets',
+    image: '/images/packaging/matchatonoki-sachet-2g.webp',
+    alt: 'An open Matcha Tonoki tube with four 2 gram sachets laid beside it',
     marks: [
       { label: 'Contents', value: '2 g — one bowl of usucha' },
       { label: 'Material', value: 'Triple-layer foil, nitrogen flushed' },
@@ -42,8 +42,8 @@ export const vessels: Vessel[] = [
     format: '25 sachets · refined paper tube',
     description:
       'Twenty-five single servings held in a seamless paper tube. The travelling form: a month of ceremony, carried without ceremony.',
-    image: '/images/packaging/tube-25.webp',
-    alt: 'Refined paper tube containing twenty-five matcha sachets',
+    image: '/images/packaging/matchatonoki-tube-25.webp',
+    alt: 'The closed Matcha Tonoki paper tube, labelled and sealed',
     marks: [
       { label: 'Contents', value: '25 × 2 g sachets — 50 g' },
       { label: 'Material', value: 'Seamless uncoated paper, foil-lined' },
@@ -58,8 +58,8 @@ export const vessels: Vessel[] = [
     format: '30 g hermetic pouch',
     description:
       'The house format for those who measure their own bowl. Hermetically sealed, resealable, sized for daily practice.',
-    image: '/images/packaging/pouch-30g.webp',
-    alt: 'Hermetic 30 gram matcha pouch',
+    image: '/images/packaging/matchatonoki-pouch-30g.webp',
+    alt: 'The standing Matcha Tonoki pouch, thirty grams, hermetically sealed',
     marks: [
       { label: 'Contents', value: '30 g — roughly fifteen bowls' },
       { label: 'Material', value: 'Hermetic resealable pouch, opaque' },
