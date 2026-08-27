@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { createBackdropOpacities } from '$lib/animations/hero-backdrop';
+  import { createBackdropOpacities, createInterludeInk } from '$lib/animations/hero-backdrop';
   import { createHeroRevealOptions } from '$lib/animations/hero-reveal';
   import { typographyReveal } from '$lib/animations/typography-reveal';
 
@@ -11,16 +11,26 @@
     // The hall that ends the relay. Its live position is what withdraws the
     // drawing, so the handoff keeps pace with the copy instead of a guess.
     const closingHall = document.querySelector('#collection');
+    // The blocks the city must not compete with. Read once: sections are not
+    // added or removed while the page is scrolled.
+    const copyBlocks = Array.from(document.querySelectorAll('.section__inner'));
 
     const updateImageFade = () => {
+      const viewportHeight = window.innerHeight;
       const { photo, drawing } = createBackdropOpacities({
         scrollY: window.scrollY,
-        viewportHeight: window.innerHeight,
+        viewportHeight,
         closingHallTop: closingHall?.getBoundingClientRect().top ?? null
       });
 
+      const interlude = createInterludeInk(
+        copyBlocks.map((block) => block.getBoundingClientRect()),
+        viewportHeight
+      );
+
       heroSection.style.setProperty('--hero-image-opacity', String(photo));
       heroSection.style.setProperty('--hero-drawing-opacity', String(drawing));
+      heroSection.style.setProperty('--hero-drawing-interlude', String(interlude));
     };
 
     updateImageFade();

@@ -1,5 +1,9 @@
 import { describe, expect, test } from 'vitest';
-import { HERO_BACKDROP_TUNING, createBackdropOpacities } from './hero-backdrop';
+import {
+  HERO_BACKDROP_TUNING,
+  createBackdropOpacities,
+  createInterludeInk
+} from './hero-backdrop';
 
 const VIEWPORT = 1000;
 
@@ -60,5 +64,55 @@ describe('createBackdropOpacities', () => {
     expect(createBackdropOpacities({ scrollY: 0, viewportHeight: 0, closingHallTop: null })).toEqual(
       { photo: 1, drawing: 0 }
     );
+  });
+});
+
+describe('createInterludeInk', () => {
+  const { readingBandTop, readingBandBottom, inkBehindCopy } = HERO_BACKDROP_TUNING;
+  const band = {
+    top: VIEWPORT * readingBandTop,
+    bottom: VIEWPORT * readingBandBottom
+  };
+
+  test('gives the city the whole gap when no copy is in the band', () => {
+    expect(createInterludeInk([], VIEWPORT)).toBe(1);
+    // A hall that has already scrolled past overhead.
+    expect(createInterludeInk([{ top: -800, bottom: -100 }], VIEWPORT)).toBe(1);
+  });
+
+  test('dims to the floor while copy fills the band', () => {
+    expect(createInterludeInk([band], VIEWPORT)).toBeCloseTo(inkBehindCopy, 5);
+  });
+
+  test('takes the deepest intrusion, not the sum', () => {
+    // Two blocks each covering half the band must not read as a full cover.
+    const middle = (band.top + band.bottom) / 2;
+    const halves = [
+      { top: band.top, bottom: middle },
+      { top: middle, bottom: band.bottom }
+    ];
+
+    expect(createInterludeInk(halves, VIEWPORT)).toBeGreaterThan(
+      createInterludeInk([band], VIEWPORT)
+    );
+  });
+
+  test('fades rather than snaps as a hall enters the band', () => {
+    const entering = createInterludeInk(
+      [{ top: band.bottom - (band.bottom - band.top) * 0.25, bottom: VIEWPORT * 2 }],
+      VIEWPORT
+    );
+
+    expect(entering).toBeGreaterThan(inkBehindCopy);
+    expect(entering).toBeLessThan(1);
+  });
+
+  test('stays within bounds and survives an unmeasured viewport', () => {
+    expect(createInterludeInk([band], 0)).toBe(1);
+    for (const top of [-500, 0, 300, 900, 2000]) {
+      const ink = createInterludeInk([{ top, bottom: top + 600 }], VIEWPORT);
+      expect(ink).toBeGreaterThanOrEqual(inkBehindCopy);
+      expect(ink).toBeLessThanOrEqual(1);
+    }
   });
 });

@@ -22,7 +22,16 @@ export const HERO_BACKDROP_TUNING = {
    * How much of the viewport the closing hall must claim, from its first
    * appearance at the bottom edge, for the drawing to be fully gone.
    */
-  withdrawalViewports: 0.6
+  withdrawalViewports: 0.6,
+  /**
+   * The band of the screen where reading actually happens, in viewport
+   * fractions. Copy crossing it dims the city; the drawing is meant to be
+   * seen in the breaths between halls, not underneath their sentences.
+   */
+  readingBandTop: 0.16,
+  readingBandBottom: 0.94,
+  /** How much ink survives while copy occupies the whole band. */
+  inkBehindCopy: 0.16
 } as const;
 
 function clamp01(value: number) {
@@ -82,4 +91,46 @@ export function createBackdropOpacities({
         );
 
   return { photo, drawing: rise * (1 - withdrawal) };
+}
+
+/** Viewport-relative bounds of a block of copy, as `getBoundingClientRect()` gives them. */
+export interface CopyBounds {
+  top: number;
+  bottom: number;
+}
+
+/**
+ * How much of the city survives at this scroll position.
+ *
+ * Osaka is dense line work, and dense line work directly behind a paragraph is
+ * just noise. Rather than thinning the ink everywhere — which would leave the
+ * drawing too faint to be worth having — the city is dimmed only while copy
+ * crosses the reading band, and comes back to full strength in the gaps
+ * between halls.
+ *
+ * Returns a multiplier: `1` in an empty gap, `inkBehindCopy` when copy fills
+ * the band, smoothly between while a hall is entering or leaving.
+ */
+export function createInterludeInk(
+  copyBounds: CopyBounds[],
+  viewportHeight: number
+): number {
+  const { readingBandTop, readingBandBottom, inkBehindCopy } = HERO_BACKDROP_TUNING;
+
+  if (viewportHeight <= 0) return 1;
+
+  const bandTop = viewportHeight * readingBandTop;
+  const bandBottom = viewportHeight * readingBandBottom;
+  const bandHeight = bandBottom - bandTop;
+  if (bandHeight <= 0) return 1;
+
+  // The deepest single intrusion decides it. Summing overlaps would let two
+  // half-covering blocks read as a full one and blink the city out early.
+  let deepest = 0;
+  for (const { top, bottom } of copyBounds) {
+    const overlap = Math.min(bottom, bandBottom) - Math.max(top, bandTop);
+    deepest = Math.max(deepest, clamp01(overlap / bandHeight));
+  }
+
+  return 1 - ease(deepest) * (1 - inkBehindCopy);
 }
