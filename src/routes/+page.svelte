@@ -13,10 +13,14 @@
     name: 'Tonoki Ceremonial',
     degree: 'Single Degree',
     description:
-      'One tea only. First-harvest leaf, shade-grown and stone-milled, held to a single uncompromised standard. There is no second tier beneath it.',
+      'One tea only. Organic ichibancha — the first flush, picked once a year — shade-grown, stone-milled, and never cut with a later harvest. There is no second tier beneath it.',
+    origin:
+      'It comes from one grower: Horiguchi Seicha, in Kagoshima at the southern end of Japan, where the season opens weeks before the rest of the country. Ichibancha is that opening. The leaf spends the winter storing sweetness and holding its bitterness back, which is why the bowl reads soft rather than grassy — and why there is no cheaper harvest of ours to compare it against.',
     marks: [
-      { label: 'Harvest', value: 'First flush, hand-picked' },
-      { label: 'Milling', value: 'Granite stone, 30g per hour' },
+      { label: 'Grower', value: 'Horiguchi Seicha, Kagoshima' },
+      { label: 'Harvest', value: 'Ichibancha — first flush, once a year' },
+      { label: 'Cultivation', value: 'Organic, shade-grown' },
+      { label: 'Milling', value: 'Granite stone, 30 g per hour' },
       { label: 'Certificate', value: 'TKC-0001' }
     ]
   };
@@ -114,6 +118,7 @@
     <p class="leaf-panel__type">{leaf.degree}</p>
     <h3>{leaf.name}</h3>
     <p class="leaf-panel__lede">{leaf.description}</p>
+    <p class="leaf-panel__origin">{leaf.origin}</p>
     <dl class="certificate">
       {#each leaf.marks as mark}
         <div>

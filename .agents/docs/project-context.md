@@ -14,7 +14,7 @@ Tonoki Matcha is planned as a high-end SvelteKit digital museum for a luxury mat
 
 - The Threshold: landing hero with cinematic Kofun atmosphere and Magatama focus.
 - The Lineage: heritage narrative around Tonoki-no-muraji, the Dignified Tree, Haniwa, Sueki, and Daisenryo Kofun.
-- The Leaf: a single degree, Tonoki Ceremonial. There is no product ladder — one tea, highest grade only.
+- The Leaf: a single degree, Tonoki Ceremonial. There is no product ladder — one tea, highest grade only. Sourcing is named here: organic ichibancha (first flush, once a year) from **Horiguchi Seicha, Kagoshima**. The heritage in The Lineage is the *name's* — Tonoki-no-muraji, Sakai, the Kofun — while the field is Kagoshima's; the copy keeps those two facts in different sections on purpose and never implies the leaf grows in Osaka.
 - The Vessels: three presentations of that same tea — 2 g individual sachet (A, sold loose from a 100-sachet minimum or inside the tube), refined paper tube of 25 sachets (B), 30 g hermetic pouch (C).
 - The Ceremony: three ways to prepare the same 2 g — Cold (sachet into a 33 cl bottle, shake hard, keeps a day in the fridge), Hot (same gesture in an insulated bottle at ~80 °C), and Ceremony (the long way: warm the bowl, sift, whisk, serve). The two everyday ways are written plainly on purpose; ease of preparation is a selling point of the sachet, not a compromise. Timings and temperatures are provisional pending Jaume's confirmation.
 - The Guardian: custom request, Tonoki Club, and B2B ambassador flow.
