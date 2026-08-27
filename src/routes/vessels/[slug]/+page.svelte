@@ -6,7 +6,7 @@
 </script>
 
 <svelte:head>
-  <title>{data.vessel.name} — Tonoki Matcha</title>
+  <title>{data.vessel.name} — Matcha Tonoki</title>
   <meta name="description" content={data.vessel.description} />
 </svelte:head>
 

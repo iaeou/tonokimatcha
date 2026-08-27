@@ -16,10 +16,10 @@
 </script>
 
 <svelte:head>
-  <title>Eternal Legacy — Tonoki Matcha</title>
+  <title>Eternal Legacy — Matcha Tonoki</title>
   <meta
     name="description"
-    content="Scarcity policy, food safety certification, and the handling of admission requests at Tonoki Matcha."
+    content="Scarcity policy, food safety certification, and the handling of admission requests at Matcha Tonoki."
   />
 </svelte:head>
 

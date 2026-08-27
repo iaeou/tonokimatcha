@@ -1,6 +1,6 @@
-# Tonoki Matcha
+# Matcha Tonoki
 
-Tonoki Matcha is a SvelteKit digital sanctuary for a luxury matcha brand rooted in Japan's Kofun era. The experience is intentionally not a storefront: it presents a museum-like landing page, procedural jade atmosphere, a single-degree product narrative with three presentations, and a Tonoki Club request route.
+Matcha Tonoki is a SvelteKit digital sanctuary for a luxury matcha brand rooted in Japan's Kofun era. The experience is intentionally not a storefront: it presents a museum-like landing page, procedural jade atmosphere, a single-degree product narrative with three presentations, and a Tonoki Club request route.
 
 ## Stack
 

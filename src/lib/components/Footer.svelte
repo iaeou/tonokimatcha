@@ -1,6 +1,6 @@
 <footer class="footer">
   <div class="footer__inner">
-    <p>Tonoki Matcha - A bridge across 1,500 years.</p>
+    <p>Matcha Tonoki - A bridge across 1,500 years.</p>
     <nav aria-label="Legal and certification links">
       <a href="/legacy#scarcity">Scarcity Policy</a>
       <!-- The seal anchors the morph: on the way into the hall it becomes the

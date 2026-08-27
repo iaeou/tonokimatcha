@@ -68,3 +68,19 @@ It now sets up the two halls that follow — one degree, three ways — instead 
 **Verification:** `npm run check` 0 errors, `npm test` 103 passed / 1 skipped, `npm run build` clean.
 
 **Still open**, minus the two spent: the pink `#e672a5` as an accent token; the packaging's old mark; the brand order; Cold/Hot figures; `JADE_BELL_TUNING`; the `/club` backend.
+
+---
+
+## Third Pass, Same Day — The Brand Order, Settled
+
+Jaume closed the split that had been open since the header was rebuilt: **the brand is `Matcha Tonoki`**, in that order, because that is what the domain says (`matchatonoki.com`) and what the drawn logo reads. No more voting.
+
+Changed to match: `Footer.svelte`, the `<title>` of `/vessels/[slug]`, the `<title>` and meta description of `/legacy`, and `README.md`. `Navigation.svelte` already said it. The hero's subtitle, written an hour earlier as plain *Tonoki* precisely to avoid taking a side, now takes it: **Matcha Tonoki**, since it is the first mention on the page.
+
+Left alone on purpose: `package.json`'s `name: "tonoki-matcha"` and the GitHub repo `iaeou/tonokimatcha`. Both are identifiers rather than copy, both would drag the lockfile or the remote with them, and neither is read by a visitor. The folder on disk is already `*matchatonoki.com`.
+
+Still short-form `Tonoki` where it is the lineage rather than the product: *"Tonoki begins with the idea of an upright tree"*, the Tonoki-no-muraji, the Tonoki Club. That is the family name and it is correct.
+
+**Deployment, for the record:** the site is live at <https://matchatonoki.com/> and it tracks `main` — the Guardian pass was already serving there before this one was written, minutes after the push. `npm run build` locally says it "could not detect a supported production environment" because `adapter-auto` resolves the platform at build time on the host, not here; that message is not a missing deploy.
+
+**Verification:** `npm run check` 0 errors, `npm test` 103 passed / 1 skipped, `npm run build` clean.
