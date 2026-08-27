@@ -516,9 +516,22 @@ textarea {
     var(--hero-drawing-opacity) * var(--hero-drawing-ink) * var(--hero-drawing-interlude, 1)
   );
   mix-blend-mode: multiply;
-  /* Even in the gaps the city is heaviest at its feet: the skyline fades out
-     towards the top of the frame, where headlines live. */
-  mask-image: linear-gradient(180deg, transparent 0%, black 34%, black 100%);
+  /* Two weights, intersected. Vertically the skyline fades out towards the top
+     of the frame, where headlines live. Horizontally it thins over the column
+     the copy occupies and keeps full strength in the open right, where the
+     densest part of the drawing — the castle and the towers — happens to sit.
+     Together they let the city be present without ever being read through. */
+  mask-image:
+    linear-gradient(180deg, transparent 0%, black 34%, black 100%),
+    linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.4) 0%,
+      rgba(0, 0, 0, 0.4) 52%,
+      rgba(0, 0, 0, 0.85) 66%,
+      black 78%
+    );
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
   transition: opacity 80ms linear;
   will-change: opacity;
   pointer-events: none;

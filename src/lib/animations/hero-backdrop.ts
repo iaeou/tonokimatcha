@@ -19,10 +19,18 @@ export const HERO_BACKDROP_TUNING = {
   /** Viewport heights the drawing takes to arrive in full. */
   drawingRiseViewports: 0.95,
   /**
-   * How much of the viewport the closing hall must claim, from its first
-   * appearance at the bottom edge, for the drawing to be fully gone.
+   * How much of the viewport the closing hall must claim before the drawing
+   * begins to withdraw at all. Leaving at its first appearance cut the city's
+   * life short: it died while The Lineage was still being read, so it never
+   * got the empty stretch below that hall — the one gap wide enough to see it
+   * in. The hall now has to be genuinely arriving, not merely visible.
    */
-  withdrawalViewports: 0.6,
+  withdrawalEntryViewports: 0.55,
+  /**
+   * How much further the hall must climb, once withdrawal has begun, for the
+   * drawing to be fully gone.
+   */
+  withdrawalViewports: 0.35,
   /**
    * The band of the screen where reading actually happens, in viewport
    * fractions. Copy crossing it dims the city; the drawing is meant to be
@@ -71,6 +79,7 @@ export function createBackdropOpacities({
     photoFadeViewports,
     drawingEntryViewports,
     drawingRiseViewports,
+    withdrawalEntryViewports,
     withdrawalViewports
   } = HERO_BACKDROP_TUNING;
 
@@ -81,13 +90,16 @@ export function createBackdropOpacities({
       (viewportHeight * drawingRiseViewports)
   );
 
-  // The closing hall enters at the bottom edge and pushes the drawing out as
-  // it climbs. Below the threshold there is nothing to withdraw from yet.
+  // The closing hall pushes the drawing out as it climbs, but only once it has
+  // claimed its share of the screen — before that the city still has the gap
+  // below The Lineage to itself.
+  const claimed = closingHallTop === null ? 0 : viewportHeight - closingHallTop;
   const withdrawal =
     closingHallTop === null
       ? 0
       : ease(
-          (viewportHeight - closingHallTop) / (viewportHeight * withdrawalViewports)
+          (claimed - viewportHeight * withdrawalEntryViewports) /
+            (viewportHeight * withdrawalViewports)
         );
 
   return { photo, drawing: rise * (1 - withdrawal) };

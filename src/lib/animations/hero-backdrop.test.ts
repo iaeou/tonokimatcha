@@ -34,16 +34,24 @@ describe('createBackdropOpacities', () => {
 
   test('withdraws the drawing as the closing hall climbs the viewport', () => {
     const scrolled = VIEWPORT * 2;
+    const { withdrawalEntryViewports, withdrawalViewports } = HERO_BACKDROP_TUNING;
 
     // Hall still below the fold.
     expect(at(scrolled, VIEWPORT).drawing).toBeCloseTo(1, 2);
 
-    const arriving = at(scrolled, VIEWPORT * 0.75).drawing;
+    // Merely visible is not yet arriving: the city keeps the gap it lives in.
+    const peeking = VIEWPORT * (1 - withdrawalEntryViewports * 0.5);
+    expect(at(scrolled, peeking).drawing).toBeCloseTo(1, 2);
+
+    const arriving = at(
+      scrolled,
+      VIEWPORT * (1 - withdrawalEntryViewports - withdrawalViewports * 0.5)
+    ).drawing;
     expect(arriving).toBeGreaterThan(0);
     expect(arriving).toBeLessThan(1);
 
     // Hall has claimed its share of the viewport: the drawing is gone.
-    const claimed = VIEWPORT * (1 - HERO_BACKDROP_TUNING.withdrawalViewports);
+    const claimed = VIEWPORT * (1 - withdrawalEntryViewports - withdrawalViewports);
     expect(at(scrolled, claimed).drawing).toBe(0);
     expect(at(scrolled, 0).drawing).toBe(0);
   });
