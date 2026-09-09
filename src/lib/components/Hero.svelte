@@ -11,11 +11,17 @@
     // The hall that ends the relay. Its live position is what withdraws the
     // drawing, so the handoff keeps pace with the copy instead of a guess.
     const closingHall = document.querySelector('#collection');
-    // The hall that ends the figure's stage, one relay further down.
-    const finalHall = document.querySelector('#lineage');
     // The blocks the city must not compete with. Read once: sections are not
     // added or removed while the page is scrolled.
     const copyBlocks = Array.from(document.querySelectorAll('.section__inner'));
+    /**
+     * What ends the figure's stage: the arrival of the first hall's *copy*,
+     * not a hall further down. The figure is punctuation between the threshold
+     * and the halls, and it has to be brief — while it holds the wall the
+     * halls keep their own figures down, and a long third stage meant three of
+     * the five landing halls never showed theirs at all.
+     */
+    const firstCopy = copyBlocks[0] ?? null;
 
     const updateImageFade = () => {
       const viewportHeight = window.innerHeight;
@@ -23,7 +29,7 @@
         scrollY: window.scrollY,
         viewportHeight,
         closingHallTop: closingHall?.getBoundingClientRect().top ?? null,
-        finalHallTop: finalHall?.getBoundingClientRect().top ?? null
+        finalHallTop: firstCopy?.getBoundingClientRect().top ?? null
       });
 
       const interlude = createInterludeInk(
@@ -35,6 +41,14 @@
       heroSection.style.setProperty('--hero-drawing-opacity', String(drawing));
       heroSection.style.setProperty('--hero-figure-opacity', String(figure));
       heroSection.style.setProperty('--hero-drawing-interlude', String(interlude));
+
+      // The halls read this to keep their own figures down while the relay
+      // still holds the wall. It goes on the root because the sections are
+      // nowhere near this component in the tree.
+      document.documentElement.style.setProperty(
+        '--backdrop-presence',
+        String(Math.max(drawing, figure))
+      );
     };
 
     updateImageFade();
@@ -59,6 +73,10 @@
     return () => {
       window.removeEventListener('scroll', updateImageFade);
       window.removeEventListener('resize', updateImageFade);
+      // The relay is the landing page's alone. Left behind on a client-side
+      // navigation, its last value would hold the other routes' figures down
+      // for a page that has no backdrop at all.
+      document.documentElement.style.removeProperty('--backdrop-presence');
     };
   });
 </script>

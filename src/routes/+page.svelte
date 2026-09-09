@@ -179,7 +179,9 @@
 
 <!-- className widens only this hall's body: three columns inside the 42rem
      reading measure are 200px each, which is a column of one word. -->
-<Section id="ceremony" className="ways-section" eyebrow="How To Use" title="Three Ways" figure="wa">
+<!-- Not `wa`: that is the figure holding the backdrop across this stretch, and
+     the same drawing twice on one screen reads as a mistake. -->
+<Section id="ceremony" className="ways-section" eyebrow="How To Use" title="Three Ways" figure="samurai">
   <p class="vessels-lede">
     Good matcha has a reputation for being fussy. It is not: two grams, water, and fifteen seconds
     of shaking will do it. The long way is here too, for when the long way is the point.

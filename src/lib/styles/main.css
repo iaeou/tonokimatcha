@@ -1281,11 +1281,23 @@ textarea {
 /* The drawn figure that stands behind each hall, in the place the ghost kanji
    used to occupy. Ink on paper, like the Osaka skyline: the drawing's white
    is multiplied away into the cream and only the lines remain. */
+/* One drawing at a time. While the threshold's own relay still holds the wall
+   — the Osaka skyline or the standing figure — the halls keep their figures
+   down; `--backdrop-presence` is written by Hero.svelte and is 0 everywhere
+   the relay does not run, which is every route but the landing page. */
+.section__figure-holder {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  opacity: calc(1 - var(--backdrop-presence, 0));
+  pointer-events: none;
+}
+
 .section__figure {
   position: absolute;
   top: 4%;
   right: clamp(0.5rem, 6vw, 6rem);
-  z-index: 0;
   width: clamp(14rem, 32vw, 26rem);
   height: auto;
   opacity: 0;

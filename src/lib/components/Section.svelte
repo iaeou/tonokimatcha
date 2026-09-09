@@ -23,19 +23,24 @@
 
 <section class={`section ${className}`} id={sectionId} aria-labelledby={`${sectionId}-title`}>
   {#if drawn}
-    <!-- Decorative: the figure repeats across halls and carries no meaning a
-         screen reader would miss, so it stays out of the accessibility tree. -->
-    <img
-      class="section__figure"
-      src={drawn.src}
-      srcset={drawn.srcset}
-      sizes="(min-width: 760px) 32vw, 46vw"
-      alt=""
-      aria-hidden="true"
-      loading="lazy"
-      decoding="async"
-      use:figureDrift
-    />
+    <!-- The holder exists to carry the backdrop's veto. GSAP owns the image's
+         own opacity for the scroll drift, so the two cannot share a property:
+         the product of holder × image is what keeps a hall's figure from ever
+         standing on top of the one holding the backdrop. -->
+    <span class="section__figure-holder" aria-hidden="true">
+      <!-- Decorative: the figure repeats across halls and carries no meaning a
+           screen reader would miss, so it stays out of the accessibility tree. -->
+      <img
+        class="section__figure"
+        src={drawn.src}
+        srcset={drawn.srcset}
+        sizes="(min-width: 760px) 32vw, 46vw"
+        alt=""
+        loading="lazy"
+        decoding="async"
+        use:figureDrift
+      />
+    </span>
   {/if}
   <div class="section__inner">
     <p class="eyebrow" use:typographyReveal={{ mode: 'sumi' }}>

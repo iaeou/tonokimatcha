@@ -11,6 +11,13 @@ describe('createFigureDriftOptions', () => {
     expect(opts.opacityPeak).toBeLessThanOrEqual(0.12);
   });
 
+  test('travels far enough to read as depth rather than as a nudge', () => {
+    const { yPercentFrom, yPercentTo } = createFigureDriftOptions();
+    // Under about half the figure's own height the lag is invisible, and the
+    // drawing just looks slightly misplaced instead of further back.
+    expect(yPercentTo - yPercentFrom).toBeGreaterThan(50);
+  });
+
   test('sits lighter than a single character did', () => {
     // The drawings carry roughly a quarter of their box in ink; the kanji they
     // replaced carried far less, so inheriting its 0.07 would stain the copy.
