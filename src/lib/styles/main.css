@@ -951,6 +951,25 @@ textarea {
   margin-top: var(--space-4);
 }
 
+/* `.section__body` holds a 42rem reading measure, which is right for prose and
+   wrong for three columns of it — split three ways it leaves ~200px a column.
+   Only this hall opts out, and only the grid takes the extra width: the lede
+   above it keeps its own 34rem cap, so the prose measure is never widened. */
+.ways-section .section__body {
+  max-width: none;
+}
+
+/* Three across only once each column can hold a line worth reading. Below
+   that they stack, because two wide columns and an orphan lose the
+   at-a-glance comparison that is the point of opening all three. */
+@media (min-width: 62rem) {
+  .ways {
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(var(--space-3), 3.2vw, var(--space-5));
+    align-items: start;
+  }
+}
+
 .way {
   border-top: 1px solid color-mix(in srgb, var(--color-gold) 42%, transparent);
   padding-top: var(--space-3);
@@ -1200,14 +1219,6 @@ textarea {
 
   .collection-grid {
     grid-template-columns: repeat(3, 1fr);
-  }
-
-  /* The three ways stand side by side so their cost lines can be compared
-     without scrolling — that comparison is the argument of the section. */
-  .ways {
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-4);
-    align-items: start;
   }
 
   .harvests__list {

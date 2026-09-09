@@ -49,6 +49,22 @@ Section eyebrow changed from "The Ceremony" to "How To Use", and the lede now na
 
 Cold gained a real justification rather than an apology: cold water draws less bitterness out of the leaf than hot, so the bottle is not a lesser method.
 
+### Width (second pass, same day)
+
+Jaume, on a 1280px laptop: the three ways are too cramped — can they have the full width?
+
+They could not, and the reason was not the grid. `.section__body` carries `max-width: 42rem`, which is the right reading measure for a paragraph and the wrong one for three columns of paragraphs: split three ways it left about 200px a column, roughly four words a line.
+
+`Ceremony`'s `<Section>` now takes `className="ways-section"`, and one rule opts that hall's body out:
+
+```css
+.ways-section .section__body { max-width: none; }
+```
+
+Only the grid takes the extra room. The section lede above it keeps its own `34rem` cap, so no prose measure was widened anywhere — and `#vessels`, `#collection` and the rest still compute to 672px. Measured on a 1152px viewport: columns went 200px → 317px.
+
+The three-across breakpoint moved from `760px` to `62rem` (992px) and the gap became `clamp(var(--space-3), 3.2vw, var(--space-5))`. Below 992px they stack rather than squeeze: two wide columns and an orphan would lose the at-a-glance comparison that is the whole reason all three are open.
+
 ### Removed
 
 - `Ceremony.svelte`'s state, `goWay`/`go`, and its view-transition wiring.

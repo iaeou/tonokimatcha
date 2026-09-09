@@ -177,7 +177,9 @@
   </div>
 </Section>
 
-<Section id="ceremony" eyebrow="How To Use" title="Three Ways" kanji="点">
+<!-- className widens only this hall's body: three columns inside the 42rem
+     reading measure are 200px each, which is a column of one word. -->
+<Section id="ceremony" className="ways-section" eyebrow="How To Use" title="Three Ways" kanji="点">
   <p class="vessels-lede">
     Good matcha has a reputation for being fussy. It is not: two grams, water, and fifteen seconds
     of shaking will do it. The long way is here too, for when the long way is the point.
