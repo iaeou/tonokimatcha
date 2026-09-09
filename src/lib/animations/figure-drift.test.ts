@@ -13,9 +13,9 @@ describe('createFigureDriftOptions', () => {
 
   test('travels far enough to read as depth rather than as a nudge', () => {
     const { yPercentFrom, yPercentTo } = createFigureDriftOptions();
-    // Under about half the figure's own height the lag is invisible, and the
-    // drawing just looks slightly misplaced instead of further back.
-    expect(yPercentTo - yPercentFrom).toBeGreaterThan(50);
+    // A hall is about a screen tall, so anything much under the figure’s own
+    // height reads as a nudge rather than as another plane.
+    expect(yPercentTo - yPercentFrom).toBeGreaterThan(150);
   });
 
   test('sits lighter than a single character did', () => {

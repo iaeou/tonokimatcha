@@ -28,14 +28,15 @@ export function createFigureDriftOptions(
   overrides: Partial<FigureDriftOptions> = {}
 ): FigureDriftOptions {
   return {
-    // Parallax. The holder scrolls with the hall; this pushes the figure the
-    // other way as it goes, so the figure lags the page and reads as standing
-    // further back. The kanji travelled 24% of their own height, which was
-    // subtle to the point of being invisible — a figure needs a real journey
-    // to look like it is at a different depth rather than just misaligned.
+    // Parallax, and deliberately overstated. The holder scrolls with the hall;
+    // this pushes the figure the other way as it goes, so the figure lags the
+    // page and reads as standing well behind it. The kanji travelled 24% of
+    // their own height and the first pass 92%, both of which read as a nudge
+    // rather than as depth — a hall is roughly a screen tall, so the figure
+    // has to travel a comparable distance to look like it is on another plane.
     // Spilling past the hall's bounds is harmless: opacity is 0 at both ends.
-    yPercentFrom: -46,
-    yPercentTo: 46,
+    yPercentFrom: -125,
+    yPercentTo: 125,
     // Lower than the kanji's 0.07: these drawings cover a quarter of their
     // box in ink where a character covered a fraction of it, so the same
     // opacity would read as a much heavier stain behind the copy.

@@ -502,9 +502,9 @@ textarea {
     linear-gradient(180deg, transparent 0%, black 34%, black 100%),
     linear-gradient(
       90deg,
-      rgba(0, 0, 0, 0.4) 0%,
-      rgba(0, 0, 0, 0.4) 52%,
-      rgba(0, 0, 0, 0.85) 66%,
+      rgba(0, 0, 0, 0.26) 0%,
+      rgba(0, 0, 0, 0.26) 52%,
+      rgba(0, 0, 0, 0.8) 66%,
       black 78%
     );
   mask-composite: intersect;
@@ -540,7 +540,7 @@ textarea {
   object-position: bottom center;
   opacity: calc(
     var(--hero-figure-opacity, 0) * var(--hero-drawing-ink) * var(--hero-drawing-interlude, 1) *
-      var(--hero-figure-ink, 0.5)
+      var(--hero-figure-ink, 0.85)
   );
   mix-blend-mode: multiply;
   /* Two weights again: out towards its own head, where headlines pass, and out

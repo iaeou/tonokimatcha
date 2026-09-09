@@ -19,10 +19,16 @@
 export const HERO_BACKDROP_TUNING = {
   /** Viewport heights over which the photograph fades out. */
   photoFadeViewports: 1,
-  /** Where the drawing starts to arrive, in viewport heights. */
-  drawingEntryViewports: 0.55,
+  /**
+   * Where the drawing starts to arrive, in viewport heights. Early, and the
+   * rise is short: the hero is exactly one viewport tall, so the city has
+   * about that much scroll to live in before the first hall claims the screen.
+   * The old 0.55 + 0.95 meant the rise had barely started when the withdrawal
+   * began, and Osaka never got above 4% of itself — invisible.
+   */
+  drawingEntryViewports: 0.2,
   /** Viewport heights the drawing takes to arrive in full. */
-  drawingRiseViewports: 0.95,
+  drawingRiseViewports: 0.35,
   /**
    * How much of the viewport the closing hall must claim before the drawing
    * begins to withdraw at all. Leaving at its first appearance cut the city's
@@ -30,12 +36,12 @@ export const HERO_BACKDROP_TUNING = {
    * got the empty stretch below that hall — the one gap wide enough to see it
    * in. The hall now has to be genuinely arriving, not merely visible.
    */
-  withdrawalEntryViewports: 0.55,
+  withdrawalEntryViewports: 1,
   /**
    * How much further the hall must climb, once withdrawal has begun, for the
    * drawing to be fully gone.
    */
-  withdrawalViewports: 0.35,
+  withdrawalViewports: 0.18,
   /**
    * The band of the screen where reading actually happens, in viewport
    * fractions. Copy crossing it dims the city; the drawing is meant to be
@@ -43,8 +49,14 @@ export const HERO_BACKDROP_TUNING = {
    */
   readingBandTop: 0.16,
   readingBandBottom: 0.94,
-  /** How much ink survives while copy occupies the whole band. */
-  inkBehindCopy: 0.16
+  /**
+   * How much ink survives while copy occupies the whole band. Legibility is
+   * mostly the *horizontal* mask's job — it holds the drawing at 40% over the
+   * column the copy occupies and full strength in the open right. Dimming
+   * hard vertically as well left nothing to see: on a page this dense there is
+   * no scroll position with an empty reading band, so the floor is the ink.
+   */
+  inkBehindCopy: 0.45
 } as const;
 
 function clamp01(value: number) {

@@ -25,44 +25,46 @@ describe('createBackdropOpacities', () => {
     expect(at(0)).toEqual({ photo: 1, drawing: 0, figure: 0 });
   });
 
-  test('does not start drawing until the photograph is mostly gone', () => {
+  test('lets the photograph lead, then crosses over rather than queueing', () => {
+    // The hero is one viewport tall and the first hall starts immediately
+    // below it, so the city cannot afford to wait for the photograph to
+    // finish. They overlap on purpose — but the photograph still opens alone
+    // and is the weaker of the two by the time the city is up.
     const { photo, drawing } = at(VIEWPORT * HERO_BACKDROP_TUNING.drawingEntryViewports);
     expect(drawing).toBe(0);
-    expect(photo).toBeLessThan(0.5);
+    expect(photo).toBeGreaterThan(0.5);
+
+    const crossed = at(VIEWPORT * 0.6);
+    expect(crossed.drawing).toBeGreaterThan(crossed.photo);
   });
 
-  test('hands the threshold over: the photograph leaves, the drawing arrives', () => {
-    const handoff = at(VIEWPORT * 0.8);
-    expect(handoff.photo).toBeLessThan(0.3);
-    expect(handoff.drawing).toBeGreaterThan(0);
-
-    const settled = at(VIEWPORT * 1.6);
-    expect(settled.photo).toBe(0);
-    expect(settled.drawing).toBeCloseTo(1, 2);
+  test('brings the city up inside the hero, not a screen below it', () => {
+    // Full strength while the hero is still on screen. It used to need 1.5
+    // viewports, by which point the closing hall had already killed it: the
+    // city never rose above 4% of itself and was invisible on the page.
+    const { photo, drawing } = at(VIEWPORT * 0.6);
+    expect(drawing).toBeCloseTo(1, 2);
+    expect(photo).toBeGreaterThan(0);
   });
 
-  test('withdraws the drawing as the closing hall climbs the viewport', () => {
+  test('withdraws the drawing once the closing hall takes the top of the screen', () => {
     const scrolled = VIEWPORT * 2;
-    const { withdrawalEntryViewports, withdrawalViewports } = HERO_BACKDROP_TUNING;
+    const { withdrawalViewports } = HERO_BACKDROP_TUNING;
 
     // Hall still below the fold.
     expect(at(scrolled, VIEWPORT).drawing).toBeCloseTo(1, 2);
 
-    // Merely visible is not yet arriving: the city keeps the gap it lives in.
-    const peeking = VIEWPORT * (1 - withdrawalEntryViewports * 0.5);
-    expect(at(scrolled, peeking).drawing).toBeCloseTo(1, 2);
+    // Filling the screen is not enough while its top is still in view: the
+    // city holds the wall right up to the moment the hall owns it.
+    expect(at(scrolled, VIEWPORT * 0.5).drawing).toBeCloseTo(1, 2);
+    expect(at(scrolled, 0).drawing).toBeCloseTo(1, 2);
 
-    const arriving = at(
-      scrolled,
-      VIEWPORT * (1 - withdrawalEntryViewports - withdrawalViewports * 0.5)
-    ).drawing;
+    const arriving = at(scrolled, -VIEWPORT * withdrawalViewports * 0.5).drawing;
     expect(arriving).toBeGreaterThan(0);
     expect(arriving).toBeLessThan(1);
 
-    // Hall has claimed its share of the viewport: the drawing is gone.
-    const claimed = VIEWPORT * (1 - withdrawalEntryViewports - withdrawalViewports);
-    expect(at(scrolled, claimed).drawing).toBe(0);
-    expect(at(scrolled, 0).drawing).toBe(0);
+    // The hall's top has climbed a full withdrawal past the edge: city gone.
+    expect(at(scrolled, -VIEWPORT * withdrawalViewports).drawing).toBe(0);
   });
 
   test('hands the wall to the figure on exactly the curve that takes the city away', () => {
