@@ -249,3 +249,46 @@ emulate a narrow viewport, and the arithmetic is the whole risk.
 pulled in when narrow, never past centre, inset preserved). `npm run check` — 0
 errors, the 2 standing `CursorPointer` warnings. `npm run build` — clean.
 In-browser at 1920 wide: small, bottom right, no console errors.
+
+---
+
+# Addendum — the stone faces the reader
+
+Jaume: smaller again; the scroll turn should always show the front of the face;
+and the edge almost the same green.
+
+## The turn was a full revolution
+
+`scrollTween` ran `scrollRotation` to `y: Math.PI * 2` and `x: Math.PI / 2` —
+a complete turn plus a tip onto its edge, scrubbed across the whole page. Which
+means the middle of the site was spent looking at the back of a stone whose
+whole drawing is on the front.
+
+It is a sway now: `animation.scrollSway`, 0.5 rad of yaw and 0.16 of pitch
+either side of rest. Out one way through the first half, back through the
+second — two tweens on a timeline rather than one, because a scrubbed tween can
+only run start to end and the point is to come back. At ~29° the face never
+turns away.
+
+Dragging the bead is still unbounded. That is a deliberate gesture, and the
+jade bell hangs off it, so it stays free.
+
+## The edge
+
+`rim.inkStrength` (0.3). The rim was already the neighbouring paint's colour
+rather than bare ink, but the ink still landed at full weight in the last
+0.014 — a drawn border, which around an object this small was most of what you
+saw of it. The edge is now the paint's own green carrying 30% of the ink: a
+shadow that holds the silhouette instead of a line around it. `inkWidth` down
+to 0.01 with a slightly wider fade to match.
+
+## Size
+
+`scaleDesktop` 0.32 → 0.24, tablet 0.26 → 0.20, mobile 0.2 → 0.16.
+
+## Verification
+
+`npm test` — 138 passed, 1 skipped. `npm run check` — 0 errors, the 2 standing
+`CursorPointer` warnings. `npm run build` — clean. Walked the page: face to the
+reader at the top, at the midpoint where the back used to be, and through the
+return; edge reads as green; no console errors.

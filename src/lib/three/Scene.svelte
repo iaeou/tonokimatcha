@@ -370,10 +370,12 @@
         ease: 'sine.inOut'
       });
 
-      const scrollTween = gsap.to(scrollRotation, {
-        x: Math.PI / 2,
-        y: Math.PI * 2,
-        ease: 'none',
+      // A sway rather than a turn: out one way through the first half of the
+      // page, back through the second. Two tweens, because a single scrubbed
+      // one can only run start to end — and the point is to come back, so the
+      // drawn face never rotates away from the reader.
+      const sway = MAGATAMA_TUNING.animation.scrollSway;
+      const scrollTween = gsap.timeline({
         scrollTrigger: {
           trigger: document.body,
           start: 'top top',
@@ -389,6 +391,20 @@
           }
         }
       });
+
+      scrollTween
+        .to(scrollRotation, {
+          x: baseRotation.x + sway.pitch,
+          y: baseRotation.y + sway.yaw,
+          ease: 'none',
+          duration: 1
+        })
+        .to(scrollRotation, {
+          x: baseRotation.x - sway.pitch,
+          y: baseRotation.y - sway.yaw,
+          ease: 'none',
+          duration: 1
+        });
 
       const vortexTween = gsap.to(particleMaterial.uniforms.uProgress, {
         value: 1,

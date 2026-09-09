@@ -83,8 +83,13 @@ export const MAGATAMA_TUNING = {
     // stair-step and narrow enough to stay a line.
     // geometry.ts -> paintIconRim()
     rim: {
-      inkWidth: 0.014,          // how far the ink line reaches in from the edge
-      inkFade: 0.022,           // blend from ink into the neighbouring paint
+      inkWidth: 0.01,           // how far the ink line reaches in from the edge
+      inkFade: 0.026,           // blend from ink into the neighbouring paint
+      // How much of the ink actually lands at that edge. At 1 the rim is the
+      // full near-black line, which at this size read as a drawn border round
+      // a small object; at 0.3 the edge is the paint's own green with just
+      // enough shadow in it to keep the silhouette from dissolving.
+      inkStrength: 0.3,
     },
   },
 
@@ -235,6 +240,17 @@ export const MAGATAMA_TUNING = {
   animation: {
     baseRotation: { x: -0.08, y: -0.28, z: -0.44 }, // resting orientation
 
+    // Scroll sway. This used to be a full turn — y ran to 2π and x to π/2 —
+    // which spent the middle of the page showing the stone's back and its
+    // edge. The drawing is on the front, so the turn is now a sway: it leans
+    // one way through the first half and back through the second, never far
+    // enough for the face to look away. Radians either side of rest.
+    // Scene.svelte -> scrollTween
+    scrollSway: {
+      yaw: 0.5,                   // ~29° left and right
+      pitch: 0.16,                // ~9° up and down
+    },
+
     floatAmplitude: 0.2,          // Y units up/down
     floatDuration: 3.4,           // seconds per half-cycle
 
@@ -275,9 +291,9 @@ export const MAGATAMA_TUNING = {
     // roughly 9.9 x 4.8 on a wide desktop. Positions below are in those units,
     // so x 2.75 lands the bead about four fifths across and y -1.05 about
     // seven tenths down: low and to the right, out of the copy's way.
-    scaleDesktop: 0.32,           // >760 px viewport width
-    scaleTablet: 0.26,            // 620-760 px
-    scaleMobile: 0.2,             // <620 px
+    scaleDesktop: 0.24,           // >760 px viewport width
+    scaleTablet: 0.2,             // 620-760 px
+    scaleMobile: 0.16,            // <620 px
     positionXDesktop: 2.75,
     positionXTablet: 1.95,
     // Mobile is the tight one: at z 7.2 and a phone's aspect the frame is only

@@ -322,7 +322,7 @@ function paintIconRim(
   distanceTo: (x: number, y: number) => number,
   sample: (x: number, y: number) => Color
 ) {
-  const { inkWidth, inkFade } = MAGATAMA_TUNING.icon.rim;
+  const { inkWidth, inkFade, inkStrength } = MAGATAMA_TUNING.icon.rim;
   const ink = new Color(inkHex).convertSRGBToLinear();
   const position = geometry.attributes.position;
   const colors = new Float32Array(position.count * 3);
@@ -335,10 +335,13 @@ function paintIconRim(
     const t = Math.min(Math.max(span, 0), 1);
     const eased = t * t * (3 - 2 * t);
     const paint = sample(x, y);
+    // The edge is the paint darkened toward the ink, not the ink itself, so
+    // the rim stays the face's own green with a shadow in it.
+    const edge = 1 - (1 - eased) * inkStrength;
 
-    colors[index * 3] = ink.r + (paint.r - ink.r) * eased;
-    colors[index * 3 + 1] = ink.g + (paint.g - ink.g) * eased;
-    colors[index * 3 + 2] = ink.b + (paint.b - ink.b) * eased;
+    colors[index * 3] = ink.r + (paint.r - ink.r) * edge;
+    colors[index * 3 + 1] = ink.g + (paint.g - ink.g) * edge;
+    colors[index * 3 + 2] = ink.b + (paint.b - ink.b) * edge;
   }
 
   return finishIconPart(geometry, colors);
