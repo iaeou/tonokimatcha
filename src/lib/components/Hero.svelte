@@ -8,27 +8,23 @@
   let heroContent: HTMLDivElement;
 
   onMount(() => {
-    // The hall that ends the relay. Its live position is what withdraws the
-    // drawing, so the handoff keeps pace with the copy instead of a guess.
-    const closingHall = document.querySelector('#collection');
-    // The blocks the city must not compete with. Read once: sections are not
-    // added or removed while the page is scrolled.
+    // The blocks the drawing must not compete with. Read once: sections are
+    // not added or removed while the page is scrolled.
     const copyBlocks = Array.from(document.querySelectorAll('.section__inner'));
     /**
      * What ends the figure's stage: the arrival of the first hall's *copy*,
      * not a hall further down. The figure is punctuation between the threshold
      * and the halls, and it has to be brief — while it holds the wall the
-     * halls keep their own figures down, and a long third stage meant three of
-     * the five landing halls never showed theirs at all.
+     * halls keep their own figures down, and a long stage meant three of the
+     * five landing halls never showed theirs at all.
      */
     const firstCopy = copyBlocks[0] ?? null;
 
     const updateImageFade = () => {
       const viewportHeight = window.innerHeight;
-      const { photo, drawing, figure } = createBackdropOpacities({
+      const { photo, figure } = createBackdropOpacities({
         scrollY: window.scrollY,
         viewportHeight,
-        closingHallTop: closingHall?.getBoundingClientRect().top ?? null,
         finalHallTop: firstCopy?.getBoundingClientRect().top ?? null
       });
 
@@ -38,17 +34,13 @@
       );
 
       heroSection.style.setProperty('--hero-image-opacity', String(photo));
-      heroSection.style.setProperty('--hero-drawing-opacity', String(drawing));
       heroSection.style.setProperty('--hero-figure-opacity', String(figure));
-      heroSection.style.setProperty('--hero-drawing-interlude', String(interlude));
+      heroSection.style.setProperty('--hero-interlude', String(interlude));
 
       // The halls read this to keep their own figures down while the relay
       // still holds the wall. It goes on the root because the sections are
       // nowhere near this component in the tree.
-      document.documentElement.style.setProperty(
-        '--backdrop-presence',
-        String(Math.max(drawing, figure))
-      );
+      document.documentElement.style.setProperty('--backdrop-presence', String(figure));
     };
 
     updateImageFade();
@@ -93,27 +85,11 @@
         fetchpriority="high"
       />
     </picture>
-    <!-- Osaka, drawn. It arrives only once the photograph has withdrawn, so it
-         yields the connection to the photograph, which is the first paint.
-         The figure covers the viewport, so `lazy` alone would not hold it
-         back — the low priority is what keeps it out of the way. -->
-    <img
-      class="hero__drawing"
-      fetchpriority="low"
-      src="/images/osaka-skyline-1200.webp"
-      srcset="
-        /images/osaka-skyline-768.webp   768w,
-        /images/osaka-skyline-1200.webp 1200w,
-        /images/osaka-skyline-1600.webp 1600w
-      "
-      sizes="100vw"
-      alt=""
-      loading="lazy"
-      decoding="async"
-    />
-    <!-- The third hand: as the city leaves, one of Jaume's figures takes the
-         wall, and leaves in turn before The Lineage. Last in the relay, so it
-         is also the last thing worth fetching. -->
+    <!-- The second hand: as the photograph withdraws, one of Jaume's figures
+         takes the wall, and leaves in turn as the first hall's copy arrives.
+         Last in the relay, so it is the last thing worth fetching — and it
+         covers the viewport, so `lazy` alone would not hold it back; the low
+         priority is what keeps it out of the first paint's way. -->
     <img
       class="hero__standing-figure"
       fetchpriority="low"
@@ -126,10 +102,10 @@
     />
   </figure>
   <div class="hero__content" bind:this={heroContent}>
-    <!-- The threshold moved to /lineage with the rest of the heritage. What
-         opens the landing page now is the thing the landing page is about: one
-         tea. The drawn city stays as weather behind it — it never claimed the
-         leaf grew there, and it is the only depth this frame has. -->
+    <!-- The threshold moved to /lineage with the rest of the heritage, and on
+         2026-09-09 the drawn city followed it there. What opens the landing
+         page is the thing the landing page is about: one tea. The photograph
+         and one standing figure are the whole backdrop now. -->
     <p class="eyebrow" use:typographyReveal={{ mode: 'sumi' }}>
       The Tea
     </p>

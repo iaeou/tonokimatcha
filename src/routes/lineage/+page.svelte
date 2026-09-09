@@ -1,5 +1,6 @@
 <script lang="ts">
   import Section from '$lib/components/Section.svelte';
+  import { backdropParallax } from '$lib/animations/backdrop-parallax';
 </script>
 
 <svelte:head>
@@ -32,26 +33,34 @@
       anything is called this.
     </p>
   </div>
+</Section>
 
-  <!-- Osaka, drawn — the same ink the landing page's threshold used to carry.
-       It belongs to the heritage, so it travels with it. -->
-  <figure class="lineage-skyline">
+<!-- Osaka, drawn — the same ink the landing page's threshold used to carry.
+     It stood framed in the hall above, where it was a picture to be looked at;
+     it is a wall here instead. Full width, a few percent of ink, drifting
+     against the scroll behind the tree the house is named for.
+
+     The samurai came off this hall when the city went up: one drawing at a
+     time is the rule everywhere else on the site, and two watermarks over the
+     same copy read as a smudge rather than as depth. -->
+<Section id="lineage" eyebrow="The Lineage" title="The Dignified Tree">
+  {#snippet backdrop()}
     <img
-      src="/images/osaka-skyline-1200.webp"
+      class="lineage-skyline"
+      src="/images/osaka-skyline-1600.webp"
       srcset="
         /images/osaka-skyline-768.webp   768w,
         /images/osaka-skyline-1200.webp 1200w,
         /images/osaka-skyline-1600.webp 1600w
       "
-      sizes="(min-width: 760px) 74vw, 92vw"
-      alt="Osaka drawn as a line of towers, castle and rooftops."
+      sizes="100vw"
+      alt=""
       loading="lazy"
       decoding="async"
+      use:backdropParallax
     />
-  </figure>
-</Section>
+  {/snippet}
 
-<Section id="lineage" eyebrow="The Lineage" title="The Dignified Tree" figure="samurai">
   <div class="narrative-grid">
     <p>
       Tonoki begins with the idea of an upright tree: a dignified witness whose roots remain below

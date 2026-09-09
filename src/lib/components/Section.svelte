@@ -11,10 +11,15 @@
     title: string;
     /** Optional drawn figure standing behind the hall's headline. */
     figure?: FigureId;
+    /**
+     * Optional full-bleed wash behind the hall — a horizon rather than a
+     * figure. Rendered edge to edge, under the copy and under the figure.
+     */
+    backdrop?: import('svelte').Snippet;
     children?: import('svelte').Snippet;
   }
 
-  let { id, className = '', eyebrow, title, figure, children }: Props = $props();
+  let { id, className = '', eyebrow, title, figure, backdrop, children }: Props = $props();
   const drawn = $derived(getFigure(figure));
   const sectionId = $derived(
     id ?? eyebrow.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
@@ -22,6 +27,15 @@
 </script>
 
 <section class={`section ${className}`} id={sectionId} aria-labelledby={`${sectionId}-title`}>
+  {#if backdrop}
+    <!-- Full-bleed and decorative: it breaks the hall's inline padding to run
+         the whole width of the viewport, and carries nothing a screen reader
+         would miss. It sits below the figure holder so a hall that somehow
+         had both would still read as one drawing in front of another. -->
+    <span class="section__backdrop" aria-hidden="true">
+      {@render backdrop()}
+    </span>
+  {/if}
   {#if drawn}
     <!-- The holder exists to carry the backdrop's veto. GSAP owns the image's
          own opacity for the scroll drift, so the two cannot share a property:

@@ -423,12 +423,11 @@ textarea {
 
 .hero {
   --hero-image-opacity: 1;
-  --hero-drawing-opacity: 0;
   /* How dark the ink lands at full arrival — that is, in the gaps between
      halls. Copy crossing the reading band scales this down (see
-     `--hero-drawing-interlude`), so the city can afford to be stronger here
-     than when it had to survive being read through. */
-  --hero-drawing-ink: 0.46;
+     `--hero-interlude`), so the drawing can afford to be stronger here than
+     if it had to survive being read through at every scroll position. */
+  --hero-ink: 0.46;
 
   position: relative;
   display: grid;
@@ -477,54 +476,14 @@ textarea {
   will-change: opacity;
 }
 
-/* Osaka as ink, not as a second photograph: the drawing's white paper is
-   multiplied away into the cream and only the lines remain. It sits above
-   the veil, which exists to keep the hero copy legible over the photograph
-   and would otherwise wash the left half of the city out. */
-.hero__drawing {
-  position: absolute;
-  z-index: 2;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: bottom center;
-  opacity: calc(
-    var(--hero-drawing-opacity) * var(--hero-drawing-ink) * var(--hero-drawing-interlude, 1)
-  );
-  mix-blend-mode: multiply;
-  /* Two weights, intersected. Vertically the skyline fades out towards the top
-     of the frame, where headlines live. Horizontally it thins over the column
-     the copy occupies and keeps full strength in the open right, where the
-     densest part of the drawing — the castle and the towers — happens to sit.
-     Together they let the city be present without ever being read through. */
-  mask-image:
-    linear-gradient(180deg, transparent 0%, black 34%, black 100%),
-    linear-gradient(
-      90deg,
-      rgba(0, 0, 0, 0.26) 0%,
-      rgba(0, 0, 0, 0.26) 52%,
-      rgba(0, 0, 0, 0.8) 66%,
-      black 78%
-    );
-  mask-composite: intersect;
-  -webkit-mask-composite: source-in;
-  transition: opacity 80ms linear;
-  will-change: opacity;
-  pointer-events: none;
-}
-
-/* In the dark hall the ink is inverted to light and screened, so the city is
-   drawn out of the void instead of blotting it. */
-:root[data-theme='dark'] .hero__drawing {
-  filter: invert(1);
-  mix-blend-mode: screen;
-}
-
-/* The third stage. A single standing figure rather than a horizon, so it is
+/* The second stage. A single standing figure rather than a horizon, so it is
    sized against the viewport's height and kept to the open right half — the
    copy column runs down the left, and this drawing is far too dense to be read
-   through even at a few percent. */
+   through even at a few percent.
+
+   It used to be the third: Osaka stood between it and the photograph until
+   2026-09-09, when the city moved to /lineage and the landing page was left to
+   the tea. The figure now rises on the curve the city used to rise on. */
 .hero__standing-figure {
   position: absolute;
   z-index: 2;
@@ -539,7 +498,7 @@ textarea {
   object-fit: contain;
   object-position: bottom center;
   opacity: calc(
-    var(--hero-figure-opacity, 0) * var(--hero-drawing-ink) * var(--hero-drawing-interlude, 1) *
+    var(--hero-figure-opacity, 0) * var(--hero-ink) * var(--hero-interlude, 1) *
       var(--hero-figure-ink, 0.85)
   );
   mix-blend-mode: multiply;
@@ -1158,23 +1117,67 @@ textarea {
   color: color-mix(in srgb, var(--color-ink) 72%, transparent);
 }
 
-/* Osaka on its own page, where it may finally be looked at rather than read
-   through: no multiply, no mask, no copy on top of it. The frame is capped
-   because the drawing is a horizon — given the full measure it stretches into
-   a strip too thin to see anything in. */
-.lineage-skyline {
-  max-width: 52rem;
-  margin: var(--space-4) 0 0;
+/* Osaka as the lineage hall's wall. It is a horizon, so it is given the whole
+   width of the viewport rather than the content measure — capped to a column
+   the drawing stretches into a strip too thin to read anything in. `contain`
+   rather than `cover`: the hall is roughly a screen tall and the drawing is
+   very wide, so filling the height would crop the city down to a few towers.
+   The parallax lives in `backdrop-parallax.ts`, which owns opacity and the
+   vertical drift; nothing here may touch either. */
+.section__backdrop {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  z-index: 0;
+  width: 100vw;
+  margin-left: -50vw;
+  overflow: hidden;
+  pointer-events: none;
 }
 
-.lineage-skyline img {
+.lineage-skyline {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: contain;
+  /* Sat centred at first, which put the densest band of the drawing — castle,
+     towers, rooftops — directly behind the paragraphs. A city belongs at the
+     foot of a frame: dropped to the bottom, the copy reads against open sky
+     and the skyline is a horizon under it rather than a texture through it. */
+  object-position: center bottom;
+  /* Ink on paper, like the halls' figures: the drawing's white paper is
+     multiplied away into the cream and only the lines remain. */
+  mix-blend-mode: multiply;
+  /* Two weights, intersected — the same pair the hero's backdrop uses.
+     Vertically the city dissolves upward well before the headline's height, so
+     there is no edge where it meets the hall above and nothing behind the
+     first paragraphs. Horizontally it thins over the left, where the copy
+     column runs, and keeps full strength out in the open right. Together they
+     let Osaka be present without ever being read through. */
+  mask-image:
+    linear-gradient(180deg, transparent 0%, transparent 26%, black 72%, black 100%),
+    linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.3) 0%,
+      rgba(0, 0, 0, 0.3) 48%,
+      rgba(0, 0, 0, 0.72) 64%,
+      black 80%
+    );
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
+  /* GSAP owns this; the value here only covers the frames before it loads. */
+  opacity: 0;
+  will-change: transform, opacity;
 }
 
-:root[data-theme='dark'] .lineage-skyline img {
+/* In the dark hall the ink is inverted to light and screened, so the city is
+   drawn out of the void instead of blotting it. */
+:root[data-theme='dark'] .lineage-skyline {
   filter: invert(1);
+  mix-blend-mode: screen;
 }
 
 .legacy-seal {
