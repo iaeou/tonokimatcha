@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest';
 import {
   createKofunConstellationPositions,
   createLineageParticleGeometry,
+  domeHeight,
   createMagatamaIconGeometry,
   createMagatamaLowPolyGeometry,
   createMagatamaShape,
@@ -233,10 +234,78 @@ describe('createMagatamaIconGeometry', () => {
     geometry.computeBoundingBox();
     const box = geometry.boundingBox!;
 
-    // Same 2.9 x 4.0 x 0.83 envelope the faceted stone occupied, so every
-    // `layout` knob in the tuning carries over untouched.
+    // Same 2.9 x 4.0 footprint the faceted stone occupied, so every `layout`
+    // knob in the tuning carries over untouched. Depth is no longer the slab's
+    // 0.83: the dome swells each face, and only z moves.
     expect(box.max.x - box.min.x).toBeCloseTo(2.9, 1);
     expect(box.max.y - box.min.y).toBeCloseTo(4.0, 1);
-    expect(box.max.z - box.min.z).toBeCloseTo(0.83, 1);
+    expect(box.max.z - box.min.z).toBeGreaterThan(0.83);
+  });
+});
+
+describe('domeHeight', () => {
+  const reach = 0.85;
+  const bulge = 0.45;
+
+  test('lies flat on the silhouette and fills to the bulge at reach', () => {
+    expect(domeHeight(0, reach, bulge)).toBe(0);
+    expect(domeHeight(reach, reach, bulge)).toBeCloseTo(bulge);
+  });
+
+  test('never dips as a point moves inward, and holds once full', () => {
+    let previous = -1;
+
+    for (let step = 0; step <= 20; step += 1) {
+      const height = domeHeight((step / 20) * reach, reach, bulge);
+      expect(height).toBeGreaterThanOrEqual(previous);
+      previous = height;
+    }
+
+    expect(domeHeight(reach * 5, reach, bulge)).toBeCloseTo(bulge);
+  });
+
+  test('is a cabochon shoulder, not a linear ramp', () => {
+    // Circular: already past halfway up by a quarter of the way in.
+    expect(domeHeight(reach * 0.25, reach, bulge)).toBeGreaterThan(bulge * 0.5);
+    expect(domeHeight(reach * 0.5, reach, bulge)).toBeGreaterThan(bulge * 0.8);
+  });
+
+  test('gives a narrow tail less thickness than a wide body', () => {
+    // The tail is never more than ~0.3 across, so its centre sits ~0.15 from
+    // the outline; the body's centre is ~0.8 away. Thickness follows width.
+    expect(domeHeight(0.15, reach, bulge)).toBeLessThan(domeHeight(0.8, reach, bulge) * 0.75);
+  });
+
+  test('switches off cleanly', () => {
+    expect(domeHeight(0.5, reach, 0)).toBe(0);
+    expect(domeHeight(0.5, 0, bulge)).toBe(0);
+  });
+});
+
+describe('createMagatamaIconGeometry with the dome', () => {
+  test('swells well past the flat slab while keeping the drawn silhouette', () => {
+    const geometry = createMagatamaIconGeometry();
+    geometry.computeBoundingBox();
+    const box = geometry.boundingBox!;
+    const thickness = box.max.z - box.min.z;
+
+    // The slab itself is only 0.16 now; everything else is swell. What matters
+    // is the proportion: thin enough to still read as a stone rather than a
+    // ball, thick enough that it is plainly not a card.
+    const width = box.max.x - box.min.x;
+    expect(thickness).toBeGreaterThan(width * 0.35);
+    expect(thickness).toBeLessThan(width * 0.6);
+    // The drawing itself is untouched: the dome only ever moves z.
+    expect(width).toBeCloseTo(2.9, 1);
+    expect(box.max.y - box.min.y).toBeCloseTo(4.0, 1);
+  });
+
+  test('is welded and smooth-shaded rather than a faceted soup', () => {
+    const geometry = createMagatamaIconGeometry();
+
+    expect(geometry.index).not.toBeNull();
+    expect(geometry.getAttribute('normal')).toBeDefined();
+    // Welding only pays off if it actually shared vertices between triangles.
+    expect(geometry.getAttribute('position').count).toBeLessThan(geometry.index!.count);
   });
 });

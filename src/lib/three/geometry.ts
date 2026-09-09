@@ -11,7 +11,7 @@ import {
   Vector2,
   Vector3
 } from 'three';
-import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { mergeGeometries, mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { MAGATAMA_TUNING } from './magatama-tuning';
 import {
   MAGATAMA_LOWPOLY_COLORS,
@@ -58,6 +58,191 @@ function iconShapes(contours: number[][][]) {
   });
 }
 
+/**
+ * Height of the drop's dome at a point `distance` from the silhouette.
+ *
+ * A circular arc, not a linear ramp: vertical at the outline and flattening
+ * as it fills, which is the profile of a cabochon. Because the input is the
+ * distance to the edge, the bead's thickness ends up following its own width
+ * for free — the body swells, the tail stays thin, and the stone reads as a
+ * drop instead of a uniformly puffed pillow.
+ */
+export function domeHeight(distance: number, reach: number, bulge: number): number {
+  if (bulge <= 0 || reach <= 0) return 0;
+
+  const t = Math.min(Math.max(distance / reach, 0), 1);
+  const shoulder = 1 - t;
+
+  return bulge * Math.sqrt(1 - shoulder * shoulder);
+}
+
+/**
+ * Shortest distance from a point to the silhouette, holes counted as edges
+ * too, so the surface comes back down to meet them rather than tenting over.
+ * Segments are flattened once and reused for every vertex.
+ */
+function createSilhouetteDistance(contours: number[][][]) {
+  const segments: number[] = [];
+
+  for (const polygon of contours) {
+    for (const ring of polygon) {
+      for (let index = 0; index < ring.length; index += 2) {
+        const next = (index + 2) % ring.length;
+        segments.push(ring[index], ring[index + 1], ring[next], ring[next + 1]);
+      }
+    }
+  }
+
+  // The refined soup carries every vertex once per triangle that touches it —
+  // about six lookups for each distinct point — and each lookup walks every
+  // segment of the outline. Remembering the answer is the difference between
+  // this being the slowest thing the scene does and it not registering.
+  const seen = new Map<string, number>();
+
+  return (x: number, y: number) => {
+    const key = `${x},${y}`;
+    const remembered = seen.get(key);
+
+    if (remembered !== undefined) return remembered;
+
+    let best = Infinity;
+
+    for (let index = 0; index < segments.length; index += 4) {
+      const ax = segments[index];
+      const ay = segments[index + 1];
+      const bx = segments[index + 2] - ax;
+      const by = segments[index + 3] - ay;
+      const lengthSq = bx * bx + by * by;
+      let t = lengthSq > 0 ? ((x - ax) * bx + (y - ay) * by) / lengthSq : 0;
+
+      t = t < 0 ? 0 : t > 1 ? 1 : t;
+
+      const dx = x - (ax + t * bx);
+      const dy = y - (ay + t * by);
+      const distanceSq = dx * dx + dy * dy;
+
+      if (distanceSq < best) best = distanceSq;
+    }
+
+    const distance = Math.sqrt(best);
+    seen.set(key, distance);
+    return distance;
+  };
+}
+
+/**
+ * Split triangles until no edge is longer than `maxEdge`, so the flat caps
+ * have something to bend with. The decision is made per *edge*, from its two
+ * endpoints alone — a neighbouring triangle sharing that edge reaches the
+ * same verdict, so the surface refines without T-junctions splitting open
+ * into cracks once it is displaced.
+ *
+ * Input and output are a non-indexed triangle soup: 9 floats per triangle.
+ */
+function refineTriangles(source: ArrayLike<number>, maxEdge: number, maxPasses: number) {
+  let current = Array.from(source);
+  const maxEdgeSq = maxEdge * maxEdge;
+
+  const far = (a: number, b: number) => {
+    const dx = current[a] - current[b];
+    const dy = current[a + 1] - current[b + 1];
+    const dz = current[a + 2] - current[b + 2];
+    return dx * dx + dy * dy + dz * dz > maxEdgeSq;
+  };
+
+  for (let pass = 0; pass < maxPasses; pass += 1) {
+    const next: number[] = [];
+    let refined = false;
+    const at = (index: number) => [current[index], current[index + 1], current[index + 2]];
+    const middle = (p: number[], q: number[]) => [
+      (p[0] + q[0]) / 2,
+      (p[1] + q[1]) / 2,
+      (p[2] + q[2]) / 2
+    ];
+    const emit = (...points: number[][]) => {
+      for (const point of points) next.push(point[0], point[1], point[2]);
+    };
+
+    for (let t = 0; t < current.length; t += 9) {
+      const a = at(t);
+      const b = at(t + 3);
+      const c = at(t + 6);
+      const longAB = far(t, t + 3);
+      const longBC = far(t + 3, t + 6);
+      const longCA = far(t + 6, t);
+
+      if (!longAB && !longBC && !longCA) {
+        emit(a, b, c);
+        continue;
+      }
+
+      refined = true;
+      const ab = middle(a, b);
+      const bc = middle(b, c);
+      const ca = middle(c, a);
+
+      if (longAB && longBC && longCA) {
+        emit(a, ab, ca, ab, b, bc, ca, bc, c, ab, bc, ca);
+      } else if (longAB && longBC) {
+        emit(a, ab, bc, ab, b, bc, a, bc, c);
+      } else if (longBC && longCA) {
+        emit(b, bc, ca, bc, c, ca, b, ca, a);
+      } else if (longCA && longAB) {
+        emit(c, ca, ab, ca, a, ab, c, ab, b);
+      } else if (longAB) {
+        emit(a, ab, c, ab, b, c);
+      } else if (longBC) {
+        emit(b, bc, a, bc, c, a);
+      } else {
+        emit(c, ca, b, ca, a, b);
+      }
+    }
+
+    current = next;
+    if (!refined) break;
+  }
+
+  return current;
+}
+
+/**
+ * Refine a face and push it out into the dome.
+ *
+ * `z` is scaled by how far the vertex already sits from the slab's midplane,
+ * so the two caps take the full bulge, the bevel takes a fraction, and the
+ * outermost rim — which defines the silhouette — takes none of it and stays
+ * exactly where the drawing put it. Paint planes sit past the cap, clamp to
+ * 1, and so land on the same surface as the face they belong to.
+ */
+function domeIconFace(
+  geometry: BufferGeometry,
+  distanceTo: (x: number, y: number) => number,
+  halfDepth: number
+) {
+  const { bulge, reach, maxEdge, maxPasses } = MAGATAMA_TUNING.icon.dome;
+  const flat = geometry.index ? geometry.toNonIndexed() : geometry;
+  const refined = refineTriangles(flat.attributes.position.array, maxEdge, maxPasses);
+
+  for (let index = 0; index < refined.length; index += 3) {
+    const z = refined[index + 2];
+    const lean = halfDepth > 0 ? Math.min(Math.max(z / halfDepth, -1), 1) : 0;
+
+    refined[index + 2] = z + lean * domeHeight(distanceTo(refined[index], refined[index + 1]), reach, bulge);
+  }
+
+  const domed = new BufferGeometry();
+  domed.setAttribute('position', new Float32BufferAttribute(refined, 3));
+  return domed;
+}
+
+function finishIconPart(geometry: BufferGeometry, colors: Float32Array) {
+  geometry.setAttribute('color', new BufferAttribute(colors, 3));
+  // ExtrudeGeometry and ShapeGeometry disagree on UVs and on indexing;
+  // mergeGeometries refuses a mismatched set, so both are stripped flat.
+  geometry.deleteAttribute('uv');
+  return geometry.index ? geometry.toNonIndexed() : geometry;
+}
+
 function paintIconColor(geometry: BufferGeometry, hex: string) {
   // Vertex colors feed a linear pipeline, so the artwork's sRGB values have to
   // be converted or every green comes out washed.
@@ -71,21 +256,108 @@ function paintIconColor(geometry: BufferGeometry, hex: string) {
     colors[index * 3 + 2] = color.b;
   }
 
-  geometry.setAttribute('color', new BufferAttribute(colors, 3));
-  // ExtrudeGeometry and ShapeGeometry disagree on UVs and on indexing;
-  // mergeGeometries refuses a mismatched set, so both are stripped flat.
-  geometry.deleteAttribute('uv');
-  return geometry.index ? geometry.toNonIndexed() : geometry;
+  return finishIconPart(geometry, colors);
+}
+
+/**
+ * Nearest colour fill to a point, for deciding what the bare shoulder should
+ * wear. Only the true colour layers are sampled — the ink-coloured front
+ * layers are the drawn face, and letting an eye or the mouth win the lookup
+ * would smear a dark patch onto the rim beside it.
+ */
+function createPaintSampler(layers: MagatamaIconLayer[], inkHex: string) {
+  const points: number[] = [];
+  const swatches: Color[] = [];
+
+  for (const layer of layers) {
+    if (layer.role !== 'front' || layer.color === inkHex) continue;
+
+    const color = new Color(layer.color).convertSRGBToLinear();
+
+    for (const polygon of layer.contours) {
+      const ring = polygon[0];
+      for (let index = 0; index < ring.length; index += 2) {
+        points.push(ring[index], ring[index + 1]);
+        swatches.push(color);
+      }
+    }
+  }
+
+  const seen = new Map<string, Color>();
+
+  return (x: number, y: number) => {
+    const key = `${x},${y}`;
+    const remembered = seen.get(key);
+
+    if (remembered !== undefined) return remembered;
+
+    let best = Infinity;
+    let found = swatches[0];
+
+    for (let index = 0; index < points.length; index += 2) {
+      const dx = x - points[index];
+      const dy = y - points[index + 1];
+      const distanceSq = dx * dx + dy * dy;
+
+      if (distanceSq < best) {
+        best = distanceSq;
+        found = swatches[index / 2];
+      }
+    }
+
+    seen.set(key, found);
+    return found;
+  };
+}
+
+/**
+ * Colour the slab per vertex: ink for `inkWidth` at the silhouette, then a
+ * short blend into whichever paint that stretch of shoulder runs into. The
+ * cap is painted over by the layers anyway, so this only ever shows on the
+ * rim and on the bare reverse — which is exactly where it was wanted.
+ */
+function paintIconRim(
+  geometry: BufferGeometry,
+  inkHex: string,
+  distanceTo: (x: number, y: number) => number,
+  sample: (x: number, y: number) => Color
+) {
+  const { inkWidth, inkFade } = MAGATAMA_TUNING.icon.rim;
+  const ink = new Color(inkHex).convertSRGBToLinear();
+  const position = geometry.attributes.position;
+  const colors = new Float32Array(position.count * 3);
+
+  for (let index = 0; index < position.count; index += 1) {
+    const x = position.getX(index);
+    const y = position.getY(index);
+    const distance = distanceTo(x, y);
+    const span = inkFade > 0 ? (distance - inkWidth) / inkFade : distance > inkWidth ? 1 : 0;
+    const t = Math.min(Math.max(span, 0), 1);
+    const eased = t * t * (3 - 2 * t);
+    const paint = sample(x, y);
+
+    colors[index * 3] = ink.r + (paint.r - ink.r) * eased;
+    colors[index * 3 + 1] = ink.g + (paint.g - ink.g) * eased;
+    colors[index * 3 + 2] = ink.b + (paint.b - ink.b) * eased;
+  }
+
+  return finishIconPart(geometry, colors);
 }
 
 /**
  * Illustrated Magatama, built from the drawn brand logo the header carries
  * (`static/matchaTonoki-logo.svg`, baked into `magatama-icon-data.ts`).
  *
- * Made the way an enamel pin is: one bevelled ink-colored slab, with the
- * artwork's colors laid flat on its two faces. The ink outline is not a layer
- * — the paint is inset, and the slab showing through around it *is* the line,
- * so the outline wraps the bevel instead of stopping dead at the edge.
+ * Made the way an enamel pin is: one slab with the artwork's colors on its two
+ * faces — except the slab is domed, so the stone is a drop rather than a card,
+ * and the paint is displaced onto that same curve instead of floating on a
+ * plane above it.
+ *
+ * The ink outline is still not a layer. The paint is inset, and the slab shows
+ * through around it; the difference is that the slab is no longer ink all the
+ * way out. Domed, that inset margin *is* the shoulder of the drop, and left
+ * bare it read as a dark tyre — so the shoulder takes the colour of the paint
+ * beside it and the ink keeps only a line's width at the silhouette.
  *
  * Paint sits `paintGap` proud of each face, stacked in the artwork's own draw
  * order so the ink details stay above the color they sit on. The back takes
@@ -113,7 +385,12 @@ export function createMagatamaIconGeometry() {
 
   const frontZ = slab.boundingBox?.max.z ?? 0;
   const backZ = slab.boundingBox?.min.z ?? 0;
-  const parts = [paintIconColor(slab, base.color)];
+  const dome = MAGATAMA_TUNING.icon.dome;
+  const distanceTo = createSilhouetteDistance(base.contours);
+  const swell = (geometry: BufferGeometry) =>
+    dome.enabled ? domeIconFace(geometry, distanceTo, frontZ) : geometry;
+  const samplePaint = createPaintSampler(layers, base.color);
+  const parts = [paintIconRim(swell(slab), base.color, distanceTo, samplePaint)];
 
   for (const layer of layers) {
     if (layer.role === 'base') continue;
@@ -130,12 +407,19 @@ export function createMagatamaIconGeometry() {
     // for the camera that sees it; rotating it to face outward would mirror it
     // off the silhouette.
     paint.translate(0, 0, layer.role === 'front' ? frontZ + lift : backZ - lift);
-    parts.push(paintIconColor(paint, layer.color));
+    parts.push(paintIconColor(swell(paint), layer.color));
   }
 
-  const geometry = mergeGeometries(parts, false);
+  const merged = mergeGeometries(parts, false);
 
-  if (!geometry) throw new Error('magatama icon layers failed to merge');
+  if (!merged) throw new Error('magatama icon layers failed to merge');
+
+  // Weld before shading. Every part arrives as a triangle soup, and on a soup
+  // `computeVertexNormals` can only give each triangle its own normal — which
+  // is exactly the faceting the dome exists to get rid of. Welding shares the
+  // vertices back so the curve shades as one surface. Colour is part of the
+  // comparison, so the layers stay separate and their edges stay crisp.
+  const geometry = mergeVertices(merged, 1e-4);
 
   geometry.computeVertexNormals();
   geometry.computeBoundingSphere();

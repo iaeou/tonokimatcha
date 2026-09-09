@@ -98,3 +98,91 @@ All green, on the real machine via the clean-path mirror:
 - Confirm the Cold/Hot recipes (33 cl, ~15 s, 80 °C, 24 h fridge).
 - Real product photography to replace the supplier packaging samples.
 - Consider whether `/grower` deserves a photograph of the field.
+
+---
+
+# Addendum — the stone gets a body
+
+Jaume: give the magatama rounded volume, "more like a drop", keeping the shape.
+Then, on seeing it: the rim's colour has to be almost the same as the faces'.
+
+## The stone was a card
+
+The bake makes an enamel pin: a slab extruded from the outline, flat paint laid
+on its two faces. 0.83 thick across 2.9 of width, and the paint sitting on
+planes — so from any angle off-axis it read as a sticker on a plate.
+
+## Doming
+
+`domeHeight(distance, reach, bulge)` — a circular arc, vertical at the outline
+and flattening as it fills, which is a cabochon's profile. The input is the
+distance to the silhouette, and that one choice does most of the work: the
+bead's thickness ends up following its own width, so the body swells to the
+full bulge and the tail, never more than ~0.3 across, stays slim without being
+told to. That is the difference between a drop and a puffed pillow.
+
+Three things had to be true for it to hold together:
+
+- **The caps had to be subdivided.** Their triangulation is earcut over the
+  outline, all long skinny triangles — doming that gives a crumpled tent.
+  `refineTriangles` splits until no edge exceeds `maxEdge`, deciding per
+  *edge* from its two endpoints, so a neighbour sharing that edge reaches the
+  same verdict and the surface refines without T-junctions cracking open.
+- **The paint had to move with it.** Same displacement, same function, so the
+  artwork curves with the stone. The eyes and mouth bend over the swell.
+- **The result had to be welded.** Every part arrives as a triangle soup, and
+  on a soup `computeVertexNormals` can only give each triangle its own normal
+  — the exact faceting the dome exists to remove. `mergeVertices` first.
+
+Only `z` ever moves, so the drawing is untouched: still 2.91 x 3.99.
+
+**Then the slab had to get thin.** Domed at the old 0.42/0.2 the stone kept a
+straight extruded wall around its rim and read as a domed lid on a can. Pared
+back to 0.08/0.04, the silhouette is a near-edge and the swell alone decides
+thickness: the section is a lens, 1.27 on 2.91 of width.
+
+## The dark tyre
+
+Which produced the second note. The bake left the slab bare for 0.045 around
+the silhouette and called that margin the outline — true of a flat card. Domed,
+that same 0.045 of drawing *is* the whole shoulder of the lens: at the paint's
+edge the surface has already climbed 0.18, so the bare margin became a dark
+ring a third of the bead's thickness. A tyre.
+
+The fix keeps the drawn line and loses the band. The shoulder samples the
+nearest colour fill and wears it, so it is body-green under the body and
+leaf-green under the leaves; the ink keeps `rim.inkWidth` (0.014) at the very
+edge with a short blend out. Ink-coloured *front* layers are excluded from that
+lookup — they are the drawn face, and letting an eye or the mouth win it would
+smear a dark patch onto the rim beside it.
+
+## Cost
+
+Nearest-point lookups are memoised: the refined soup carries each vertex about
+six times over, and each lookup walks the whole outline. `maxEdge` then went
+0.12 → 0.18 after checking it in the browser — visually identical under smooth
+normals, half the triangles.
+
+| | tris | build |
+| --- | --- | --- |
+| 0.12, no memo | 36,937 | 162 ms |
+| 0.12, memo | 36,937 | 135 ms |
+| **0.18, memo** | **17,042** | **62 ms** |
+
+One-time, inside the scene's existing lazy init.
+
+## Verification
+
+`npm test` — 127 passed, 1 skipped, 15 files. Seven new: the profile's shape
+(monotonic, cabochon shoulder, clamped, off cleanly), that a narrow tail gets
+less thickness than a wide body, the built envelope's proportions, and that the
+result is indexed rather than a soup. `npm run check` — 0 errors, the 2 standing
+`CursorPointer` warnings. `npm run build` — clean. In-browser: smooth at several
+angles, rim green, no console errors.
+
+## Open
+
+The tuning is `icon.dome` and `icon.rim`; `dome.enabled: false` returns the
+card. The back of the stone still carries only the colour fills, so its
+shoulder is now green where the reverse itself stays bare — consistent, but
+worth a look if the bead is ever seen from behind for long.

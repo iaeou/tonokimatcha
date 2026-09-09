@@ -38,8 +38,12 @@ export const MAGATAMA_TUNING = {
   // scene-config.ts -> createIconMaterialOptions()
   icon: {
     enabled: true,
-    depth: 0.42,                // slab thickness before the bevel
-    bevelThickness: 0.2,        // how far the rounded edge bulges in z
+    // Thin on purpose now that `dome` below carries the volume. Left at the
+    // old 0.42/0.2 the stone kept a straight extruded wall around its rim and
+    // read as a domed lid on a can; pared back, the silhouette is a near-edge
+    // and the swell alone decides the thickness, so the section is a lens.
+    depth: 0.08,                // slab thickness before the bevel
+    bevelThickness: 0.04,       // how far the rounded edge bulges in z
     bevelSegments: 8,           // roundness of that edge
     paintGap: 0.004,            // z-step between stacked paint layers
     roughness: 0.62,            // matte enamel, not plastic
@@ -49,6 +53,39 @@ export const MAGATAMA_TUNING = {
     // loses its black line. The greens are bright enough not to miss it.
     envMapIntensity: 0.25,
     scaleBoost: 1,              // presence relative to the jade bead
+
+    // Drop volume. Without this the bead is a 0.82-thick slab across 3.4 of
+    // width — a sticker on a plate. Each face is domed outward by distance
+    // from the silhouette, and the paint is displaced onto the same surface,
+    // so the artwork curves with the stone instead of floating on a plane.
+    //
+    // `reach` being wide is what makes it read as a drop rather than a pill:
+    // thickness follows how far a point is from the outline, so the fat body
+    // swells to the full bulge while the tail, which is never more than ~0.3
+    // across, stays slim on its own.
+    // geometry.ts -> domeHeight() / createMagatamaIconGeometry()
+    dome: {
+      enabled: true,
+      bulge: 0.55,              // how far each face lifts at its fullest
+      reach: 0.85,              // distance from the outline over which it rises
+      maxEdge: 0.18,            // triangles longer than this are split first
+      maxPasses: 5,             // ceiling on that refinement
+    },
+
+    // The rim's colour. The bake left the slab bare for 0.045 around the
+    // silhouette and called that margin the outline — which worked when the
+    // stone was a flat card. Domed, that same 0.045 of drawing becomes the
+    // whole shoulder of the lens, and the bead wore it as a dark tyre.
+    //
+    // So the shoulder now takes the colour of whichever paint it runs into,
+    // and the ink keeps only `width` at the very edge: a drawn line again
+    // rather than a band. `fade` is the blend out of it, wide enough not to
+    // stair-step and narrow enough to stay a line.
+    // geometry.ts -> paintIconRim()
+    rim: {
+      inkWidth: 0.014,          // how far the ink line reaches in from the edge
+      inkFade: 0.022,           // blend from ink into the neighbouring paint
+    },
   },
 
   // Farewell — the bead withdraws before the closing hall.
