@@ -1,13 +1,18 @@
 /**
  * The threshold changes hands as the visitor descends.
  *
- * The photograph holds the first screen. As it withdraws, Osaka is drawn in
- * its place — the city the tea comes from, rendered as ink rather than as a
- * second photograph. The drawing then withdraws before The Leaf, so the halls
- * below keep their quiet for the magatama and the ghost kanji.
+ * Three stages, each handing to the next. The photograph holds the first
+ * screen. As it withdraws, Osaka is drawn in its place — the city the name
+ * comes from, rendered as ink rather than as a second photograph. As the city
+ * leaves before The Leaf, one of Jaume's drawn figures takes the wall, and it
+ * in turn withdraws before The Lineage, so the halls below keep their quiet
+ * for the magatama.
  *
- * Everything here is measured in viewport heights, except the withdrawal,
- * which follows the real position of the hall that ends the relay: section
+ * The hand-off is literal: the figure's arrival *is* the city's withdrawal
+ * curve, so one cannot be present without the other being absent.
+ *
+ * Everything here is measured in viewport heights, except the withdrawals,
+ * which follow the real positions of the halls that end each stage: section
  * heights change with the copy, and a hardcoded scroll distance would drift.
  */
 
@@ -61,27 +66,47 @@ export interface BackdropGeometry {
    * the document — the drawing then simply stays.
    */
   closingHallTop: number | null;
+  /**
+   * Viewport-relative top of the hall that ends the *figure's* stage
+   * (`#lineage`). `null` when that hall is absent — the figure then stays,
+   * exactly as the drawing does without its own closing hall.
+   */
+  finalHallTop?: number | null;
 }
 
 export interface BackdropOpacities {
   photo: number;
   drawing: number;
+  figure: number;
+}
+
+/**
+ * A hall pushing a layer out as it climbs, but only once it has claimed its
+ * share of the screen. Merely appearing at the bottom edge is not arriving:
+ * leaving then cut the city's life short, before the gap it lives in.
+ */
+function withdrawalFor(hallTop: number | null | undefined, viewportHeight: number) {
+  if (hallTop === null || hallTop === undefined) return 0;
+
+  const { withdrawalEntryViewports, withdrawalViewports } = HERO_BACKDROP_TUNING;
+  const claimed = viewportHeight - hallTop;
+
+  return ease(
+    (claimed - viewportHeight * withdrawalEntryViewports) /
+      (viewportHeight * withdrawalViewports)
+  );
 }
 
 export function createBackdropOpacities({
   scrollY,
   viewportHeight,
-  closingHallTop
+  closingHallTop,
+  finalHallTop = null
 }: BackdropGeometry): BackdropOpacities {
-  if (viewportHeight <= 0) return { photo: 1, drawing: 0 };
+  if (viewportHeight <= 0) return { photo: 1, drawing: 0, figure: 0 };
 
-  const {
-    photoFadeViewports,
-    drawingEntryViewports,
-    drawingRiseViewports,
-    withdrawalEntryViewports,
-    withdrawalViewports
-  } = HERO_BACKDROP_TUNING;
+  const { photoFadeViewports, drawingEntryViewports, drawingRiseViewports } =
+    HERO_BACKDROP_TUNING;
 
   const photo = 1 - ease(scrollY / (viewportHeight * photoFadeViewports));
 
@@ -90,19 +115,16 @@ export function createBackdropOpacities({
       (viewportHeight * drawingRiseViewports)
   );
 
-  // The closing hall pushes the drawing out as it climbs, but only once it has
-  // claimed its share of the screen — before that the city still has the gap
-  // below The Lineage to itself.
-  const claimed = closingHallTop === null ? 0 : viewportHeight - closingHallTop;
-  const withdrawal =
-    closingHallTop === null
-      ? 0
-      : ease(
-          (claimed - viewportHeight * withdrawalEntryViewports) /
-            (viewportHeight * withdrawalViewports)
-        );
+  const cityLeaves = withdrawalFor(closingHallTop, viewportHeight);
+  const figureLeaves = withdrawalFor(finalHallTop, viewportHeight);
 
-  return { photo, drawing: rise * (1 - withdrawal) };
+  return {
+    photo,
+    drawing: rise * (1 - cityLeaves),
+    // The hand-off: the figure arrives on exactly the curve that takes the
+    // city away, so the wall is never held by both and never by neither.
+    figure: cityLeaves * (1 - figureLeaves)
+  };
 }
 
 /** Viewport-relative bounds of a block of copy, as `getBoundingClientRect()` gives them. */

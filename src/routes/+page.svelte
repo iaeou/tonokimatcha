@@ -135,7 +135,7 @@
   what the tea is, how you make it, and how it is sold. The heritage follows
   afterwards — it is why the house exists, not why anyone would buy the tea.
 -->
-<Section id="collection" eyebrow="The Leaf" title="A Single Degree" kanji="玉">
+<Section id="collection" eyebrow="The Leaf" title="A Single Degree" figure="oriental">
   <article class="leaf-panel">
     <p class="leaf-panel__type">{leaf.degree}</p>
     <h3>{leaf.name}</h3>
@@ -179,7 +179,7 @@
 
 <!-- className widens only this hall's body: three columns inside the 42rem
      reading measure are 200px each, which is a column of one word. -->
-<Section id="ceremony" className="ways-section" eyebrow="How To Use" title="Three Ways" kanji="点">
+<Section id="ceremony" className="ways-section" eyebrow="How To Use" title="Three Ways" figure="wa">
   <p class="vessels-lede">
     Good matcha has a reputation for being fussy. It is not: two grams, water, and fifteen seconds
     of shaking will do it. The long way is here too, for when the long way is the point.
@@ -187,7 +187,7 @@
   <Ceremony />
 </Section>
 
-<Section id="vessels" eyebrow="The Vessels" title="Three Presentations" kanji="器">
+<Section id="vessels" eyebrow="The Vessels" title="Three Presentations" figure="oriental">
   <p class="vessels-lede">
     The tea does not change. Only the vessel that carries it to the bowl.
   </p>
@@ -252,7 +252,7 @@
   className="heritage-section"
   eyebrow="The Lineage"
   title="The Dignified Tree"
-  kanji="樹"
+  figure="samurai"
 >
   <div class="narrative-grid">
     <p>
@@ -271,7 +271,7 @@
   </div>
 </Section>
 
-<Section id="guardian" eyebrow="The Guardian" title="By Request" kanji="陵">
+<Section id="guardian" eyebrow="The Guardian" title="By Request" figure="wa">
   <div class="guardian-panel">
     <p>
       Tearooms, restaurants and shops order Tonoki in their own quantities and their own

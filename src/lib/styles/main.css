@@ -521,6 +521,47 @@ textarea {
   mix-blend-mode: screen;
 }
 
+/* The third stage. A single standing figure rather than a horizon, so it is
+   sized against the viewport's height and kept to the open right half — the
+   copy column runs down the left, and this drawing is far too dense to be read
+   through even at a few percent. */
+.hero__standing-figure {
+  position: absolute;
+  z-index: 2;
+  /* Bleeding off the right edge, and half again the height of a hall's
+     watermark. The two share a language, so they must not share a scale: at
+     the same size, in the same corner, the fixed backdrop figure and the
+     scrolling hall figure read as one drawing failing to make up its mind. */
+  right: clamp(-6rem, -4vw, -2rem);
+  bottom: 0;
+  width: auto;
+  height: clamp(34rem, 92vh, 62rem);
+  object-fit: contain;
+  object-position: bottom center;
+  opacity: calc(
+    var(--hero-figure-opacity, 0) * var(--hero-drawing-ink) * var(--hero-drawing-interlude, 1) *
+      var(--hero-figure-ink, 0.5)
+  );
+  mix-blend-mode: multiply;
+  /* Two weights again: out towards its own head, where headlines pass, and out
+     towards its left, which is the side copy reaches — the three-column Ways
+     hall runs a column right up to it. Only the outer half stays at strength,
+     and that half hangs off the edge of the screen. */
+  mask-image:
+    linear-gradient(180deg, transparent 0%, black 28%, black 100%),
+    linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.45) 38%, black 72%);
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
+  transition: opacity 80ms linear;
+  will-change: opacity;
+  pointer-events: none;
+}
+
+:root[data-theme='dark'] .hero__standing-figure {
+  filter: invert(1);
+  mix-blend-mode: screen;
+}
+
 .hero__image {
   position: absolute;
   z-index: 0;
@@ -1237,19 +1278,27 @@ textarea {
 }
 
 /* Ghost kanji watermark — one enormous character drifting behind each hall. */
-.section__kanji {
+/* The drawn figure that stands behind each hall, in the place the ghost kanji
+   used to occupy. Ink on paper, like the Osaka skyline: the drawing's white
+   is multiplied away into the cream and only the lines remain. */
+.section__figure {
   position: absolute;
   top: 4%;
   right: clamp(0.5rem, 6vw, 6rem);
   z-index: 0;
-  font-family: 'Noto Serif JP', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
-  font-size: clamp(14rem, 32vw, 30rem);
-  font-weight: 500;
-  line-height: 1;
-  color: var(--color-ink);
+  width: clamp(14rem, 32vw, 26rem);
+  height: auto;
   opacity: 0;
+  mix-blend-mode: multiply;
   pointer-events: none;
   user-select: none;
+}
+
+/* In the dark hall the ink is inverted to light and screened, so the figure is
+   drawn out of the void instead of blotting it. */
+:root[data-theme='dark'] .section__figure {
+  filter: invert(1);
+  mix-blend-mode: screen;
 }
 
 .section__inner {

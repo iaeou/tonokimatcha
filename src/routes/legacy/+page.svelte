@@ -28,7 +28,7 @@
   className="heritage-section"
   eyebrow="Eternal Legacy"
   title="Scarcity Policy"
-  kanji="陵"
+  figure="samurai"
 >
   <div class="narrative-grid">
     <p>
@@ -49,7 +49,7 @@
   </div>
 </Section>
 
-<Section id="certification" eyebrow="The Record" title="Certification" kanji="証">
+<Section id="certification" eyebrow="The Record" title="Certification" figure="oriental">
   <div class="narrative-grid">
     <p>
       Ceremony without documentation is theatre. Every lot leaves the mill with a certificate that
@@ -70,7 +70,7 @@
   </article>
 </Section>
 
-<Section id="privacy" eyebrow="The Guardian" title="Privacy" kanji="守">
+<Section id="privacy" eyebrow="The Guardian" title="Privacy" figure="wa">
   <div class="narrative-grid">
     <p>
       An admission request carries three things: a name, an institution, and the ceremony you

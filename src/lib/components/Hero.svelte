@@ -11,16 +11,19 @@
     // The hall that ends the relay. Its live position is what withdraws the
     // drawing, so the handoff keeps pace with the copy instead of a guess.
     const closingHall = document.querySelector('#collection');
+    // The hall that ends the figure's stage, one relay further down.
+    const finalHall = document.querySelector('#lineage');
     // The blocks the city must not compete with. Read once: sections are not
     // added or removed while the page is scrolled.
     const copyBlocks = Array.from(document.querySelectorAll('.section__inner'));
 
     const updateImageFade = () => {
       const viewportHeight = window.innerHeight;
-      const { photo, drawing } = createBackdropOpacities({
+      const { photo, drawing, figure } = createBackdropOpacities({
         scrollY: window.scrollY,
         viewportHeight,
-        closingHallTop: closingHall?.getBoundingClientRect().top ?? null
+        closingHallTop: closingHall?.getBoundingClientRect().top ?? null,
+        finalHallTop: finalHall?.getBoundingClientRect().top ?? null
       });
 
       const interlude = createInterludeInk(
@@ -30,6 +33,7 @@
 
       heroSection.style.setProperty('--hero-image-opacity', String(photo));
       heroSection.style.setProperty('--hero-drawing-opacity', String(drawing));
+      heroSection.style.setProperty('--hero-figure-opacity', String(figure));
       heroSection.style.setProperty('--hero-drawing-interlude', String(interlude));
     };
 
@@ -85,6 +89,19 @@
         /images/osaka-skyline-1600.webp 1600w
       "
       sizes="100vw"
+      alt=""
+      loading="lazy"
+      decoding="async"
+    />
+    <!-- The third hand: as the city leaves, one of Jaume's figures takes the
+         wall, and leaves in turn before The Lineage. Last in the relay, so it
+         is also the last thing worth fetching. -->
+    <img
+      class="hero__standing-figure"
+      fetchpriority="low"
+      src="/images/figures/wa.webp"
+      srcset="/images/figures/wa-480.webp 480w, /images/figures/wa.webp 700w"
+      sizes="(min-width: 760px) 52vh, 62vh"
       alt=""
       loading="lazy"
       decoding="async"

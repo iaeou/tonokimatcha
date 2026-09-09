@@ -28,7 +28,7 @@
   className="heritage-section"
   eyebrow="The Grower"
   title="Kagoshima Horiguchi Seicha"
-  kanji="農"
+  figure="oriental"
 >
   <div class="narrative-grid">
     <p>
@@ -51,7 +51,7 @@
   </div>
 </Section>
 
-<Section id="method" eyebrow="The Method" title="Machines Instead of Poison" kanji="虫">
+<Section id="method" eyebrow="The Method" title="Machines Instead of Poison" figure="samurai">
   <div class="narrative-grid">
     <p>
       The house belief is that good tea comes from a healthy environment, and they have farmed that
@@ -81,7 +81,7 @@
   </article>
 </Section>
 
-<Section id="mill" eyebrow="The Mill" title="Tencha Before Matcha" kanji="碾">
+<Section id="mill" eyebrow="The Mill" title="Tencha Before Matcha" figure="wa">
   <div class="narrative-grid">
     <p>
       Matcha is not a kind of leaf; it is a kind of handling. Shaded leaf is steamed and dried

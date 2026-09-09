@@ -7,13 +7,22 @@ import {
 
 const VIEWPORT = 1000;
 
-function at(scrollY: number, closingHallTop: number | null = null) {
-  return createBackdropOpacities({ scrollY, viewportHeight: VIEWPORT, closingHallTop });
+function at(
+  scrollY: number,
+  closingHallTop: number | null = null,
+  finalHallTop: number | null = null
+) {
+  return createBackdropOpacities({
+    scrollY,
+    viewportHeight: VIEWPORT,
+    closingHallTop,
+    finalHallTop
+  });
 }
 
 describe('createBackdropOpacities', () => {
   test('opens on the photograph alone', () => {
-    expect(at(0)).toEqual({ photo: 1, drawing: 0 });
+    expect(at(0)).toEqual({ photo: 1, drawing: 0, figure: 0 });
   });
 
   test('does not start drawing until the photograph is mostly gone', () => {
@@ -56,21 +65,69 @@ describe('createBackdropOpacities', () => {
     expect(at(scrolled, 0).drawing).toBe(0);
   });
 
-  test('keeps both layers within bounds at every stage', () => {
+  test('hands the wall to the figure on exactly the curve that takes the city away', () => {
+    const scrolled = VIEWPORT * 2;
+    const { withdrawalEntryViewports, withdrawalViewports } = HERO_BACKDROP_TUNING;
+
+    // City still holds the wall: no figure yet.
+    expect(at(scrolled, VIEWPORT).figure).toBe(0);
+
+    // Mid hand-off, both are partly present and neither is absent.
+    const midpoint = VIEWPORT * (1 - withdrawalEntryViewports - withdrawalViewports * 0.5);
+    const mid = at(scrolled, midpoint);
+    expect(mid.drawing).toBeGreaterThan(0);
+    expect(mid.figure).toBeGreaterThan(0);
+    expect(mid.drawing + mid.figure).toBeCloseTo(1, 5);
+
+    // City gone, figure holding the wall alone.
+    const claimed = VIEWPORT * (1 - withdrawalEntryViewports - withdrawalViewports);
+    expect(at(scrolled, claimed)).toMatchObject({ drawing: 0, figure: 1 });
+  });
+
+  test('withdraws the figure in turn as the final hall climbs', () => {
+    const scrolled = VIEWPORT * 3;
+    const { withdrawalEntryViewports, withdrawalViewports } = HERO_BACKDROP_TUNING;
+    const gone = VIEWPORT * (1 - withdrawalEntryViewports - withdrawalViewports);
+
+    // Final hall below the fold: the figure stays.
+    expect(at(scrolled, gone, VIEWPORT).figure).toBe(1);
+
+    const leaving = at(
+      scrolled,
+      gone,
+      VIEWPORT * (1 - withdrawalEntryViewports - withdrawalViewports * 0.5)
+    ).figure;
+    expect(leaving).toBeGreaterThan(0);
+    expect(leaving).toBeLessThan(1);
+
+    expect(at(scrolled, gone, gone).figure).toBe(0);
+  });
+
+  test('leaves the figure in place when the final hall is absent', () => {
+    // Same forgiveness the drawing gets without its closing hall.
+    const gone =
+      VIEWPORT *
+      (1 - HERO_BACKDROP_TUNING.withdrawalEntryViewports - HERO_BACKDROP_TUNING.withdrawalViewports);
+    expect(at(VIEWPORT * 3, gone, null).figure).toBe(1);
+  });
+
+  test('keeps every layer within bounds at every stage', () => {
     for (let scrollY = 0; scrollY <= VIEWPORT * 4; scrollY += VIEWPORT / 8) {
       for (const top of [null, VIEWPORT * 1.5, VIEWPORT * 0.5, 0, -VIEWPORT]) {
-        const { photo, drawing } = at(scrollY, top);
-        expect(photo).toBeGreaterThanOrEqual(0);
-        expect(photo).toBeLessThanOrEqual(1);
-        expect(drawing).toBeGreaterThanOrEqual(0);
-        expect(drawing).toBeLessThanOrEqual(1);
+        for (const final of [null, VIEWPORT * 1.5, 0, -VIEWPORT]) {
+          const { photo, drawing, figure } = at(scrollY, top, final);
+          for (const value of [photo, drawing, figure]) {
+            expect(value).toBeGreaterThanOrEqual(0);
+            expect(value).toBeLessThanOrEqual(1);
+          }
+        }
       }
     }
   });
 
   test('survives a viewport that has not been measured yet', () => {
     expect(createBackdropOpacities({ scrollY: 0, viewportHeight: 0, closingHallTop: null })).toEqual(
-      { photo: 1, drawing: 0 }
+      { photo: 1, drawing: 0, figure: 0 }
     );
   });
 });
