@@ -88,6 +88,6 @@
   </div>
 
   <div class="guardian-panel">
-    <a class="text-link" href="/club">Start a request</a>
+    <a class="text-link" href="/request">Start a request</a>
   </div>
 </Section>

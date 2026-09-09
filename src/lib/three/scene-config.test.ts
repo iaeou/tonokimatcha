@@ -182,7 +182,7 @@ describe('createFarewellSettings', () => {
     const settings = createFarewellSettings();
 
     expect(settings.enabled).toBe(true);
-    expect(settings.trigger).toBe('#guardian');
+    expect(settings.trigger).toBe('#request');
     // Both edges are offsets past the viewport bottom, so the stone is gone
     // before The Guardian is on screen at all.
     expect(settings.start).toMatch(/^top bottom\+=/);

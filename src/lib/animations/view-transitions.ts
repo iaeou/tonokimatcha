@@ -51,7 +51,7 @@ export function prefersReducedMotion(win: Window | undefined = globalThis.window
 
 /**
  * Which way the visitor is moving through the halls. Depth is measured by path
- * segments, so `/` -> `/club` reads as forward and the reverse as backward.
+ * segments, so `/` -> `/request` reads as forward and the reverse as backward.
  * A browser back/forward gesture always reads as backward, whatever the paths,
  * because the visitor is retracing their own steps.
  */

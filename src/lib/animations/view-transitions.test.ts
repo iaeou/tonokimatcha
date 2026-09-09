@@ -3,25 +3,25 @@ import { getNavigationDirection, startTypedViewTransition } from './view-transit
 
 describe('getNavigationDirection', () => {
   test('reads a deeper path as travelling forward', () => {
-    expect(getNavigationDirection('/', '/club')).toBe('forward');
+    expect(getNavigationDirection('/', '/request')).toBe('forward');
   });
 
   test('reads a shallower path as travelling backward', () => {
-    expect(getNavigationDirection('/club', '/')).toBe('backward');
+    expect(getNavigationDirection('/request', '/')).toBe('backward');
   });
 
   test('treats a browser back gesture as backward whatever the paths', () => {
     // Retracing your own steps should feel the same in both directions.
-    expect(getNavigationDirection('/', '/club', 'popstate')).toBe('backward');
+    expect(getNavigationDirection('/', '/request', 'popstate')).toBe('backward');
   });
 
   test('falls forward when a path is unknown', () => {
-    expect(getNavigationDirection(null, '/club')).toBe('forward');
-    expect(getNavigationDirection('/club', undefined)).toBe('forward');
+    expect(getNavigationDirection(null, '/request')).toBe('forward');
+    expect(getNavigationDirection('/request', undefined)).toBe('forward');
   });
 
   test('keeps same-depth moves moving forward', () => {
-    expect(getNavigationDirection('/club', '/lineage')).toBe('forward');
+    expect(getNavigationDirection('/request', '/lineage')).toBe('forward');
   });
 });
 

@@ -81,7 +81,7 @@
   });
 </script>
 
-<section class="hero" aria-labelledby="threshold-title" bind:this={heroSection}>
+<section class="hero" aria-labelledby="hero-title" bind:this={heroSection}>
   <figure class="hero__figure" aria-hidden="true">
     <picture class="hero__photo">
       <source srcset="/images/home-header2-m.webp" media="(max-width: 767px)" type="image/webp" />
@@ -126,20 +126,24 @@
     />
   </figure>
   <div class="hero__content" bind:this={heroContent}>
+    <!-- The threshold moved to /lineage with the rest of the heritage. What
+         opens the landing page now is the thing the landing page is about: one
+         tea. The drawn city stays as weather behind it — it never claimed the
+         leaf grew there, and it is the only depth this frame has. -->
     <p class="eyebrow" use:typographyReveal={{ mode: 'sumi' }}>
-      The Threshold
+      The Tea
     </p>
     <h1
-      id="threshold-title"
+      id="hero-title"
       class="hero-title heritage-text"
       use:typographyReveal={{ mode: 'sumi', delay: 0.35 }}
     >
-      Before history was written, we were here.
+      One field, one harvest, one tea.
     </h1>
     <p class="hero__text hero-subtitle">
-      Matcha Tonoki is one tea from the shaded fields of Kagoshima: first-harvest leaf, stone-milled, held to
-      a single standard. Whisk it in a bowl or shake it in a bottle — it is the same two grams.
+      Organic first-flush leaf from the shaded fields of Kagoshima, stone-milled and held to a
+      single standard. Whisk it in a bowl or shake it in a bottle — it is the same two grams.
     </p>
-    <a class="hero__cue" href="#lineage">Scroll to explore</a>
+    <a class="hero__cue" href="#collection">Scroll to explore</a>
   </div>
 </section>

@@ -79,8 +79,8 @@ export interface BackdropGeometry {
    */
   closingHallTop: number | null;
   /**
-   * Viewport-relative top of the hall that ends the *figure's* stage
-   * (`#lineage`). `null` when that hall is absent — the figure then stays,
+   * Viewport-relative top of the block that ends the *figure's* stage — the
+   * first hall's copy. `null` when that block is absent — the figure then stays,
    * exactly as the drawing does without its own closing hall.
    */
   finalHallTop?: number | null;

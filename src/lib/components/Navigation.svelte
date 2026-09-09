@@ -42,13 +42,15 @@
   </a>
   <div class="navigation__actions">
     <nav class="navigation__links" aria-label="Primary navigation">
-      <!-- The nav follows the page: leaf, use, shelf, then the heritage. -->
+      <!-- The nav follows the page while the page lasts — leaf, use, shelf —
+           and then leaves it: the grower, the heritage and the order desk are
+           rooms of their own now. -->
       <a href="/#collection">The Leaf</a>
       <a href="/#ceremony">How To Use</a>
       <a href="/#vessels">Vessels</a>
       <a href="/grower">Grower</a>
-      <a href="/#lineage">Lineage</a>
-      <a href="/club">Club</a>
+      <a href="/lineage">Lineage</a>
+      <a href="/request">Request</a>
     </nav>
     <ThemeToggle />
   </div>

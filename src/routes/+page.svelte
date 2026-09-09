@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { tick } from 'svelte';
-  import { pushState } from '$app/navigation';
+  import { onMount, tick } from 'svelte';
+  import { goto, pushState } from '$app/navigation';
   import { page } from '$app/state';
   import Ceremony from '$lib/components/Ceremony.svelte';
   import Hero from '$lib/components/Hero.svelte';
@@ -58,6 +58,21 @@
       ours: false
     }
   ];
+
+  /**
+   * Two halls left this page for rooms of their own. Anchors cannot be
+   * redirected by the server, so the links printed in older pages — and in
+   * anyone's bookmarks — are caught here on arrival and forwarded.
+   */
+  const MOVED_ANCHORS: Record<string, string> = {
+    '#lineage': '/lineage',
+    '#guardian': '/request'
+  };
+
+  onMount(() => {
+    const moved = MOVED_ANCHORS[window.location.hash];
+    if (moved) goto(moved, { replaceState: true });
+  });
 
   const openVessel = $derived(page.state.vessel);
 
@@ -131,9 +146,10 @@
 <Hero />
 
 <!--
-  The three sections a first-time visitor needs, in the order they need them:
-  what the tea is, how you make it, and how it is sold. The heritage follows
-  afterwards — it is why the house exists, not why anyone would buy the tea.
+  All that is left here, and all a first-time visitor needs, in the order they
+  need it: what the tea is, how you make it, and how it is sold. The heritage
+  moved to /lineage — it is why the house exists, not why anyone would buy the
+  tea, and it was interrupting the only three halls that answer that.
 -->
 <Section id="collection" eyebrow="The Leaf" title="A Single Degree" figure="oriental">
   <article class="leaf-panel">
@@ -249,37 +265,14 @@
   }}
 />
 
-<Section
-  id="lineage"
-  className="heritage-section"
-  eyebrow="The Lineage"
-  title="The Dignified Tree"
-  figure="samurai"
->
-  <div class="narrative-grid">
-    <p>
-      Tonoki begins with the idea of an upright tree: a dignified witness whose roots remain
-      below speech and whose canopy carries memory forward.
-    </p>
-    <p>
-      The sanctuary frames the Tonoki-no-muraji lineage beside Haniwa silhouettes, Sueki
-      ceramics, and the immense quiet of the Daisenryo Kofun. The name is Osaka's; the field is
-      Kagoshima's.
-    </p>
-    <p>
-      This is arranged like a small museum: documented provenance, room around each object. But
-      the tea is meant to be drunk, not admired — we would rather you served it than shelved it.
-    </p>
-  </div>
-</Section>
-
-<Section id="guardian" eyebrow="The Guardian" title="By Request" figure="wa">
-  <div class="guardian-panel">
-    <p>
-      Tearooms, restaurants and shops order Tonoki in their own quantities and their own
-      packaging. Tell us what you need and who it is for, and we will tell you honestly whether we
-      can make it.
-    </p>
-    <a class="text-link" href="/club">Start a request</a>
-  </div>
-</Section>
+<!--
+  The landing page used to end in The Guardian, a full hall whose only content
+  was a link to /request. The hall is gone; the ask is not. A band, not a room:
+  the request deserves a door here, not a second telling of what is behind it.
+-->
+<aside class="closing-cue" id="request" aria-label="Order Tonoki">
+  <p>
+    Tearooms, restaurants and shops order Tonoki in their own quantities and their own packaging.
+  </p>
+  <a class="text-link" href="/request">Start a request</a>
+</aside>

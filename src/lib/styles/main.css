@@ -1139,6 +1139,44 @@ textarea {
   max-width: 38rem;
 }
 
+/* The landing page's last word. Deliberately not a `.section`: a hall here
+   would be the old Guardian back again, 90svh of restatement in front of a
+   link. One rule, one line, one door. */
+.closing-cue {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  max-width: 34rem;
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-3) var(--space-6);
+  border-top: 1px solid color-mix(in srgb, var(--color-gold) 42%, transparent);
+  text-align: center;
+}
+
+.closing-cue p {
+  margin: 0;
+  color: color-mix(in srgb, var(--color-ink) 72%, transparent);
+}
+
+/* Osaka on its own page, where it may finally be looked at rather than read
+   through: no multiply, no mask, no copy on top of it. The frame is capped
+   because the drawing is a horizon — given the full measure it stretches into
+   a strip too thin to see anything in. */
+.lineage-skyline {
+  max-width: 52rem;
+  margin: var(--space-4) 0 0;
+}
+
+.lineage-skyline img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+:root[data-theme='dark'] .lineage-skyline img {
+  filter: invert(1);
+}
+
 .legacy-seal {
   max-width: 38rem;
   margin-top: var(--space-4);

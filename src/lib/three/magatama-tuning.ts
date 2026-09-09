@@ -95,15 +95,16 @@ export const MAGATAMA_TUNING = {
 
   // Farewell — the bead withdraws before the closing hall.
   //
-  // The Guardian is where the visitor is asked for something, and the stone
-  // shouldn't be hovering over that request. It dissolves during the approach
-  // and is fully gone by the time the section starts to appear: the fade both
-  // begins and ends while `trigger` is still below the fold.
+  // The closing band is where the visitor is asked for something, and the
+  // stone shouldn't be hovering over that request. It dissolves during the
+  // approach and is fully gone by the time the band starts to appear: the fade
+  // both begins and ends while `trigger` is still below the fold. (It was
+  // `#guardian` while that ask was a full hall of its own.)
   // scene-config.ts -> createFarewellSettings() / computeFarewellOpacity()
   // Scene.svelte -> farewell ScrollTrigger + render loop
   farewell: {
     enabled: true,
-    trigger: '#guardian',       // the last section
+    trigger: '#request',        // the closing band, last on the page
     start: 'top bottom+=70%',   // begins ~0.7 viewport before the hall arrives
     end: 'top bottom+=5%',      // fully transparent just before it enters
     hideBelow: 0.02,            // opacity under this -> mesh.visible = false
