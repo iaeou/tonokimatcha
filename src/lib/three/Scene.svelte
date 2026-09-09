@@ -56,6 +56,7 @@
           createEnvironmentSettings,
           createFarewellSettings,
           computeFarewellOpacity,
+          fitMagatamaX,
           createGrainOptions,
           createIconMaterialOptions,
           createLowPolyMaterialOptions,
@@ -280,7 +281,20 @@
           : useLowPoly
             ? MAGATAMA_TUNING.lowPoly.scaleBoost
             : 1;
-        magatama.scale.setScalar(baseScale * presence);
+        const scale = baseScale * presence;
+        magatama.scale.setScalar(scale);
+
+        // Keep the stone inside the frame however narrow the window gets. The
+        // bounding sphere stands in for its half-width — generous on purpose,
+        // since the bead rotates and its widest axis swings into view.
+        const halfHeight = Math.tan((camera.fov * Math.PI) / 360) * Math.abs(cameraBase.z);
+
+        magatama.position.x = fitMagatamaX(
+          magatama.position.x,
+          halfHeight * camera.aspect,
+          (magatama.geometry.boundingSphere?.radius ?? 2) * scale,
+          MAGATAMA_TUNING.layout.edgeInset
+        );
         camera.updateProjectionMatrix();
       };
 

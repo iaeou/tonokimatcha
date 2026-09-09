@@ -5,6 +5,7 @@ import {
   createBloomOptions,
   createEnvironmentSettings,
   createFarewellSettings,
+  fitMagatamaX,
   createGrainOptions,
   createLowPolyMaterialOptions,
   createMagatamaMaterialOptions,
@@ -223,5 +224,34 @@ describe('computeFarewellOpacity', () => {
   test('clamps scroll progress that overshoots the window', () => {
     expect(computeFarewellOpacity(-3)).toBe(1);
     expect(computeFarewellOpacity(4)).toBe(0);
+  });
+});
+
+describe('fitMagatamaX', () => {
+  const inset = 0.04;
+
+  test('honours the tuned position when the frame is wide enough', () => {
+    // A wide desktop: ~4.96 of half-width against a bead reaching ~0.82.
+    expect(fitMagatamaX(2.75, 4.96, 0.82, inset)).toBe(2.75);
+  });
+
+  test('pulls the stone in when a narrow window cannot hold it', () => {
+    // The same 2.75 on a tall narrow desktop window, where only ~2.1 fits.
+    const fitted = fitMagatamaX(2.75, 2.13, 0.82, inset);
+
+    expect(fitted).toBeLessThan(2.75);
+    // Still fully on screen, with the inset left over.
+    expect(fitted + 0.82).toBeLessThanOrEqual(2.13);
+  });
+
+  test('never pushes the stone past centre, however cramped', () => {
+    expect(fitMagatamaX(2.75, 0.5, 0.82, inset)).toBe(0);
+  });
+
+  test('leaves the requested breathing room at the edge', () => {
+    const halfWidth = 3;
+    const fitted = fitMagatamaX(99, halfWidth, 0.5, inset);
+
+    expect(halfWidth - (fitted + 0.5)).toBeCloseTo(halfWidth * inset);
   });
 });

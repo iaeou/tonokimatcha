@@ -72,6 +72,27 @@ export function computeFarewellOpacity(progress: number): number {
   return 1 - eased;
 }
 
+/**
+ * Where the stone can actually sit, given how much world fits across.
+ *
+ * The tuned x is an art direction in world units, but the frame's width comes
+ * from the aspect: a tall narrow desktop window shows barely two units either
+ * side of centre, and a value chosen on a wide one would put the bead off the
+ * edge. So it is honoured when there is room and clamped when there is not,
+ * never past centre. `reach` is the bead's own half-extent, `inset` the
+ * breathing room to leave, as a fraction of the half-width.
+ */
+export function fitMagatamaX(
+  desiredX: number,
+  halfWidth: number,
+  reach: number,
+  inset: number
+): number {
+  const room = halfWidth - reach - halfWidth * inset;
+
+  return Math.min(desiredX, Math.max(room, 0));
+}
+
 interface DragRotationInput {
   movementX: number;
   movementY: number;

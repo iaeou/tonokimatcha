@@ -270,14 +270,25 @@ export const MAGATAMA_TUNING = {
   // Responsive layout
   // Scene.svelte -> resize()
   layout: {
-    scaleDesktop: 0.45,           // >760 px viewport width
-    scaleTablet: 0.35,            // 620-760 px
-    scaleMobile: 0.27,            // <620 px
-    positionXDesktop: 1.65,
-    positionXTablet: 1.65,
-    positionXMobile: 0.95,
-    positionYWide: 0.12,          // >620 px
-    positionYNarrow: 0.26,        // <=620 px
+    // Where the stone sits in frame. The camera is 45° at z 5.8, so the plane
+    // at z 0 shows ~4.8 units of height and that times the aspect of width —
+    // roughly 9.9 x 4.8 on a wide desktop. Positions below are in those units,
+    // so x 2.75 lands the bead about four fifths across and y -1.05 about
+    // seven tenths down: low and to the right, out of the copy's way.
+    scaleDesktop: 0.32,           // >760 px viewport width
+    scaleTablet: 0.26,            // 620-760 px
+    scaleMobile: 0.2,             // <620 px
+    positionXDesktop: 2.75,
+    positionXTablet: 1.95,
+    // Mobile is the tight one: at z 7.2 and a phone's aspect the frame is only
+    // ~2.7 wide, so there is barely a unit of room either side of centre.
+    positionXMobile: 0.9,
+    positionYWide: -1.05,         // >620 px
+    positionYNarrow: -1.45,       // <=620 px
+    // Breathing room kept between the stone and the right edge when the frame
+    // is too narrow to honour the x above, as a fraction of the half-width.
+    // Scene.svelte -> resize()
+    edgeInset: 0.04,
     cameraZDesktop: 5.8,
     cameraZMobile: 7.2,
   },

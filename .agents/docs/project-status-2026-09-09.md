@@ -186,3 +186,50 @@ The tuning is `icon.dome` and `icon.rim`; `dome.enabled: false` returns the
 card. The back of the stone still carries only the colour fills, so its
 shoulder is now green where the reverse itself stays bare — consistent, but
 worth a look if the bead is ever seen from behind for long.
+
+---
+
+# Addendum — the stone steps back
+
+Jaume: smaller, and further into the bottom right.
+
+## Framing
+
+The camera is 45° at z 5.8, so the plane the bead sits on shows ~4.8 units of
+height and that times the aspect of width — about 9.9 x 4.8 on a wide desktop.
+Positions in `layout` are in those units, which makes them readable once the
+frame is written down:
+
+| | was | now |
+| --- | --- | --- |
+| `scaleDesktop` | 0.45 | 0.32 |
+| `positionXDesktop` | 1.65 | 2.75 |
+| `positionYWide` | 0.12 | -1.05 |
+
+That lands it about four fifths across and seven tenths down, clear of the
+copy. Tablet and mobile moved with it.
+
+## The clamp that had to come with it
+
+x is an art direction in world units, but how much world fits across depends on
+the aspect, and only the *width* does — the vertical extent is fixed by the fov
+and the camera distance, so y is safe at any window shape. A tall narrow
+desktop window shows barely 2.1 units either side of centre, so 2.75 would have
+put the bead off the right edge entirely. The old 1.65 was already grazing it;
+this would have made it a plain bug.
+
+So `fitMagatamaX` honours the tuned x when there is room and clamps to what
+exists when there is not, never past centre, leaving `layout.edgeInset` (4% of
+the half-width) at the edge. The bead's own half-extent comes from its bounding
+sphere — generous on purpose, since the stone rotates and its widest axis
+swings into view.
+
+Pure and tested rather than checked by eye: the browser tooling here would not
+emulate a narrow viewport, and the arithmetic is the whole risk.
+
+## Verification
+
+`npm test` — 131 passed, 1 skipped (4 new on the clamp: honoured when wide,
+pulled in when narrow, never past centre, inset preserved). `npm run check` — 0
+errors, the 2 standing `CursorPointer` warnings. `npm run build` — clean.
+In-browser at 1920 wide: small, bottom right, no console errors.
