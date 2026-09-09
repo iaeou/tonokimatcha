@@ -8,13 +8,12 @@
  * footer permanently would carve them out of the theme circle and break it.
  */
 
-export type ViewTransitionType = 'theme' | 'forward' | 'backward' | 'vessel' | 'ceremony';
+export type ViewTransitionType = 'theme' | 'forward' | 'backward' | 'vessel';
 
 /**
- * Point the blurred circle at whatever the visitor just touched. Both the
- * theme swap and the ceremony steps grow their reveal from these coordinates,
- * so the gesture always starts under the hand rather than at the centre of
- * the screen.
+ * Point the blurred circle at whatever the visitor just touched. The theme
+ * swap grows its reveal from these coordinates, so the gesture always starts
+ * under the hand rather than at the centre of the screen.
  */
 export function setRevealOrigin(origin: { x: number; y: number } | undefined) {
   const { x, y } = origin ?? { x: window.innerWidth / 2, y: window.innerHeight / 2 };

@@ -10,20 +10,54 @@
   import { vessels, type Vessel } from '$lib/data/vessels';
 
   const leaf = {
-    name: 'Tonoki Ceremonial',
+    name: 'Premium Ceremonial Organic Matcha',
     degree: 'Single Degree',
     description:
-      'One tea only. Organic ichibancha — the first flush, picked once a year — shade-grown, stone-milled, and never cut with a later harvest. There is no second tier beneath it.',
+      'One tea only, and it is the top of the tree: organic ichibancha, the first flush, picked once a year and never cut with a later harvest. There is no second tier beneath it because we do not sell one.',
     origin:
-      'It comes from one grower: Horiguchi Seicha, in Kagoshima at the southern end of Japan, where the season opens weeks before the rest of the country. Ichibancha is that opening. The leaf spends the winter storing sweetness and holding its bitterness back, which is why the bowl reads soft rather than grassy — and why there is no cheaper harvest of ours to compare it against.',
+      'It comes from one grower — Kagoshima Horiguchi Seicha, in Shibushi at the southern end of Japan, where the season opens weeks before the rest of the country and the fields are worked without pesticides.',
     marks: [
-      { label: 'Grower', value: 'Horiguchi Seicha, Kagoshima' },
+      { label: 'Grower', value: 'Kagoshima Horiguchi Seicha' },
       { label: 'Harvest', value: 'Ichibancha — first flush, once a year' },
-      { label: 'Cultivation', value: 'Organic, shade-grown' },
+      { label: 'Cultivation', value: 'Organic, shade-grown, IPM' },
       { label: 'Milling', value: 'Granite stone, 30 g per hour' },
       { label: 'Certificate', value: 'TKC-0001' }
     ]
   };
+
+  /**
+   * Why the first flush is the expensive one. Sunlight turns theanine — the
+   * amino acid behind matcha's sweetness and its calm — into catechins, which
+   * are what taste bitter. A tea bush spends the winter dormant, storing
+   * theanine; the first cut takes that stored sweetness away with it, and every
+   * later cut grows under a stronger sun on a plant that has less left to give.
+   */
+  const harvests = [
+    {
+      name: 'Ichibancha',
+      when: 'First flush · late April',
+      note: 'The winter’s store, cut once. Highest in theanine, lowest in bitterness. This is the only harvest we buy.',
+      ours: true
+    },
+    {
+      name: 'Nibancha',
+      when: 'Second flush · June',
+      note: 'The regrowth, under a stronger sun. More catechin, less theanine — brisker, sharper, and cheaper.',
+      ours: false
+    },
+    {
+      name: 'Sanbancha',
+      when: 'Third flush · July',
+      note: 'Thinner again. Usually bound for blends, bottled tea and everyday grades.',
+      ours: false
+    },
+    {
+      name: 'Bancha',
+      when: 'Late leaf and stem',
+      note: 'What is left when the season is spent. An honest daily tea — but not a ceremonial one.',
+      ours: false
+    }
+  ];
 
   const openVessel = $derived(page.state.vessel);
 
@@ -96,29 +130,20 @@
 
 <Hero />
 
-<Section id="lineage" className="heritage-section" eyebrow="The Lineage" title="The Dignified Tree" kanji="樹">
-  <div class="narrative-grid">
-    <p>
-      Tonoki begins with the idea of an upright tree: a dignified witness whose roots remain
-      below speech and whose canopy carries memory forward.
-    </p>
-    <p>
-      The sanctuary frames the Tonoki-no-muraji lineage beside Haniwa silhouettes, Sueki
-      ceramics, and the immense quiet of the Daisenryo Kofun.
-    </p>
-    <p>
-      This is arranged like a small museum: documented provenance, room around each object. But
-      the tea is meant to be drunk, not admired — we would rather you served it than shelved it.
-    </p>
-  </div>
-</Section>
-
+<!--
+  The three sections a first-time visitor needs, in the order they need them:
+  what the tea is, how you make it, and how it is sold. The heritage follows
+  afterwards — it is why the house exists, not why anyone would buy the tea.
+-->
 <Section id="collection" eyebrow="The Leaf" title="A Single Degree" kanji="玉">
   <article class="leaf-panel">
     <p class="leaf-panel__type">{leaf.degree}</p>
     <h3>{leaf.name}</h3>
     <p class="leaf-panel__lede">{leaf.description}</p>
-    <p class="leaf-panel__origin">{leaf.origin}</p>
+    <p class="leaf-panel__origin">
+      {leaf.origin}
+      <a class="text-link leaf-panel__link" href="/grower">Meet the grower</a>
+    </p>
     <dl class="certificate">
       {#each leaf.marks as mark}
         <div>
@@ -128,6 +153,36 @@
       {/each}
     </dl>
   </article>
+
+  <div class="harvests">
+    <h4 class="harvests__title">Why the first flush</h4>
+    <p class="harvests__lede">
+      Sunlight turns theanine — the amino acid behind matcha's sweetness and its steady calm — into
+      the catechins that taste bitter. A bush spends the winter dormant, storing theanine up. The
+      first cut takes that store away with it; every later cut grows under a stronger sun on a plant
+      with less left to give.
+    </p>
+    <ol class="harvests__list">
+      {#each harvests as harvest}
+        <li class="harvest" class:harvest--ours={harvest.ours}>
+          <p class="harvest__when">{harvest.when}</p>
+          <h5>
+            {harvest.name}
+            {#if harvest.ours}<span class="harvest__flag">Ours</span>{/if}
+          </h5>
+          <p class="harvest__note">{harvest.note}</p>
+        </li>
+      {/each}
+    </ol>
+  </div>
+</Section>
+
+<Section id="ceremony" eyebrow="How To Use" title="Three Ways" kanji="点">
+  <p class="vessels-lede">
+    Good matcha has a reputation for being fussy. It is not: two grams, water, and fifteen seconds
+    of shaking will do it. The long way is here too, for when the long way is the point.
+  </p>
+  <Ceremony />
 </Section>
 
 <Section id="vessels" eyebrow="The Vessels" title="Three Presentations" kanji="器">
@@ -190,12 +245,28 @@
   }}
 />
 
-<Section id="ceremony" eyebrow="The Ceremony" title="Three Ways" kanji="点">
-  <p class="vessels-lede">
-    The same two grams, whether it takes fifteen seconds or fifteen minutes. A bottle and a hard
-    shake is a legitimate way to drink this tea.
-  </p>
-  <Ceremony />
+<Section
+  id="lineage"
+  className="heritage-section"
+  eyebrow="The Lineage"
+  title="The Dignified Tree"
+  kanji="樹"
+>
+  <div class="narrative-grid">
+    <p>
+      Tonoki begins with the idea of an upright tree: a dignified witness whose roots remain
+      below speech and whose canopy carries memory forward.
+    </p>
+    <p>
+      The sanctuary frames the Tonoki-no-muraji lineage beside Haniwa silhouettes, Sueki
+      ceramics, and the immense quiet of the Daisenryo Kofun. The name is Osaka's; the field is
+      Kagoshima's.
+    </p>
+    <p>
+      This is arranged like a small museum: documented provenance, room around each object. But
+      the tea is meant to be drunk, not admired — we would rather you served it than shelved it.
+    </p>
+  </div>
 </Section>
 
 <Section id="guardian" eyebrow="The Guardian" title="By Request" kanji="陵">

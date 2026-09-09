@@ -2,8 +2,14 @@ import { describe, expect, test } from 'vitest';
 import { findVessel, vessels } from './vessels';
 
 describe('vessels', () => {
-  test('offers exactly the three presentations of the single degree', () => {
-    expect(vessels.map((vessel) => vessel.slug)).toEqual(['sachet', 'tube', 'pouch']);
+  test('shelves the three presentations tube first and loose sachet last', () => {
+    expect(vessels.map((vessel) => vessel.slug)).toEqual(['tube', 'pouch', 'sachet']);
+  });
+
+  test('letters the vessels in shelf order', () => {
+    // The letter is house shorthand for a position on the shelf, so it must be
+    // derived from the order rather than pinned to a product.
+    expect(vessels.map((vessel) => vessel.key)).toEqual(['A', 'B', 'C']);
   });
 
   test('keeps slugs unique', () => {

@@ -13,16 +13,18 @@ Matcha Tonoki (brand order settled 2026-08-27 — never "Tonoki Matcha") is a hi
 ## Content Architecture
 
 - The Threshold: landing hero with cinematic Kofun atmosphere and Magatama focus.
-- The Lineage: heritage narrative around Tonoki-no-muraji, the Dignified Tree, Haniwa, Sueki, and Daisenryo Kofun.
-- The Leaf: a single degree, Tonoki Ceremonial. There is no product ladder — one tea, highest grade only. Sourcing is named here: organic ichibancha (first flush, once a year) from **Horiguchi Seicha, Kagoshima**. The heritage in The Lineage is the *name's* — Tonoki-no-muraji, Sakai, the Kofun — while the field is Kagoshima's. Nothing on the site may say the leaf grows in Osaka: the hero subtitle claimed "the shaded fields of Osaka" until 2026-08-27 and had to be corrected to Kagoshima. Osaka is the lineage and the drawn skyline; Kagoshima is the field. Keep them apart.
-- The Vessels: three presentations of that same tea — 2 g individual sachet (A, sold loose from a 100-sachet minimum or inside the tube), refined paper tube of 25 sachets (B), 30 g hermetic pouch (C).
-- The Ceremony: three ways to prepare the same 2 g — Cold (sachet into a 33 cl bottle, shake hard, keeps a day in the fridge), Hot (same gesture in an insulated bottle at ~80 °C), and Ceremony (the long way: warm the bowl, sift, whisk, serve). The two everyday ways are written plainly on purpose; ease of preparation is a selling point of the sachet, not a compromise. Timings and temperatures are provisional pending Jaume's confirmation.
+- **Section order on the home page (set 2026-09-09): The Leaf → How To Use → The Vessels → The Lineage → The Guardian.** What the tea is, how you make it, how it is sold — then the heritage. The heritage is why the house exists, not why anyone buys the tea, so it follows rather than leads. Anchors (`#collection`, `#ceremony`, `#vessels`, `#lineage`) were kept through the reshuffle for inbound links.
+- The Leaf (`#collection`): a single degree, "Premium Ceremonial Organic Matcha". No product ladder — one tea, highest grade only. Sourcing is named here: organic ichibancha from **Kagoshima Horiguchi Seicha**, with a link to `/grower`. Carries the **harvest ladder** (ichibancha vs nibancha / sanbancha / bancha) explaining the mechanism — sunlight converts theanine into bitter catechins, a dormant winter bush stores theanine, the first cut takes that store. The harvests we do not sell are described plainly, never disparaged.
+- How To Use (`#ceremony`): three ways to prepare the same 2 g, **all open at once, no selector** — Cold (sachet into a 33 cl bottle, shake ~15 s, keeps a day in the fridge), Hot (same gesture in an insulated bottle near 80 °C), Ceremony (the long way). Each leads with an effort line so the cost is comparable at a glance; that comparison is the section's argument and is lost the moment it goes behind a tab. Data in `src/lib/data/ways.ts`. Timings provisional pending Jaume's confirmation.
+- The Vessels (`#vessels`): three presentations, shelved **tube (A) → 30 g pouch (B) → loose 2 g sachet (C)**. The letter follows the shelf position, not the product — reordering `vessels.ts` reletters the site, and a test pins that.
+- The Lineage: heritage narrative around Tonoki-no-muraji, the Dignified Tree, Haniwa, Sueki, and Daisenryo Kofun. The heritage in The Lineage is the *name's* — Osaka, Sakai, the Kofun — while the field is Kagoshima's. **Nothing on the site may say the leaf grows in Osaka**: the hero subtitle claimed "the shaded fields of Osaka" until 2026-08-27 and had to be corrected. Osaka is the lineage and the drawn skyline; Kagoshima is the field. Keep them apart.
+- The Grower (`/grower`): the field, the method and the mill at Kagoshima Horiguchi Seicha — Shibushi on the Ōsumi peninsula, ~300 ha (120 owned + 180 affiliated), IPM "Tea Rangers" in place of pesticides, the `T-Pole` tencha factory, FSSC 22000. Every figure is theirs, from their corporate site, which is linked out. **Both they and we hold FSSC 22000, for different scopes** — theirs covers how the leaf is made, ours covers milling, sealing and keeping. Do not conflate them.
 - The Guardian: custom request, Tonoki Club, and B2B ambassador flow.
 - Eternal Legacy: legal, certifications, scarcity policy, and closing sign-off. Lives at `/legacy` with `#scarcity`, `#certification`, and `#privacy`; the privacy copy is explicitly provisional pending legal review.
 
 ## Current Implementation Snapshot
 
-Last reviewed: 2026-08-27.
+Last reviewed: 2026-09-09.
 
 The project is now a working SvelteKit baseline with:
 
@@ -86,5 +88,15 @@ npm test
 npm run build
 npm run dev
 ```
+
+**`NODE_ENV=production` is set in this shell environment, and it breaks all three commands.** npm derives `omit=dev` from it and skips every devDependency — `@sveltejs/adapter-auto`, `vitest`, `svelte-check`, `three`, `gsap` — so the mirror installs 9 packages instead of 200 and the tooling fails with "Cannot find package". There is no `.npmrc` involved; it is purely the environment variable, and it masquerades as a broken lockfile or a corrupt `node_modules`. Until the environment is changed, prefix every command:
+
+```sh
+NODE_ENV=development npm run check
+NODE_ENV=development npm test
+NODE_ENV=development npm run build
+```
+
+If the mirror was already populated by a bad run, `rm -rf /tmp/tonoki-matcha-dev-src` before retrying.
 
 The runner syncs the source tree to `/tmp/tonoki-matcha-dev-src`, installs dependencies there with `npm ci` when `package.json` or `package-lock.json` changes, and then runs the requested local binary from the mirror. Extra arguments still work, for example `npm test -- src/lib/stores/theme.test.ts` or `npm run dev -- --port 5174`.

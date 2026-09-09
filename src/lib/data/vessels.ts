@@ -2,6 +2,11 @@
  * The three presentations of the single degree. One tea; only the vessel that
  * carries it to the bowl changes. Shared by the landing grid and the vessel
  * halls so the card and its detail can never drift apart.
+ *
+ * Array order is the shelf order and the house lettering follows it: the tube
+ * leads because it is the form most people buy, the pouch serves the practised
+ * hand, and the loose sachet trails because it carries a hundred-unit minimum.
+ * Reordering this array reletters the whole site — that is intentional.
  */
 export type Vessel = {
   slug: string;
@@ -19,25 +24,8 @@ export type Vessel = {
 
 export const vessels: Vessel[] = [
   {
-    slug: 'sachet',
-    key: 'A',
-    name: 'The Single Serving',
-    format: '2 g sachet',
-    description:
-      'One bowl, sealed at the mill. Individual foil sachet that protects the leaf from light and air until the moment of service.',
-    note: 'Offered loose from one hundred sachets, or held inside the tube.',
-    image: '/images/packaging/matchatonoki-sachet-2g.webp',
-    alt: 'An open Matcha Tonoki tube with four 2 gram sachets laid beside it',
-    marks: [
-      { label: 'Contents', value: '2 g — one bowl of usucha' },
-      { label: 'Material', value: 'Triple-layer foil, nitrogen flushed' },
-      { label: 'Keeping', value: 'Sealed: 12 months. Opened: serve at once' },
-      { label: 'Minimum', value: '100 sachets when ordered loose' }
-    ]
-  },
-  {
     slug: 'tube',
-    key: 'B',
+    key: 'A',
     name: 'The Vessel',
     format: '25 sachets · refined paper tube',
     description:
@@ -53,7 +41,7 @@ export const vessels: Vessel[] = [
   },
   {
     slug: 'pouch',
-    key: 'C',
+    key: 'B',
     name: 'The Reserve',
     format: '30 g hermetic pouch',
     description:
@@ -65,6 +53,23 @@ export const vessels: Vessel[] = [
       { label: 'Material', value: 'Hermetic resealable pouch, opaque' },
       { label: 'Keeping', value: 'Opened: four weeks, refrigerated and closed' },
       { label: 'Intent', value: 'Measured by hand, with a chashaku' }
+    ]
+  },
+  {
+    slug: 'sachet',
+    key: 'C',
+    name: 'The Single Serving',
+    format: '2 g sachet',
+    description:
+      'One bowl, sealed at the mill. Individual foil sachet that protects the leaf from light and air until the moment of service.',
+    note: 'Loose from one hundred sachets — ask us. Otherwise it travels inside the tube.',
+    image: '/images/packaging/matchatonoki-sachet-2g.webp',
+    alt: 'An open Matcha Tonoki tube with four 2 gram sachets laid beside it',
+    marks: [
+      { label: 'Contents', value: '2 g — one bowl of usucha' },
+      { label: 'Material', value: 'Triple-layer foil, nitrogen flushed' },
+      { label: 'Keeping', value: 'Sealed: 12 months. Opened: serve at once' },
+      { label: 'Minimum', value: '100 sachets when ordered loose' }
     ]
   }
 ];

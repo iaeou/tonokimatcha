@@ -196,29 +196,6 @@ textarea {
   view-transition-name: hall-footer;
 }
 
-/* The ceremony advances with the same blurred circle as the theme swap, grown
-   from the numeral the visitor pressed. Only the step panel is captured, so the
-   rest of the hall stays still while the movement changes. */
-:root[data-view-transition='ceremony'] .ceremony__step {
-  view-transition-name: ceremony-step;
-}
-
-:root[data-view-transition='ceremony']::view-transition-old(ceremony-step) {
-  animation: none;
-}
-
-:root[data-view-transition='ceremony']::view-transition-new(ceremony-step) {
-  animation: circle-blur-reveal 760ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3CradialGradient id='g'%3E%3Cstop offset='55%25' stop-color='white'/%3E%3Cstop offset='100%25' stop-color='white' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='50' fill='url(%23g)'/%3E%3C/svg%3E")
-    var(--reveal-x, 50%) var(--reveal-y, 50%) / 0 0 no-repeat;
-}
-
-/* Only the step is in play; the rest of the page must not cross-fade with it. */
-:root[data-view-transition='ceremony']::view-transition-old(root),
-:root[data-view-transition='ceremony']::view-transition-new(root) {
-  animation: none;
-}
-
 /* A vessel opens: the card's photograph is the same object as the panel's, so
    they share a name and the image morphs from grid to panel. Names are keyed
    per slug — three cards, three independent morphs. The card yields its name
@@ -881,120 +858,178 @@ textarea {
   cursor: pointer;
 }
 
-.ceremony {
+/* The harvest ladder. Its whole job is to make "first flush" mean something to
+   a reader who has never heard the word — so the three we do not sell are
+   named plainly rather than disparaged, and only ours is marked. */
+.harvests {
+  margin-top: var(--space-5);
+  border-top: 1px solid var(--color-line);
+  padding-top: var(--space-4);
+}
+
+.harvests__title {
+  margin: 0;
+  font-size: var(--step-1);
+}
+
+.harvests__lede {
+  margin: 0.8rem 0 0;
+  max-width: 42rem;
+  color: var(--color-muted);
+}
+
+.harvests__list {
+  display: grid;
+  gap: var(--space-3);
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.harvest {
+  border-top: 1px solid var(--color-line);
+  padding-top: var(--space-2);
+}
+
+.harvest--ours {
+  border-top-color: var(--color-gold);
+}
+
+.harvest h5 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin: 0.3rem 0 0.5rem;
+  font-family: var(--font-serif);
+  font-size: var(--step-1);
+  font-weight: 400;
+}
+
+.harvest__when {
+  margin: 0;
+  color: color-mix(in srgb, var(--color-ink) 45%, transparent);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.harvest--ours .harvest__when {
+  color: var(--color-gold);
+}
+
+.harvest__flag {
+  border: 1px solid color-mix(in srgb, var(--color-gold) 60%, transparent);
+  padding: 0.15rem 0.5rem;
+  color: var(--color-gold);
+  font-family: var(--font-sans, inherit);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.harvest__note {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.92rem;
+}
+
+/* The three harvests we do not sell recede, so the ladder reads at a glance
+   without having to call them bad tea. */
+.harvest:not(.harvest--ours) .harvest__note {
+  color: color-mix(in srgb, var(--color-ink) 48%, transparent);
+}
+
+.leaf-panel__link {
+  margin-left: 0.4rem;
+  white-space: nowrap;
+}
+
+.ways {
   display: grid;
   gap: var(--space-4);
   margin-top: var(--space-4);
 }
 
-.ceremony {
-  gap: var(--space-3);
+.way {
+  border-top: 1px solid color-mix(in srgb, var(--color-gold) 42%, transparent);
+  padding-top: var(--space-3);
 }
 
-.ceremony__ways {
+.way__head {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-3);
+  align-items: baseline;
+  gap: 0.6rem var(--space-2);
 }
 
-.ceremony__way {
-  border: 0;
-  border-bottom: 1px solid transparent;
-  background: transparent;
-  padding: 0 0 0.3rem;
-  color: color-mix(in srgb, var(--color-ink) 45%, transparent);
-  cursor: pointer;
-  font-size: 0.72rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  transition:
-    color 220ms var(--ease-ceremony),
-    border-color 220ms var(--ease-ceremony);
-}
-
-.ceremony__way:hover {
-  color: var(--color-ink);
-}
-
-.ceremony__way[aria-pressed='true'] {
-  border-bottom-color: var(--color-gold);
-  color: var(--color-ink);
-}
-
-.ceremony__kicker {
+.way__head h3 {
   margin: 0;
-  max-width: 34rem;
-  color: var(--color-muted);
+  font-size: var(--step-1);
 }
 
-.ceremony__numerals {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  margin: var(--space-2) 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.ceremony__numeral {
-  display: grid;
-  gap: 0.35rem;
-  justify-items: start;
-  border: 0;
-  background: transparent;
-  padding: 0;
-  color: color-mix(in srgb, var(--color-ink) 45%, transparent);
-  cursor: pointer;
-  text-align: left;
-  transition: color 220ms var(--ease-ceremony);
-}
-
-.ceremony__numeral:hover,
-.ceremony__numeral[aria-current='step'] {
-  color: var(--color-ink);
-}
-
-.ceremony__glyph {
-  font-family: var(--font-serif);
-  font-size: var(--step-2);
-  line-height: 1;
-}
-
-.ceremony__numeral[aria-current='step'] .ceremony__glyph {
+/* The cost of the way, before any step is read — the whole point of opening
+   all three at once is that this line is comparable at a glance. */
+.way__effort {
+  margin: 0;
   color: var(--color-gold);
-}
-
-.ceremony__label {
   font-size: 0.72rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
-.ceremony__step {
-  max-width: 40rem;
-  border-top: 1px solid color-mix(in srgb, var(--color-gold) 42%, transparent);
-  padding-top: var(--space-3);
+.way__kicker {
+  margin: 0.8rem 0 0;
+  color: var(--color-ink);
 }
 
-.ceremony__step h3 {
-  margin: 0.35rem 0 0.8rem;
-  font-size: var(--step-2);
+.way__steps {
+  display: grid;
+  gap: var(--space-3);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
 }
 
-.ceremony__japanese {
+.way__step {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-3);
+  align-items: start;
+}
+
+.way__glyph {
   margin: 0;
   color: var(--color-gold);
-  font-size: 0.9rem;
-  letter-spacing: 0.24em;
+  font-family: var(--font-serif);
+  font-size: var(--step-1);
+  line-height: 1;
 }
 
-.ceremony__body {
+.way__step-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin: 0 0 0.35rem;
+  font-size: 0.76rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.way__japanese {
+  color: var(--color-gold);
+  letter-spacing: 0.2em;
+  text-transform: none;
+}
+
+.way__body {
   margin: 0;
   color: var(--color-muted);
 }
 
-.ceremony__mark {
-  margin-top: var(--space-2);
+.way__mark {
+  margin-top: var(--space-3);
   padding-top: 0.7rem;
   border-top: 1px solid var(--color-line);
   color: color-mix(in srgb, var(--color-ink) 52%, transparent);
@@ -1165,6 +1200,18 @@ textarea {
 
   .collection-grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* The three ways stand side by side so their cost lines can be compared
+     without scrolling — that comparison is the argument of the section. */
+  .ways {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-4);
+    align-items: start;
+  }
+
+  .harvests__list {
+    grid-template-columns: repeat(4, 1fr);
   }
 
   .footer {

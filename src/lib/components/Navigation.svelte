@@ -42,11 +42,13 @@
   </a>
   <div class="navigation__actions">
     <nav class="navigation__links" aria-label="Primary navigation">
-      <a href="/#lineage">Lineage</a>
+      <!-- The nav follows the page: leaf, use, shelf, then the heritage. -->
       <a href="/#collection">The Leaf</a>
+      <a href="/#ceremony">How To Use</a>
       <a href="/#vessels">Vessels</a>
+      <a href="/grower">Grower</a>
+      <a href="/#lineage">Lineage</a>
       <a href="/club">Club</a>
-      <a href="/legacy">Legacy</a>
     </nav>
     <ThemeToggle />
   </div>
