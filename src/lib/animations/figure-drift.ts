@@ -22,6 +22,14 @@ export interface FigureDriftOptions {
   yPercentTo: number;
   /** Peak opacity at the center of the section. */
   opacityPeak: number;
+  /**
+   * Where the wipe's edge rests, as a fraction of the figure's height, at
+   * each end of its journey. Past the drawing on both sides so the feathered
+   * band is fully clear of it: stopped at exactly 0 or 1 the soft edge leaves
+   * a sliver of the crown or the feet showing.
+   */
+  wipeFrom: number;
+  wipeTo: number;
 }
 
 export function createFigureDriftOptions(
@@ -41,6 +49,8 @@ export function createFigureDriftOptions(
     // box in ink where a character covered a fraction of it, so the same
     // opacity would read as a much heavier stain behind the copy.
     opacityPeak: 0.05,
+    wipeFrom: -0.16,
+    wipeTo: 1.16,
     ...overrides
   };
 }
@@ -60,7 +70,8 @@ export const figureDrift: Action<HTMLElement> = (node) => {
   node.style.opacity = '0';
 
   if (prefersReducedMotion()) {
-    // Static watermark: present, but it does not travel.
+    // Static watermark: present and whole, but it neither travels nor draws.
+    node.style.setProperty('--figure-wipe', String(opts.wipeTo));
     node.style.opacity = String(opts.opacityPeak * 0.7);
     return {};
   }
@@ -73,7 +84,11 @@ export const figureDrift: Action<HTMLElement> = (node) => {
     if (disposed) return;
 
     gsap.registerPlugin(ScrollTrigger);
-    gsap.set(node, { yPercent: opts.yPercentFrom, opacity: 0 });
+    gsap.set(node, {
+      yPercent: opts.yPercentFrom,
+      opacity: 0,
+      '--figure-wipe': opts.wipeFrom
+    });
 
     const tl = gsap.timeline({
       scrollTrigger: {
@@ -84,8 +99,28 @@ export const figureDrift: Action<HTMLElement> = (node) => {
       }
     });
 
-    tl.to(node, { opacity: opts.opacityPeak, yPercent: 0, ease: 'none', duration: 0.5 });
-    tl.to(node, { opacity: 0, yPercent: opts.yPercentTo, ease: 'none', duration: 0.5 });
+    /**
+     * The figure is drawn onto the hall rather than faded into it. One soft
+     * edge does the whole gesture: it sweeps down from the crown to the feet
+     * to draw the figure in, then rises back from the feet to the crown to
+     * take it away — ink laid on, then lifted off the way it came.
+     *
+     * A single edge, not two. Descending a second edge would have erased the
+     * figure from its head downwards, which is the opposite gesture and looks
+     * like a shutter closing.
+     *
+     * The parallax is on the same halves, so the drawing is still moving
+     * while it is being drawn. Opacity only takes the first and last sliver
+     * of the scrub: fading the whole way as well would flatten the wipe back
+     * into the ordinary dissolve this replaces.
+     */
+    tl.to(node, { '--figure-wipe': opts.wipeTo, ease: 'none', duration: 0.5 }, 0);
+    tl.to(node, { yPercent: 0, ease: 'none', duration: 0.5 }, 0);
+    tl.to(node, { opacity: opts.opacityPeak, ease: 'none', duration: 0.09 }, 0);
+
+    tl.to(node, { '--figure-wipe': opts.wipeFrom, ease: 'none', duration: 0.5 }, 0.5);
+    tl.to(node, { yPercent: opts.yPercentTo, ease: 'none', duration: 0.5 }, 0.5);
+    tl.to(node, { opacity: 0, ease: 'none', duration: 0.09 }, 0.91);
 
     cleanup = () => {
       tl.scrollTrigger?.kill();

@@ -28,3 +28,22 @@ describe('createFigureDriftOptions', () => {
     expect(createFigureDriftOptions({ opacityPeak: 0.1 }).opacityPeak).toBe(0.1);
   });
 });
+
+describe('the wipe', () => {
+  test('rests both edges off the drawing so nothing shows at either end', () => {
+    const { wipeFrom, wipeTo } = createFigureDriftOptions();
+    // Clamped to exactly 0 and 1 the feathered band leaves a sliver of the
+    // crown or the feet visible at rest.
+    expect(wipeFrom).toBeLessThan(0);
+    expect(wipeTo).toBeGreaterThan(1);
+  });
+
+  test('draws downward and lifts back upward, rather than closing like a shutter', () => {
+    const { wipeFrom, wipeTo } = createFigureDriftOptions();
+    // The edge starts above the crown and ends below the feet, and the exit
+    // retraces it. A second edge descending instead would erase the figure
+    // from the head down, which is the opposite gesture.
+    expect(wipeFrom).toBeLessThan(wipeTo);
+    expect(wipeTo - wipeFrom).toBeGreaterThan(1);
+  });
+});

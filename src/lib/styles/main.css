@@ -1295,6 +1295,13 @@ textarea {
 }
 
 .section__figure {
+  /* One soft edge, driven by `figure-drift.ts`. It rests above the drawing, so
+     nothing shows; it sweeps down to draw the figure in, then rises back to
+     lift it off from the feet up. Feathered, so the edge reads as ink being
+     laid down rather than as a shutter. */
+  --figure-wipe: -0.16;
+  --figure-feather: 13%;
+
   position: absolute;
   top: 4%;
   right: clamp(0.5rem, 6vw, 6rem);
@@ -1302,6 +1309,11 @@ textarea {
   height: auto;
   opacity: 0;
   mix-blend-mode: multiply;
+  mask-image: linear-gradient(
+    180deg,
+    black calc(var(--figure-wipe) * 100% - var(--figure-feather)),
+    transparent calc(var(--figure-wipe) * 100%)
+  );
   pointer-events: none;
   user-select: none;
 }
