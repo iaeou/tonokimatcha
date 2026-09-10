@@ -48,21 +48,15 @@ describe('createFigureDriftOptions', () => {
   });
 });
 
-describe('the wipe', () => {
-  test('rests both edges off the drawing so nothing shows at either end', () => {
-    const { wipeFrom, wipeTo } = createFigureDriftOptions();
-    // Clamped to exactly 0 and 1 the feathered band leaves a sliver of the
-    // crown or the feet visible at rest.
-    expect(wipeFrom).toBeLessThan(0);
-    expect(wipeTo).toBeGreaterThan(1);
-  });
-
-  test('draws downward and lifts back upward, rather than closing like a shutter', () => {
-    const { wipeFrom, wipeTo } = createFigureDriftOptions();
-    // The edge starts above the crown and ends below the feet, and the exit
-    // retraces it. A second edge descending instead would erase the figure
-    // from the head down, which is the opposite gesture.
-    expect(wipeFrom).toBeLessThan(wipeTo);
-    expect(wipeTo - wipeFrom).toBeGreaterThan(1);
+describe('staying whole', () => {
+  test('spends most of the hall at full ink, not arriving or leaving', () => {
+    const { fadeShare } = createFigureDriftOptions();
+    // Jaume, 2026-09-10: a figure caught half-drawn reads as a broken image.
+    // The mask wipe that used to draw it on is gone; the fade that replaced it
+    // is even across the whole drawing and has to stay short, or the figure
+    // spends its time on screen in a state of arriving.
+    expect(fadeShare).toBeGreaterThan(0);
+    expect(fadeShare).toBeLessThan(0.25);
+    expect(1 - 2 * fadeShare).toBeGreaterThan(0.6);
   });
 });

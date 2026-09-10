@@ -660,24 +660,18 @@ textarea {
     var(--hero-figure-opacity, 0) * var(--hero-ink) * var(--hero-interlude, 1) *
       var(--hero-figure-ink, 0.85)
   );
-  mix-blend-mode: multiply;
-  /* Two weights again: out towards its own head, where headlines pass, and out
-     towards its left, which is the side copy reaches — the three-column Ways
-     hall runs a column right up to it. Only the outer half stays at strength,
-     and that half hangs off the edge of the screen. */
-  mask-image:
-    linear-gradient(180deg, transparent 0%, black 28%, black 100%),
-    linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.45) 38%, black 72%);
-  mask-composite: intersect;
-  -webkit-mask-composite: source-in;
+  /* Unmasked, like the hall figures: this is the same drawing language, and a
+     figure with its head faded out reads as broken rather than as distant.
+     It hangs far enough off the edge to keep its weight clear of the copy. */
   transition: opacity 80ms linear;
   will-change: opacity;
   pointer-events: none;
 }
 
 :root[data-theme='dark'] .hero__standing-figure {
+  /* The figures carry their own alpha, so inverting the ink is the whole job —
+     there is no paper left to blend away. */
   filter: invert(1);
-  mix-blend-mode: screen;
 }
 
 .hero__image {
@@ -1335,8 +1329,9 @@ textarea {
 /* In the dark hall the ink is inverted to light and screened, so the city is
    drawn out of the void instead of blotting it. */
 :root[data-theme='dark'] .lineage-skyline {
+  /* The figures carry their own alpha, so inverting the ink is the whole job —
+     there is no paper left to blend away. */
   filter: invert(1);
-  mix-blend-mode: screen;
 }
 
 .legacy-seal {
@@ -1499,38 +1494,35 @@ textarea {
   pointer-events: none;
 }
 
-.section__figure {
-  /* One soft edge, driven by `figure-drift.ts`. It rests above the drawing, so
-     nothing shows; it sweeps down to draw the figure in, then rises back to
-     lift it off from the feet up. Feathered, so the edge reads as ink being
-     laid down rather than as a shutter. */
-  --figure-wipe: -0.16;
-  --figure-feather: 13%;
+/* No masks and no blend mode on the drawings. They were wiped in from the
+   crown and thinned on the side the copy reaches, and both readings were the
+   same complaint from Jaume (2026-09-10): a figure half-drawn or half-faded
+   looks like a loading error, not like ink. A figure is whole for as long as
+   it is on screen, and it arrives and leaves by moving and by an even fade —
+   never by being cut. Anything that wants to protect the copy has to do it
+   with position or ink, not by dissolving part of the drawing.
 
+   `mix-blend-mode: multiply` went with the masks. Only ~55% of each scan was
+   pure white; the 250–254 paper around it multiplied into the cream and drew
+   a faint rectangle around every figure — visible the moment the horizontal
+   mask stopped hiding the edge. The webp files now carry real alpha (ink
+   opaque, paper absent), so there is nothing left to blend and no box to
+   show, on any background. */
+.section__figure {
   position: absolute;
   /* The hall's middle, not its top. The scrub peaks when the hall's middle
      crosses the screen's middle, so this is the only anchor that puts the
      drawing in front of the reader at full ink. `figure-drift.ts` carries the
      matching −50% in its transform, since GSAP owns that property. */
   top: 50%;
-  /* Hanging off the right edge. The copy reaches x=1322 in the Ways hall on a
-     1496px screen, and the figure used to sit from 990 — four fifths of it
-     behind a column of text. Now its weight is past the edge and only its
-     softened left shoulder overlaps anything. */
-  right: clamp(-5rem, -3vw, -1rem);
+  /* Hanging further off the right edge than before. With no mask to thin the
+     side the copy reaches, position is the only tool left: the copy runs to
+     x=1322 in the Ways hall on a 1496px screen, so the drawing is pushed out
+     until only its shoulder is behind text. */
+  right: clamp(-9rem, -7vw, -3rem);
   width: clamp(16rem, 36vw, 30rem);
   height: auto;
   opacity: 0;
-  mix-blend-mode: multiply;
-  mask-image:
-    linear-gradient(
-      180deg,
-      black calc(var(--figure-wipe) * 100% - var(--figure-feather)),
-      transparent calc(var(--figure-wipe) * 100%)
-    ),
-    linear-gradient(90deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.62) 34%, black 62%);
-  mask-composite: intersect;
-  -webkit-mask-composite: source-in;
   pointer-events: none;
   user-select: none;
 }
@@ -1538,8 +1530,9 @@ textarea {
 /* In the dark hall the ink is inverted to light and screened, so the figure is
    drawn out of the void instead of blotting it. */
 :root[data-theme='dark'] .section__figure {
+  /* The figures carry their own alpha, so inverting the ink is the whole job —
+     there is no paper left to blend away. */
   filter: invert(1);
-  mix-blend-mode: screen;
 }
 
 .section__inner {
