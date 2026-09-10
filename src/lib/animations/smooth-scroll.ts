@@ -31,6 +31,31 @@ export function shouldEnableSmoothScroll(
 }
 
 /**
+ * The live scroll instance, held so overlays can hold the hall still.
+ *
+ * `syncTouch` is off (see the options above), so on a phone the page scrolls
+ * natively and `lenis.stop()` alone would not hold it: the caller is expected
+ * to lock the document as well. Pausing Lenis is what keeps the wheel, the
+ * keyboard and any running anchor glide from moving the hall behind an open
+ * panel.
+ */
+type PausableScroll = { stop: () => void; start: () => void };
+
+let activeScroll: PausableScroll | null = null;
+
+export function setActiveScroll(instance: PausableScroll | null) {
+  activeScroll = instance;
+}
+
+export function pauseSmoothScroll() {
+  activeScroll?.stop();
+}
+
+export function resumeSmoothScroll() {
+  activeScroll?.start();
+}
+
+/**
  * Initializes Lenis lazily (keeps it out of the initial shell chunk, like the
  * Three/GSAP scene) and wires it to ScrollTrigger. Returns a cleanup function.
  */
@@ -48,6 +73,7 @@ export async function initSmoothScroll(): Promise<() => void> {
   gsap.registerPlugin(ScrollTrigger);
 
   const lenis = new Lenis(createSmoothScrollOptions());
+  setActiveScroll(lenis);
 
   const handleScroll = () => ScrollTrigger.update();
   lenis.on('scroll', handleScroll);
@@ -62,5 +88,6 @@ export async function initSmoothScroll(): Promise<() => void> {
     gsap.ticker.remove(handleTick);
     lenis.off('scroll', handleScroll);
     lenis.destroy();
+    setActiveScroll(null);
   };
 }

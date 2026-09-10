@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { createSmoothScrollOptions, shouldEnableSmoothScroll } from './smooth-scroll';
+import {
+  createSmoothScrollOptions,
+  pauseSmoothScroll,
+  resumeSmoothScroll,
+  setActiveScroll,
+  shouldEnableSmoothScroll
+} from './smooth-scroll';
 
 describe('createSmoothScrollOptions', () => {
   it('lets the GSAP ticker own the RAF loop', () => {
@@ -50,5 +56,26 @@ describe('shouldEnableSmoothScroll', () => {
       return { matches: false };
     });
     expect(received).toBe('(prefers-reduced-motion: reduce)');
+  });
+});
+
+describe('pausing the hall for an overlay', () => {
+  it('stops and starts whichever instance is live', () => {
+    const calls: string[] = [];
+    setActiveScroll({ stop: () => calls.push('stop'), start: () => calls.push('start') });
+
+    pauseSmoothScroll();
+    resumeSmoothScroll();
+
+    expect(calls).toEqual(['stop', 'start']);
+  });
+
+  it('is inert when smooth scroll never started (reduced motion, or SSR)', () => {
+    setActiveScroll(null);
+
+    expect(() => {
+      pauseSmoothScroll();
+      resumeSmoothScroll();
+    }).not.toThrow();
   });
 });

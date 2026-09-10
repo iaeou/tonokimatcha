@@ -29,6 +29,15 @@ body {
   }
 }
 
+/* While the shoji stands open the hall is held still. Lenis is paused from the
+   component, but `syncTouch` is off, so native touch scroll needs the document
+   locked too — otherwise the page slides behind the panel on exactly the
+   devices the panel is for. */
+:root.is-menu-open,
+:root.is-menu-open body {
+  overflow: hidden;
+}
+
 :root.is-rotating-magatama,
 :root.is-rotating-magatama * {
   cursor: grabbing !important;
@@ -136,6 +145,156 @@ textarea {
   font-size: 0.78rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+/* The door handle. Same round stone as the theme circle so the two read as a
+   pair, with two drawn strokes instead of the usual three — and they fold into
+   a cross while the door is open, so the button says what it will do next. */
+.nav-handle {
+  position: relative;
+  display: inline-grid;
+  width: 2.35rem;
+  height: 2.35rem;
+  place-items: center;
+  gap: 0.34rem;
+  grid-auto-flow: row;
+  border: 1px solid var(--color-line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-void) 68%, transparent);
+  color: var(--color-ink);
+  cursor: pointer;
+  transition: border-color 220ms var(--ease-ceremony);
+}
+
+.nav-handle__stroke {
+  display: block;
+  width: 1.05rem;
+  height: 1px;
+  background: var(--color-ink);
+  transition: transform 420ms var(--ease-ceremony);
+}
+
+/* Each stroke travels half the gap back to the centre and then turns: the two
+   lines become one cross without either leaving the stone. */
+.nav-handle--open .nav-handle__stroke:first-child {
+  transform: translateY(0.175rem) rotate(45deg);
+}
+
+.nav-handle--open .nav-handle__stroke:last-child {
+  transform: translateY(-0.175rem) rotate(-45deg);
+}
+
+/* The shoji itself: a screen that slides in from the right and stops short of
+   nothing — it covers the hall. Paper ground, faint lattice, and a leading
+   edge that carries a shadow so the panel reads as a door in front of the room
+   rather than a colour change. z-index 9 keeps it under the header (10), so the
+   brand, the theme circle and the handle stay lit across the slide. */
+.nav-shoji {
+  position: fixed;
+  inset: 0;
+  z-index: 9;
+  visibility: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-left: 1px solid var(--color-line);
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent calc(33.333% - 1px),
+      var(--color-line) calc(33.333% - 1px),
+      var(--color-line) 33.333%
+    ),
+    linear-gradient(200deg, color-mix(in srgb, var(--color-moss) 34%, transparent), transparent 62%),
+    var(--color-void);
+  box-shadow: -1.5rem 0 3.5rem -1rem rgba(0, 0, 0, 0.22);
+  transform: translateX(100%);
+  transition:
+    transform 640ms var(--ease-ceremony),
+    visibility 0s linear 640ms;
+}
+
+.nav-shoji--open {
+  visibility: visible;
+  transform: translateX(0);
+  transition:
+    transform 640ms var(--ease-ceremony),
+    visibility 0s linear 0s;
+}
+
+/* Clear of the header, and the copy sits low in the screen where a thumb
+   reaches rather than centred where it cannot. */
+.nav-shoji__inner {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--space-4);
+  padding: calc(2.25rem + var(--space-3) * 2 + var(--space-4)) var(--space-3) var(--space-5);
+}
+
+.nav-shoji__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.nav-shoji__label {
+  margin: 0;
+}
+
+.nav-shoji__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* A hairline under each name, the same rule the halls are ruled with, so the
+   list reads as a ledger of rooms. */
+.nav-shoji__item {
+  border-bottom: 1px solid var(--color-line);
+}
+
+.nav-shoji__link {
+  display: block;
+  padding: var(--space-2) 0;
+  color: var(--color-ink);
+  font-family: var(--font-serif);
+  font-size: var(--step-1);
+  line-height: 1.1;
+}
+
+/* Label and names arrive behind the door's edge, one after another, each
+   carrying its own delay off `--i`. They leave together the moment the screen
+   starts back, so nothing lingers over a closing door. */
+.nav-shoji__label,
+.nav-shoji__item {
+  opacity: 0;
+  transform: translateX(1.5rem);
+  transition:
+    opacity 380ms var(--ease-ceremony),
+    transform 520ms var(--ease-ceremony);
+}
+
+.nav-shoji--open .nav-shoji__label,
+.nav-shoji--open .nav-shoji__item {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay: calc(var(--i, 0) * 55ms + 180ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-shoji,
+  .nav-shoji__label,
+  .nav-shoji__item,
+  .nav-handle__stroke {
+    transition-duration: 1ms;
+  }
+
+  .nav-shoji--open .nav-shoji__label,
+  .nav-shoji--open .nav-shoji__item {
+    transition-delay: 0s;
+  }
 }
 
 /* Theme swap: a blurred circle grows from the toggle and reveals the new theme.
@@ -1281,6 +1440,11 @@ textarea {
 
   .navigation__links {
     display: flex;
+  }
+
+  .nav-handle,
+  .nav-shoji {
+    display: none;
   }
 
   .hero,
