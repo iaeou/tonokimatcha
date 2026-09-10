@@ -205,7 +205,10 @@
   <Ceremony />
 </Section>
 
-<Section id="vessels" eyebrow="The Vessels" title="Three Presentations" figure="oriental">
+<!-- The one filmed hall, for now. Its right side is the most open on the page —
+     the copy stops at x=967 of 1496 — so the drawing can move without moving
+     under anyone's reading. -->
+<Section id="vessels" eyebrow="The Vessels" title="Three Presentations" figure="oriental" filmed>
   <p class="vessels-lede">
     The tea does not change. Only the vessel that carries it to the bowl.
   </p>

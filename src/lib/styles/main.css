@@ -1508,7 +1508,10 @@ textarea {
    mask stopped hiding the edge. The webp files now carry real alpha (ink
    opaque, paper absent), so there is nothing left to blend and no box to
    show, on any background. */
-.section__figure {
+/* The stage is what moves: the parallax and the fade live here, so a hall's
+   drawing can be a still, a film, or a still that becomes a film, without any
+   of them owning the motion. */
+.section__figure-stage {
   position: absolute;
   /* The hall's middle, not its top. The scrub peaks when the hall's middle
      crosses the screen's middle, so this is the only anchor that puts the
@@ -1521,17 +1524,47 @@ textarea {
      until only its shoulder is behind text. */
   right: clamp(-9rem, -7vw, -3rem);
   width: clamp(16rem, 36vw, 30rem);
-  height: auto;
   opacity: 0;
   pointer-events: none;
   user-select: none;
 }
 
-/* In the dark hall the ink is inverted to light and screened, so the figure is
-   drawn out of the void instead of blotting it. */
-:root[data-theme='dark'] .section__figure {
-  /* The figures carry their own alpha, so inverting the ink is the whole job —
-     there is no paper left to blend away. */
+.section__figure {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* The film lies exactly over its own still and fades in only once the GPU has
+   a frame to show, so a slow connection or a refused autoplay leaves the
+   drawing standing rather than a hole. Its aspect is the still's, and the
+   encode is framed to match. */
+.section__figure-film {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 700ms var(--ease-ceremony);
+}
+
+.section__figure-film[data-painting='true'] {
+  opacity: 1;
+}
+
+/* Once the film is up the still beneath would only darken it — two copies of
+   the same ink at the same opacity read as one heavier drawing. */
+.section__figure-stage:has(.section__figure-film[data-painting='true']) .section__figure {
+  opacity: 0;
+  transition: opacity 700ms var(--ease-ceremony);
+}
+
+/* In the dark hall the ink is inverted, so the figure is drawn out of the void
+   instead of blotting it. Both the still and the film carry their own alpha —
+   the film's is derived on the GPU — so inverting is the whole job; there is no
+   paper left to blend away. */
+:root[data-theme='dark'] .section__figure,
+:root[data-theme='dark'] .section__figure-film {
   filter: invert(1);
 }
 
