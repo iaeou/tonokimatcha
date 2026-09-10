@@ -1508,17 +1508,29 @@ textarea {
   --figure-feather: 13%;
 
   position: absolute;
-  top: 4%;
-  right: clamp(0.5rem, 6vw, 6rem);
-  width: clamp(14rem, 32vw, 26rem);
+  /* The hall's middle, not its top. The scrub peaks when the hall's middle
+     crosses the screen's middle, so this is the only anchor that puts the
+     drawing in front of the reader at full ink. `figure-drift.ts` carries the
+     matching −50% in its transform, since GSAP owns that property. */
+  top: 50%;
+  /* Hanging off the right edge. The copy reaches x=1322 in the Ways hall on a
+     1496px screen, and the figure used to sit from 990 — four fifths of it
+     behind a column of text. Now its weight is past the edge and only its
+     softened left shoulder overlaps anything. */
+  right: clamp(-5rem, -3vw, -1rem);
+  width: clamp(16rem, 36vw, 30rem);
   height: auto;
   opacity: 0;
   mix-blend-mode: multiply;
-  mask-image: linear-gradient(
-    180deg,
-    black calc(var(--figure-wipe) * 100% - var(--figure-feather)),
-    transparent calc(var(--figure-wipe) * 100%)
-  );
+  mask-image:
+    linear-gradient(
+      180deg,
+      black calc(var(--figure-wipe) * 100% - var(--figure-feather)),
+      transparent calc(var(--figure-wipe) * 100%)
+    ),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.62) 34%, black 62%);
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
   pointer-events: none;
   user-select: none;
 }

@@ -18,10 +18,29 @@ describe('createFigureDriftOptions', () => {
     expect(yPercentTo - yPercentFrom).toBeGreaterThan(150);
   });
 
-  test('sits lighter than a single character did', () => {
-    // The drawings carry roughly a quarter of their box in ink; the kanji they
-    // replaced carried far less, so inheriting its 0.07 would stain the copy.
-    expect(createFigureDriftOptions().opacityPeak).toBeLessThan(0.07);
+  test('stays a watermark, however much headroom the mask buys', () => {
+    // It sat at 0.05 while the drawing overlapped a column of copy, and was
+    // present without being seen. Hanging it off the right edge behind a
+    // horizontal mask bought the headroom to raise it — but a figure that
+    // competes with the writing is a picture, not a watermark, so there is
+    // still a ceiling.
+    const { opacityPeak } = createFigureDriftOptions();
+    expect(opacityPeak).toBeGreaterThan(0.07);
+    expect(opacityPeak).toBeLessThan(0.16);
+  });
+
+  test('centres the figure on the hall it belongs to', () => {
+    const { anchorYPercent, travelYPercent, yPercentFrom, yPercentTo } =
+      createFigureDriftOptions();
+
+    // The travel is symmetric about the anchor, so the midpoint of the scrub —
+    // where the ink peaks — leaves the figure exactly on it. Drop the anchor
+    // and the peak wanders off the top of the screen, which is the bug this
+    // replaced.
+    expect((yPercentFrom + yPercentTo) / 2).toBe(anchorYPercent);
+    expect(yPercentTo - yPercentFrom).toBe(travelYPercent);
+    // −50% of its own height is what centres a `top: 50%` element.
+    expect(anchorYPercent).toBe(-50);
   });
 
   test('accepts overrides', () => {

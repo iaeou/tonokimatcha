@@ -16,6 +16,15 @@ import { prefersReducedMotion } from './typography-reveal';
  */
 
 export interface FigureDriftOptions {
+  /**
+   * The transform that puts the figure's middle on its anchor. The figure is
+   * placed at `top: 50%` of the hall, so it needs pulling back by half its own
+   * height — and because GSAP drives the same transform property, the offset
+   * has to live here rather than in a CSS `translateY`.
+   */
+  anchorYPercent: number;
+  /** How far the figure travels across the hall, in its own heights. */
+  travelYPercent: number;
   /** yPercent at section entry (the figure sits high, mostly hidden). */
   yPercentFrom: number;
   /** yPercent at section exit (has drifted down past the headline). */
@@ -35,20 +44,39 @@ export interface FigureDriftOptions {
 export function createFigureDriftOptions(
   overrides: Partial<FigureDriftOptions> = {}
 ): FigureDriftOptions {
+  /**
+   * The scrub runs from the hall's top reaching the bottom of the screen to
+   * its bottom reaching the top, so the ink peaks exactly when the hall's
+   * middle crosses the middle of the screen. Anchoring the figure to that
+   * middle is what puts the peak in front of the reader.
+   *
+   * It used to hang at 4% of the hall's height — inherited from the kanji,
+   * when a hall was about one screen tall. The halls are now twice that, and
+   * measured on the page the figure's top sat 361px *above* the viewport at
+   * full ink: barely a third of the drawing was on screen, and what showed
+   * were its feet. That is the "descoordinado" — the drawing did its whole
+   * performance where nobody was looking.
+   */
+  const anchorYPercent = -50;
+  const travelYPercent = 250;
+
   return {
-    // Parallax, and deliberately overstated. The holder scrolls with the hall;
-    // this pushes the figure the other way as it goes, so the figure lags the
-    // page and reads as standing well behind it. The kanji travelled 24% of
-    // their own height and the first pass 92%, both of which read as a nudge
-    // rather than as depth — a hall is roughly a screen tall, so the figure
-    // has to travel a comparable distance to look like it is on another plane.
-    // Spilling past the hall's bounds is harmless: opacity is 0 at both ends.
-    yPercentFrom: -125,
-    yPercentTo: 125,
-    // Lower than the kanji's 0.07: these drawings cover a quarter of their
-    // box in ink where a character covered a fraction of it, so the same
-    // opacity would read as a much heavier stain behind the copy.
-    opacityPeak: 0.05,
+    anchorYPercent,
+    travelYPercent,
+    yPercentFrom: anchorYPercent - travelYPercent / 2,
+    yPercentTo: anchorYPercent + travelYPercent / 2,
+    // Parallax, and deliberately overstated: the holder scrolls with the hall
+    // and this pushes the figure the other way, so it lags the page and reads
+    // as standing well behind it. Measured at a 0.75 ratio — the page travels
+    // 1833px while the figure travels 1373px on screen. Spilling past the
+    // hall's bounds is harmless: the wipe has closed at both ends.
+    //
+    // Heavier than the 0.05 it replaced. At that value, and behind a drawing
+    // whose own ink is thin lines rather than solid mass, the figures were
+    // there but not *seen*. The horizontal mask is what buys the headroom:
+    // the strong half of the drawing hangs off the right edge, clear of the
+    // copy, so the ink can be raised without being read through.
+    opacityPeak: 0.11,
     wipeFrom: -0.16,
     wipeTo: 1.16,
     ...overrides
