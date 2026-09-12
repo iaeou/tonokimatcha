@@ -6,8 +6,8 @@
   // about Matcha Tonoki's own handling belongs on this page — this hall is
   // about the field, not about us.
   const field = [
-    { label: 'Grower', value: 'Kagoshima Horiguchi Seicha' },
-    { label: 'Place', value: 'Shibushi, Ōsumi peninsula, Kagoshima' },
+    { label: 'Grower', value: 'Horiguchi Seicha' },
+    { label: 'Place', value: 'Kagoshima' },
     { label: 'Under management', value: '≈300 ha — 120 owned, 180 affiliated' },
     { label: 'Cultivation', value: 'IPM — water, wind and rice bran in place of pesticides' },
     { label: 'Tencha mill', value: '“T-Pole”, dedicated to the leaf that becomes matcha' },
@@ -19,7 +19,7 @@
   <title>The Grower — Matcha Tonoki</title>
   <meta
     name="description"
-    content="Matcha Tonoki comes from one grower: Kagoshima Horiguchi Seicha, in Shibushi on the Ōsumi peninsula, where roughly 300 hectares are farmed without pesticides under an IPM regime."
+    content="Matcha Tonoki comes from one grower: Horiguchi Seicha, in Kagoshima, where roughly 300 hectares are farmed without pesticides under an IPM regime."
   />
 </svelte:head>
 
@@ -27,14 +27,13 @@
   id="field"
   className="heritage-section"
   eyebrow="The Grower"
-  title="Kagoshima Horiguchi Seicha"
+  title="Horiguchi Seicha"
   figure="oriental"
 >
   <div class="narrative-grid">
     <p>
       One tea means one grower. Matcha Tonoki does not blend across farms or seasons, so the whole
-      of what we sell rests on a single field in Shibushi, on the Ōsumi peninsula at the southern
-      end of Kyūshū.
+      of what we sell rests on a single field in Kagoshima, at the southern end of Kyūshū.
     </p>
     <p>
       Kagoshima sits far enough south that its season opens weeks before the rest of Japan. Warmth
@@ -43,7 +42,7 @@
       cold night in April can take the first flush away entirely.
     </p>
     <p>
-      Horiguchi has been growing tea on this peninsula for around seventy-five years, beginning
+      Horiguchi has been growing tea in Kagoshima for around seventy-five years, beginning
       after the war with black tea. Today they manage roughly three hundred hectares: a hundred and
       twenty of their own and a hundred and eighty belonging to affiliated farmers they have grown
       alongside for decades.
@@ -107,7 +106,7 @@
       target="_blank"
       rel="noopener noreferrer"
     >
-      Visit Kagoshima Horiguchi Seicha
+      Visit Horiguchi Seicha
       <span aria-hidden="true">↗</span>
       <span class="visually-hidden">(opens in a new tab)</span>
     </a>

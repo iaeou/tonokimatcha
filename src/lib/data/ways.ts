@@ -40,7 +40,7 @@ export const ways: Way[] = [
         numeral: '一',
         name: 'Pour',
         japanese: '注ぐ',
-        body: 'Empty one 2 g sachet into a 33 cl bottle of cold water. No sieve, no bowl, no whisk.'
+        body: 'Empty one 2 g sachet into a 15-75cl bottle of cold water. No sieve, no bowl, no whisk.'
       },
       {
         numeral: '二',
@@ -60,26 +60,26 @@ export const ways: Way[] = [
   {
     id: 'hot',
     label: 'Hot',
-    effort: '15 seconds · a thermos',
-    kicker: 'The same gesture with hot water. One rule only: not boiling.',
+    effort: 'One minute · standard cutlery',
+    kicker: 'Warm matcha without the ritual. One rule only: not boiling.',
     steps: [
       {
         numeral: '一',
         name: 'Fill',
         japanese: '湯を注ぐ',
-        body: 'About 33 cl of hot water into an insulated bottle, near 80 °C. Boiling water scorches the leaf and turns it bitter. Leave a few centimetres of air.'
+        body: 'Hot water into a cup or mug, near 80 °C. Boiling water scorches the leaf and turns it bitter.'
       },
       {
         numeral: '二',
-        name: 'Shake',
-        japanese: '振る',
-        body: 'Add one 2 g sachet, close it, hold the cap down and shake about fifteen seconds. Same test as the cold way.'
+        name: 'Mix',
+        japanese: '混ぜる',
+        body: 'Add one 2 g sachet and mix briskly. It is easy if you have a chasen (bamboo whisk), but also doable using standard cutlery.'
       },
       {
         numeral: '三',
         name: 'Drink',
         japanese: '飲む',
-        body: 'Warm, from the bottle. Insulated it stays drinkable for hours, so it travels as well as the cold one.'
+        body: 'Warm, straight from the cup. Drink while fresh, before the leaf begins to settle.'
       }
     ],
     mark: 'Best within the hour'

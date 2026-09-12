@@ -15,9 +15,9 @@
     description:
       'One tea only, and it is the top of the tree: organic ichibancha, the first flush, picked once a year and never cut with a later harvest. There is no second tier beneath it because we do not sell one.',
     origin:
-      'It comes from one grower — Kagoshima Horiguchi Seicha, in Shibushi at the southern end of Japan, where the season opens weeks before the rest of the country and the fields are worked without pesticides.',
+      'It comes from one grower — Horiguchi Seicha, in Kagoshima at the southern end of Japan, where the season opens weeks before the rest of the country and the fields are worked without pesticides.',
     marks: [
-      { label: 'Grower', value: 'Kagoshima Horiguchi Seicha' },
+      { label: 'Grower', value: 'Horiguchi Seicha' },
       { label: 'Harvest', value: 'Ichibancha — first flush, once a year' },
       { label: 'Cultivation', value: 'Organic, shade-grown, IPM' },
       { label: 'Milling', value: 'Granite stone, 30 g per hour' },
