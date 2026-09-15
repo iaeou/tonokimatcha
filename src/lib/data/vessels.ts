@@ -64,7 +64,7 @@ export const vessels: Vessel[] = [
       'One bowl, sealed at the mill. Individual foil sachet that protects the leaf from light and air until the moment of service.',
     note: 'Loose from one hundred sachets — ask us. Otherwise it travels inside the tube.',
     image: '/images/packaging/matchatonoki-sachet-2g.webp',
-    alt: 'An open Matcha Tonoki tube with four 2 gram sachets laid beside it',
+    alt: 'A dark stone bowl holding several dozen Matcha Tonoki 2 gram sachets, standing upright',
     marks: [
       { label: 'Contents', value: '2 g — one bowl of usucha' },
       { label: 'Material', value: 'Triple-layer foil, nitrogen flushed' },
