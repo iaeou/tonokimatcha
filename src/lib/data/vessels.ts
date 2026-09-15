@@ -31,7 +31,7 @@ export const vessels: Vessel[] = [
     description:
       'Twenty-five single servings held in a seamless paper tube. The travelling form: a month of ceremony, carried without ceremony.',
     image: '/images/packaging/matchatonoki-tube-25.webp',
-    alt: 'The closed Matcha Tonoki paper tube, labelled and sealed',
+    alt: 'An open Matcha Tonoki paper tube, its lid set beside it and four 2 gram sachets laid in front',
     marks: [
       { label: 'Contents', value: '25 × 2 g sachets — 50 g' },
       { label: 'Material', value: 'Seamless uncoated paper, foil-lined' },
@@ -64,7 +64,7 @@ export const vessels: Vessel[] = [
       'One bowl, sealed at the mill. Individual foil sachet that protects the leaf from light and air until the moment of service.',
     note: 'Loose from one hundred sachets — ask us. Otherwise it travels inside the tube.',
     image: '/images/packaging/matchatonoki-sachet-2g.webp',
-    alt: 'A dark stone bowl holding several dozen Matcha Tonoki 2 gram sachets, standing upright',
+    alt: 'A pale ceramic bowl filled with Matcha Tonoki 2 gram sachets, standing upright',
     marks: [
       { label: 'Contents', value: '2 g — one bowl of usucha' },
       { label: 'Material', value: 'Triple-layer foil, nitrogen flushed' },

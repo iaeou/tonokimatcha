@@ -52,3 +52,30 @@ reusing it later; the visible composition is the same either way.
 `npm run check` 0 errors (the two standing `dot`/`ring` warnings in
 `CursorPointer.svelte`), `npm test` 142 passed / 1 skipped, `npm run build`
 clean. Visual acceptance is Jaume's, on `npm run dev`.
+
+---
+
+# Same day, second round — the tube too, and the bowl re-shot
+
+Jaume came back with two more frames from the same session:
+
+- **The Vessel (tube)** — the tube open, its lid set beside it, four sticks laid
+  in front. It replaces the closed, sealed tube. Arrived **1086 × 1448**, the
+  house size exactly, so it is committed as delivered: no crop, no re-encode,
+  no generation loss.
+- **The Single Serving** — the same bowl composition as this morning but in a
+  **pale ceramic bowl** rather than the dark stone one. Landscape again
+  (1448 × 1086), so it went through `reframe-sachet-2026-09-15.py` unchanged.
+  Only the measured subject box moved: `SX1` 1230 → **1240**, the new bowl's
+  rim reaching a few pixels further right. 57 KB.
+
+Both alt texts follow their photographs: the tube's says open with the lid
+beside it, the bowl's says pale ceramic rather than dark stone.
+
+Note for whoever shoots next: **the tube and the bowl share a ground, and the
+pouch does not.** A and C now sit on the same warm beige from one session; B is
+still the cooler, lighter sample from August. On the shelf the three read as
+one set at a glance, but side by side the pouch's ground is visibly a different
+paper. Not fixed here — it wants a re-shoot of B, not a colour grade of B.
+
+Verified again after the swap: check 0 errors, 142 tests, build clean.
