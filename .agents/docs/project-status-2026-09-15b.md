@@ -67,18 +67,31 @@ curl's default `Accept: */*` negotiates to JSON and will fool you):
 `npm test` 155 passed / 1 skipped (13 new), `npm run check` 0 errors (the two
 standing `CursorPointer` warnings), `npm run build` clean.
 
-## What Jaume has to do, in this order
+## Configured and verified live (same day)
 
-1. Run `.agents/docs/request-form-supabase-2026-09-15.sql` in the SQL editor of
-   project `yytzsqvphsdjlwlgkapl`. It is idempotent.
-2. Set in Vercel (Project → Settings → Environment Variables), for Production
-   **and** Preview: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`. Names must not
-   start with `PUBLIC_` — SvelteKit ships those to the browser.
-3. Optional, for the doorbell: `RESEND_API_KEY`, `REQUEST_NOTIFY_TO`,
-   `REQUEST_NOTIFY_FROM` (an address on a domain verified in Resend).
-4. Only then push. Without step 2 the live form answers 500 on every send.
+All of it is done, and done from the terminal rather than by hand:
 
-`.env.example` carries the same list for local work.
+- **Table**: applied through the Supabase MCP server (project
+  `yytzsqvphsdjlwlgkapl`) as migration `create_requests_table`. The security
+  advisor reports exactly one notice, `rls_enabled_no_policy` at INFO — that is
+  the design, not a gap.
+- **Vercel**: CLI installed and signed in on Jaume's Mac, project linked to
+  `jasubals-projects/tonokimatcha`. `SUPABASE_URL` as Config, and
+  `SUPABASE_SERVICE_ROLE_KEY` as a Secret, both on Production, Preview and
+  Development. The key was piped in over stdin from a file that was deleted
+  straight after, so it never entered a chat, a shell history or a process
+  list. Note `vercel env ls` prints the ciphertext of a Config value — to see
+  what a deploy actually gets, `vercel env pull`.
+- **Live check** against matchatonoki.com/request after the deploy: bad email
+  and a two-letter request → 400 with both messages; a complete request → the
+  receipt, and exactly one row in the table with the phone and business filled;
+  a filled honeypot → the same receipt and no row. The two test rows were
+  deleted afterwards; the table is empty.
+
+**The doorbell is not wired.** `RESEND_API_KEY`, `REQUEST_NOTIFY_TO` and
+`REQUEST_NOTIFY_FROM` are unset, which is a supported state: requests land in
+the table and nobody is told. Until they are set, the table is the inbox —
+`select * from public.requests where status = 'new' order by created_at desc`.
 
 ## Open
 
