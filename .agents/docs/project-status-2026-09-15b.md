@@ -113,10 +113,11 @@ destination from years back, so no confirmation email was needed.
 Region `eu-west-1`, so the mail stays in the EU like the Supabase project.
 
 **Verified end to end** on the deployed site: a request through the live form
-returned the receipt, and Resend reports the notification `delivered` to
+returned the receipt, Resend reported the notification `delivered` to
 `request@matchatonoki.com`, from `Matcha Tonoki <request@send.matchatonoki.com>`,
-subject `Request — <business>`. Hitting reply answers the visitor, not the
-robot: `reply_to` carries their address.
+subject `Request — <business>` — and **Jaume confirmed it arrived in his inbox**,
+which is the only step neither API can attest to. Hitting reply answers the
+visitor, not the robot: `reply_to` carries their address.
 
 A local `dig` was useless throughout — Jaume's network answers DNS from a
 different source than the one queried ("reply from unexpected source"). Check
@@ -128,9 +129,10 @@ notification ever stops arriving, requests keep landing in
 
 ## Open
 
-- **No contact address anywhere on the site.** When the form fails there is
-  nothing to fall back to — "try again in a moment" is all the visitor gets. An
-  address in the footer would also give the failure an escape hatch.
+- **The site still shows no contact address**, though one now exists:
+  `request@matchatonoki.com` reaches Jaume. Nothing on the page says so, so when
+  the form fails the visitor still gets only "try again in a moment". Putting it
+  in the footer costs one line and gives the failure an escape hatch.
 - The privacy copy in `/legacy#privacy` was updated to name the email and phone
   the form now collects, but it is still Jaume's provisional text, not a
   lawyer's. It does not name a data controller, a retention period, or a legal
