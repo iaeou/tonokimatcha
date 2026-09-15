@@ -101,9 +101,15 @@ email never does. Required: name, email, request. Optional: phone, business.
   validation, tested) and `request-inbox.ts` (Supabase + Resend). Shared
   field limits are in `src/lib/data/request-fields.ts`, because a component
   may not import from `$lib/server`.
-- Env: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, and optionally
-  `SUPABASE_REQUESTS_TABLE`, `RESEND_API_KEY`, `REQUEST_NOTIFY_TO`,
-  `REQUEST_NOTIFY_FROM`. Never prefixed `PUBLIC_`. See `.env.example`.
+- Env (all set in Vercel for Production, Preview and Development):
+  `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`,
+  `REQUEST_NOTIFY_TO`, `REQUEST_NOTIFY_FROM`; `SUPABASE_REQUESTS_TABLE` is
+  optional. Never prefixed `PUBLIC_`. See `.env.example`.
+- Mail: notifications go to `request@matchatonoki.com` (Cloudflare Email
+  Routing → Jaume's Gmail) and are sent from `request@send.matchatonoki.com`
+  (Resend, eu-west-1). The sending domain is a **subdomain on purpose** —
+  Email Routing owns the root's MX and SPF, and verifying the root in Resend
+  would collide with it.
 - RLS is on with no policies: only the service-role key writes. Do not add an
   anon insert policy.
 - Table DDL: `.agents/docs/request-form-supabase-2026-09-15.sql`. Detail and

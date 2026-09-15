@@ -88,10 +88,43 @@ All of it is done, and done from the terminal rather than by hand:
   a filled honeypot → the same receipt and no row. The two test rows were
   deleted afterwards; the table is empty.
 
-**The doorbell is not wired.** `RESEND_API_KEY`, `REQUEST_NOTIFY_TO` and
-`REQUEST_NOTIFY_FROM` are unset, which is a supported state: requests land in
-the table and nobody is told. Until they are set, the table is the inbox —
-`select * from public.requests where status = 'new' order by created_at desc`.
+## The doorbell, wired the same day
+
+`request@matchatonoki.com` → Jaume's Gmail, and the form sends from
+`request@send.matchatonoki.com`. Two addresses that read alike and do opposite
+things, because **Cloudflare Email Routing only receives** — it cannot send, so
+the From needs a sending provider regardless.
+
+**Why the sending address lives on a subdomain.** Email Routing takes over the
+root's MX and writes the root SPF. Verifying `matchatonoki.com` itself in Resend
+would have put two sets of records in the same place, which is how half your
+mail starts disappearing. `send.matchatonoki.com` keeps Resend's DKIM, SPF and
+bounce MX in their own subtree; the root keeps Cloudflare's. Neither knows about
+the other. (The record names read oddly — `send.send`, `rsend.send` — because
+the subdomain is already called `send`. They are correct.)
+
+Set up from the terminal with two scoped credentials, both deleted after use: a
+Cloudflare token limited to this zone (DNS:Edit + Email Routing Rules:Edit) and
+a Resend full-access key. What the zone token could **not** do: enable Email
+Routing on the zone, or add a destination address — those are account-level and
+were done in the dashboard. `jaume.subirats@gmail.com` was already a verified
+destination from years back, so no confirmation email was needed.
+
+Region `eu-west-1`, so the mail stays in the EU like the Supabase project.
+
+**Verified end to end** on the deployed site: a request through the live form
+returned the receipt, and Resend reports the notification `delivered` to
+`request@matchatonoki.com`, from `Matcha Tonoki <request@send.matchatonoki.com>`,
+subject `Request — <business>`. Hitting reply answers the visitor, not the
+robot: `reply_to` carries their address.
+
+A local `dig` was useless throughout — Jaume's network answers DNS from a
+different source than the one queried ("reply from unexpected source"). Check
+propagation over DoH instead: `curl "https://dns.google/resolve?name=…&type=TXT"`.
+
+The table is still the durable record; the email is only the doorbell. If the
+notification ever stops arriving, requests keep landing in
+`public.requests` — `select * from public.requests where status = 'new'`.
 
 ## Open
 
