@@ -91,6 +91,24 @@ The project is now a working SvelteKit baseline with:
 - Ceremonial cursor trail: `CursorTrail.svelte` fixed-canvas overlay + pure logic in `cursor-trail.ts` — gold ink motes dissolve behind fine pointers; disabled for touch and reduced motion.
 - The latest visual reference is `.agents/docs/magatama-reference-geometry-2026-05-26.jpg`; older transient WebGL screenshots were removed to keep the agent docs focused.
 
+## The Request Form (2026-09-15)
+
+`/request` posts to a real server action. Supabase (`public.requests`) is the
+record and an optional Resend email is the doorbell; the insert throws, the
+email never does. Required: name, email, request. Optional: phone, business.
+
+- Server-only code lives in `src/lib/server/` — `request-form.ts` (pure
+  validation, tested) and `request-inbox.ts` (Supabase + Resend). Shared
+  field limits are in `src/lib/data/request-fields.ts`, because a component
+  may not import from `$lib/server`.
+- Env: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, and optionally
+  `SUPABASE_REQUESTS_TABLE`, `RESEND_API_KEY`, `REQUEST_NOTIFY_TO`,
+  `REQUEST_NOTIFY_FROM`. Never prefixed `PUBLIC_`. See `.env.example`.
+- RLS is on with no policies: only the service-role key writes. Do not add an
+  anon insert policy.
+- Table DDL: `.agents/docs/request-form-supabase-2026-09-15.sql`. Detail and
+  the verification log: `project-status-2026-09-15b.md`.
+
 ## Known Local Development Note
 
 Only ever run **one** dev server on port 5173. Two at once serve the HTML from one instance and the client modules from the other; the bundle then fails to load and every effect dies together — cursor, GSAP, Lenis, transitions — with nothing wrong in the source. If the site suddenly looks inert, check `lsof -ti:5173` before suspecting the code, and start with `--strictPort` so a collision is loud rather than silent.

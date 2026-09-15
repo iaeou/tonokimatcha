@@ -73,9 +73,10 @@
 <Section id="privacy" eyebrow="The Guardian" title="Privacy" figure="wa">
   <div class="narrative-grid">
     <p>
-      An admission request carries three things: a name, an institution, and the ceremony you
-      intend. They are read by a guardian and kept to review the request. Nothing is sold, and
-      nothing is passed to a third party for advertising.
+      A request carries what you type into the form: a name, an email address, and what you
+      need — and a phone number and a business name if you choose to give them. They are read by
+      a guardian and kept to answer and to review the request. Nothing is sold, and nothing is
+      passed to a third party for advertising.
     </p>
     <p>
       Write to the house to ask what is held about you, to correct it, or to have it removed. A

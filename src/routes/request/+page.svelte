@@ -1,6 +1,12 @@
 <script lang="ts">
   import MembershipForm from '$lib/components/MembershipForm.svelte';
   import Section from '$lib/components/Section.svelte';
+  import type { ActionData } from './$types';
+
+  // The action's reply. SvelteKit hands it to the page, and the page hands it
+  // to the form: the component stays a component and does not reach into the
+  // route it happens to be standing in.
+  let { form }: { form: ActionData } = $props();
 </script>
 
 <svelte:head>
@@ -29,5 +35,5 @@
     </p>
   </div>
 
-  <MembershipForm />
+  <MembershipForm result={form} />
 </Section>

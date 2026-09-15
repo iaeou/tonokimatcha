@@ -1372,10 +1372,22 @@ textarea {
   margin-top: var(--space-4);
 }
 
-.membership-form label {
+.membership-form__field {
   display: grid;
   gap: var(--space-1);
+}
+
+.membership-form label {
   color: var(--color-muted);
+}
+
+/* Said quietly and inside the label, rather than marking the three required
+   ones: two words are less noise than three asterisks. */
+.membership-form__optional {
+  color: color-mix(in srgb, var(--color-ink) 44%, transparent);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
 }
 
 .membership-form input,
@@ -1388,6 +1400,65 @@ textarea {
   padding: 0.9rem 1rem;
 }
 
+.membership-form input:focus-visible,
+.membership-form textarea:focus-visible {
+  outline: 1px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+/* The browser paints its own pink on :invalid before anyone has typed a
+   character. Only the server's verdict, carried by aria-invalid, colours a
+   field here. */
+.membership-form input[aria-invalid='true'],
+.membership-form textarea[aria-invalid='true'] {
+  border-color: var(--color-alert);
+}
+
+.membership-form__hint,
+.membership-form__error {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.membership-form__hint {
+  color: color-mix(in srgb, var(--color-ink) 52%, transparent);
+}
+
+.membership-form__error {
+  color: var(--color-alert);
+}
+
+.membership-form__alert {
+  margin: 0;
+  border-left: 2px solid var(--color-alert);
+  color: var(--color-alert);
+  padding-left: var(--space-2);
+  font-size: 0.9rem;
+}
+
+.membership-form__note {
+  margin: 0;
+  color: color-mix(in srgb, var(--color-ink) 52%, transparent);
+  font-size: 0.78rem;
+}
+
+.membership-form__note a {
+  border-bottom: 1px solid color-mix(in srgb, var(--color-gold) 54%, transparent);
+  color: inherit;
+}
+
+/* Off the page rather than display:none — a hidden field is one a bot skips,
+   and a rendered one it fills. aria-hidden and tabindex keep it away from
+   everyone else. */
+.membership-form__trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
 .membership-form button {
   width: fit-content;
   border: 1px solid var(--color-gold);
@@ -1396,6 +1467,37 @@ textarea {
   padding: 0.9rem 1.2rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+}
+
+.membership-form button[disabled] {
+  cursor: progress;
+  opacity: 0.55;
+}
+
+.membership-form__receipt {
+  display: grid;
+  gap: var(--space-2);
+  width: min(100%, 36rem);
+  border-left: 1px solid color-mix(in srgb, var(--color-gold) 54%, transparent);
+  color: var(--color-muted);
+  margin-top: var(--space-4);
+  padding-left: var(--space-3);
+}
+
+.membership-form__receipt p {
+  margin: 0;
+}
+
+.membership-form__receipt-line {
+  color: var(--color-ink);
+  font-family: var(--font-serif);
+  font-size: clamp(1.4rem, 3.4vw, 2rem);
+  line-height: 1.2;
+}
+
+.membership-form__receipt button {
+  background: none;
+  padding: 0;
 }
 
 .footer {

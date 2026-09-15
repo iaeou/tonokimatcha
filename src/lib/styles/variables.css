@@ -9,6 +9,7 @@
   --color-muted: rgba(23, 32, 25, 0.68);
   --color-nav-muted: rgba(23, 32, 25, 0.72);
   --color-line: rgba(23, 32, 25, 0.14);
+  --color-alert: #9a3b2a;
   --color-field: rgba(255, 250, 240, 0.72);
   --color-stage-hisui: rgba(0, 168, 107, 0.16);
   --color-stage-clay: rgba(139, 69, 19, 0.14);
@@ -43,6 +44,7 @@
   --color-muted: rgba(244, 239, 228, 0.74);
   --color-nav-muted: rgba(244, 239, 228, 0.74);
   --color-line: rgba(244, 239, 228, 0.14);
+  --color-alert: #dd9078;
   --color-field: rgba(8, 11, 7, 0.62);
   --color-stage-hisui: rgba(0, 168, 107, 0.16);
   --color-stage-clay: rgba(155, 98, 68, 0.28);
