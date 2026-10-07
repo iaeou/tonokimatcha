@@ -115,6 +115,27 @@ email never does. Required: name, email, request. Optional: phone, business.
 - Table DDL: `.agents/docs/request-form-supabase-2026-09-15.sql`. Detail and
   the verification log: `project-status-2026-09-15b.md`.
 
+## Supabase Inactivity Keepalive (2026-10-07)
+
+Supabase Free Tier flags projects with no database queries for 7 days and pauses
+them. Because Supabase is only written to when someone submits `/request`, quiet
+periods triggered Supabase's weekly warning email ("scheduled to be paused"). If
+paused, visitor submissions fail until manually unpaused in the Supabase dashboard.
+
+- **Vercel Cron**: Scheduled in `vercel.json` (`0 5 * * *`, daily at 05:00 UTC).
+  Daily frequency fits within Vercel's free Hobby plan limits and guarantees the
+  database never approaches the 7-day idle threshold.
+- **Endpoint**: `src/routes/api/cron/keepalive/+server.ts` calls `pingSupabase()`
+  in `src/lib/server/supabase-keepalive.ts`.
+- **Query**: Executes `GET /rest/v1/${TABLE}?select=id&limit=1` via PostgREST with
+  the `SUPABASE_SERVICE_ROLE_KEY`. It executes a real `SELECT id LIMIT 1` on the
+  Postgres instance, registering external database activity.
+- **Security**: If `CRON_SECRET` is set in Vercel environment variables, the route
+  verifies `Authorization: Bearer ${CRON_SECRET}` (which Vercel automatically passes
+  on cron invocation). Without `CRON_SECRET` set, the endpoint still runs so it
+  works immediately without extra setup.
+- Detail and implementation log: `project-status-2026-10-07.md`.
+
 ## Known Local Development Note
 
 Only ever run **one** dev server on port 5173. Two at once serve the HTML from one instance and the client modules from the other; the bundle then fails to load and every effect dies together — cursor, GSAP, Lenis, transitions — with nothing wrong in the source. If the site suddenly looks inert, check `lsof -ti:5173` before suspecting the code, and start with `--strictPort` so a collision is loud rather than silent.
