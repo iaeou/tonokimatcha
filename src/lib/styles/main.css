@@ -607,6 +607,17 @@ textarea {
   isolation: isolate;
 }
 
+.hero__figure::before {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  background: url('/images/matchatonoki-flower-power.webp') center / cover no-repeat;
+  opacity: calc(0.24 * var(--hero-image-opacity));
+  transition: opacity 80ms linear;
+  pointer-events: none;
+}
+
 .hero__figure::after {
   position: absolute;
   z-index: 1;

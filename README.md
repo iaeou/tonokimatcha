@@ -24,6 +24,16 @@ npm run build
 npm run dev -- --port 5174
 ```
 
+## Homepages
+
+| Page | Production URL |
+| --- | --- |
+| Main homepage with the Flower Power backdrop | https://matchatonoki.com/ |
+| A Cup Full of Worlds | https://matchatonoki.com/alts/alt1 |
+| How Do You Take a Moment? | https://matchatonoki.com/alts/alt2 |
+
+Both alternate homepages are prerendered and carry a `noindex` directive.
+
 ## Project Notes
 
 Project context, implementation status, and agent handoff notes live in:
