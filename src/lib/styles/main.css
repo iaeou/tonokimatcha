@@ -613,8 +613,7 @@ textarea {
   z-index: 2;
   inset: 0;
   background: url('/images/matchatonoki-flower-power.webp') center / cover no-repeat;
-  opacity: calc(0.24 * var(--hero-image-opacity));
-  transition: opacity 80ms linear;
+  opacity: 0.24;
   pointer-events: none;
 }
 

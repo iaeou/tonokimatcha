@@ -24,7 +24,7 @@ Matcha Tonoki (brand order settled 2026-08-27 — never "Tonoki Matcha") is a hi
 
 ## Homepage artwork update (2026-11-26)
 
-The main hero overlays Yoshi’s transparent Flower Power artwork from `static/images/matchatonoki-flower-power.webp` on the matcha photograph. The `.hero__figure::before` rule in `src/lib/styles/main.css` centers the artwork with `cover` sizing and multiplies the photographic scroll opacity by 0.24. The two test homepages remain accessible directly at `/alts/alt1` and `/alts/alt2`.
+The main hero overlays Yoshi’s transparent Flower Power artwork from `static/images/matchatonoki-flower-power.webp` on the matcha photograph. The `.hero__figure::before` rule in `src/lib/styles/main.css` centers the artwork with `cover` sizing and keeps it fixed at 24% opacity throughout the homepage, including the footer. The photograph fades independently. The two test homepages remain accessible directly at `/alts/alt1` and `/alts/alt2`.
 
 ## Current Implementation Snapshot
 
