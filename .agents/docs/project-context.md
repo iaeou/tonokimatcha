@@ -26,6 +26,14 @@ Matcha Tonoki (brand order settled 2026-08-27 — never "Tonoki Matcha") is a hi
 
 The main hero overlays Yoshi’s transparent Flower Power artwork from `static/images/matchatonoki-flower-power.webp` on the matcha photograph. The `.hero__figure::before` rule in `src/lib/styles/main.css` centers the artwork with `cover` sizing and keeps it fixed at 24% opacity throughout the homepage, including the footer. The photograph fades independently. The two test homepages remain accessible directly at `/alts/alt1` and `/alts/alt2`.
 
+## Interactive tea photograph (2026-11-27)
+
+`Hero.svelte` renders the original responsive picture on first paint and loads `src/lib/three/tea-scene.ts` on mount. The scene samples the active photograph for grain colour and position. Scroll controls how much powder detaches over the first 0.65 viewport heights. Detached grains continue drifting while scroll is stationary. The foliage uses a separate flexible mesh and responds to nearby mouse movement. Reduced motion or an unavailable WebGL context leaves the photograph visible.
+
+The masks in the shader follow the specific crops of `home-header2.webp` and `home-header2-m.webp`. When replacing either asset, check the crest, the bamboo scoop and the edge of the bowl at rest and halfway through dispersal. Resize across 767 px in both directions to check texture replacement. The figure starts entering at 0.40 viewport heights and finishes at 0.60.
+
+The static version is preserved at `backup/portada-2026-11-27` (`cf2cc3f`). To restore its behaviour on main while keeping later repository history, revert the implementation commit with `git revert 322d379`, test the result, then publish it through the normal release process.
+
 ## Current Implementation Snapshot
 
 Last reviewed: 2026-09-09.

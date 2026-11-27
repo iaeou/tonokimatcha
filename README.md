@@ -28,9 +28,13 @@ npm run dev -- --port 5174
 
 | Page | Production URL |
 | --- | --- |
-| Main homepage with the Flower Power backdrop | https://matchatonoki.com/ |
+| Interactive matcha homepage with the Flower Power backdrop | https://matchatonoki.com/ |
 | A Cup Full of Worlds | https://matchatonoki.com/alts/alt1 |
 | How Do You Take a Moment? | https://matchatonoki.com/alts/alt2 |
+
+On the main homepage, scrolling disperses the photographed matcha into suspended particles. Scrolling back reassembles the mound. A light breeze moves the tea leaves, which also react to nearby mouse movement. Visitors who prefer reduced motion see the original photograph.
+
+The previous homepage is preserved on the Git branch `backup/portada-2026-11-27` at `cf2cc3f`.
 
 Both alternate homepages are prerendered and carry a `noindex` directive.
 
