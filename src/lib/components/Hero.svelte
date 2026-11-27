@@ -4,6 +4,18 @@
   import { createHeroRevealOptions } from '$lib/animations/hero-reveal';
   import { typographyReveal } from '$lib/animations/typography-reveal';
 
+  let photo: HTMLImageElement;
+  let canvas: HTMLCanvasElement;
+
+  onMount(() => {
+    let cancelled = false;
+    let release: (() => void) | undefined;
+    import('$lib/three/tea-scene').then(({ mountTeaScene }) => {
+      if (!cancelled) release = mountTeaScene(canvas, photo);
+    }).catch(() => { /* The original picture is the WebGL fallback. */ });
+    return () => { cancelled = true; release?.(); };
+  });
+
   let heroSection: HTMLElement;
   let heroContent: HTMLDivElement;
 
@@ -75,16 +87,20 @@
 
 <section class="hero" aria-labelledby="hero-title" bind:this={heroSection}>
   <figure class="hero__figure" aria-hidden="true">
-    <picture class="hero__photo">
-      <source srcset="/images/home-header2-m.webp" media="(max-width: 767px)" type="image/webp" />
-      <img
-        class="hero__image"
-        src="/images/home-header2.webp"
-        alt=""
-        decoding="async"
-        fetchpriority="high"
-      />
-    </picture>
+    <div class="hero__photo">
+      <picture>
+        <source srcset="/images/home-header2-m.webp" media="(max-width: 767px)" type="image/webp" />
+        <img
+          class="hero__image"
+          bind:this={photo}
+          src="/images/home-header2.webp"
+          alt=""
+          decoding="async"
+          fetchpriority="high"
+        />
+      </picture>
+      <canvas bind:this={canvas} class="hero__scene"></canvas>
+    </div>
     <!-- The second hand: as the photograph withdraws, one of Jaume's figures
          takes the wall, and leaves in turn as the first hall's copy arrives.
          Last in the relay, so it is the last thing worth fetching — and it

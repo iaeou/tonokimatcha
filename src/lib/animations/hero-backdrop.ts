@@ -26,9 +26,9 @@ export const HERO_BACKDROP_TUNING = {
    * rise is short: the hero is exactly one viewport tall, so the figure has
    * about that much scroll to live in before the first hall claims the screen.
    */
-  figureEntryViewports: 0.2,
+  figureEntryViewports: 0.40,
   /** Viewport heights the figure takes to arrive in full. */
-  figureRiseViewports: 0.35,
+  figureRiseViewports: 0.20,
   /**
    * How much of the viewport the closing hall must claim before the figure
    * begins to withdraw at all. Leaving at the hall's first appearance cut the
